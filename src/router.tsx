@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Home from "./Pages/Home/Home";
 import Om from "./Pages/Om/Om";
+import Login from "./Pages/Login/Login";
 import Layout from "./Pages/Layout/Layout";
 const Router = ()=>{
     return (
@@ -15,6 +16,9 @@ const Router = ()=>{
                     <Layout>
                         <Om />
                     </Layout>
+                } />
+                <Route path="/login" element={
+                    <Login />
                 } />
             </Routes>
         </>
