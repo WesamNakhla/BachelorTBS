@@ -18,7 +18,7 @@ const Login = ()=>{
                 <div className="flex items-center font-bold text-[#fff] w-[100%] h-[50px] p-10 text-lg bg-[#112147]">
                     <h3>TBS</h3>
                 </div>
-                <div className="flex flex-col justify-center items-center h-full">
+                <div className="flex flex-col justify-center items-center h-full ">
                     <div className="w-1/2">
                         <FormInput 
                             type="email" 
@@ -36,12 +36,12 @@ const Login = ()=>{
                         />
                     </div>
                     <Link to="/" className="text-[#66B2FF] my-5">Jeg har glemt mitt passord</Link>
-                    <button type="submit" className="bg-[#66B2FF] cursor-pointer rounded-full text-[#fff] font-bold mb-5 w-[200px] h-[50px]">
+                    <button type="submit" className="bg-[#66B2FF] cursor-pointer rounded-full text-[#fff] font-bold  w-[200px] h-[50px]">
                         Logg inn
                     </button>
-                    <button type="submit" className="border border-[#66B2FF] cursor-pointer rounded-full text-[#66B2FF] font-bold w-[200px] h-[50px]">
+                    <Link to="/register" className="flex justify-center items-center border border-[#66B2FF] cursor-pointer mt-10 rounded-full text-[#66B2FF] font-bold w-[200px] h-[50px]">
                         Opprett bruker
-                    </button>
+                    </Link>
                 </div>
                 <div className="w-[100%] h-[50px] bg-[#112147]">
 
