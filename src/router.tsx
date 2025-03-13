@@ -3,7 +3,9 @@ import Home from "./Pages/Home/Home";
 import Om from "./Pages/Om/Om";
 import Login from "./Pages/Login/Login";
 import Contact from "./Pages/Contact/Contact";
+import Register from "./Pages/Register/Register";
 import Layout from "./Pages/Layout/Layout";
+
 const Router = ()=>{
     return (
         <>
@@ -25,6 +27,9 @@ const Router = ()=>{
                     <Layout>
                         <Contact />
                     </Layout>
+                } />
+                <Route path="/register" element={
+                        <Register />
                 } />
             </Routes>
         </>

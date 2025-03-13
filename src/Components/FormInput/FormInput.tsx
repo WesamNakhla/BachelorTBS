@@ -15,7 +15,7 @@ const FormInput: React.FC<FormParameters> = ({
     value
  }) => {
     return (
-       <div className="flex flex-col gap-4 my-5 w-full sm:w-full">
+       <div className="flex flex-col gap-4 my-5 mx-5 w-full sm:w-full">
           <div className="flex flex-auto">
              <label className="font-semibold text-[#252524]">{label}</label>
           </div>
