@@ -21,7 +21,7 @@ const FormInput: React.FC<FormParameters> = ({
           </div>
           <div className=" flex-auto  border-solid rounded-2xl h-11">
              <input
-                className="w-full h-full border border-[#000] rounded-xl pl-8 outline-0 bg-[#fff] text-[#767676] text-sm font-semibold"
+                className="w-full h-full border border-[#D9D9D9] rounded-xl pl-8 outline-0 bg-[#fff] text-[#767676] text-sm font-semibold"
                 placeholder={placeholder}
                 type={type}
                 onChange={onChange}

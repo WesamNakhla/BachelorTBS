@@ -8,7 +8,7 @@ const Header = ()=>{
                 <div>
                     <NavLink to="/" className={({isActive}: NavLinkRenderProps)=> isActive ? "text-[#76C2D1] underline decoration-[#76C2D1] mb-3" : undefined } >HJEMME</NavLink>
                     <NavLink to="/om" className={({isActive}: NavLinkRenderProps)=> isActive ? "text-[#76C2D1] underline decoration-[#76C2D1] mb-3 mx-4" : "mx-4" }>OM OSS</NavLink>
-                    <NavLink to="/wew" className={({isActive}: NavLinkRenderProps)=> isActive ? "text-[#76C2D1] underline decoration-[#76C2D1] mb-3" : undefined }>KONTAKT</NavLink>
+                    <NavLink to="/contact" className={({isActive}: NavLinkRenderProps)=> isActive ? "text-[#76C2D1] underline decoration-[#76C2D1] mb-3" : undefined }>KONTAKT</NavLink>
                 </div>
                 <div>
                     <Link to="/login">LOGG INN</Link>
