@@ -1,0 +1,39 @@
+{
+  "dashboard": {
+    "stats": {
+      "totalInvoices": 10,
+      "totalCustomers": 5,
+      "totalRevenue": 1500
+    },
+    "recentInvoices": [
+      {
+        "id": 1,
+        "invoiceNumber": "INV-001",
+        "customer": "Customer A",
+        "amount": 200,
+        "status": "Paid"
+      },
+      {
+        "id": 2,
+        "invoiceNumber": "INV-002",
+        "customer": "Customer B",
+        "amount": 300,
+        "status": "Pending"
+      }
+    ]
+  },
+  "users": [
+    {
+      "id": 1,
+      "name": "User One",
+      "email": "userone@example.com",
+      "role": "Admin"
+    },
+    {
+      "id": 2,
+      "name": "User Two",
+      "email": "usertwo@example.com",
+      "role": "User"
+    }
+  ]
+}
