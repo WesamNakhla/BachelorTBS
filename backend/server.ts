@@ -8,41 +8,57 @@ import connectDB from "./config/db";
 dotenv.config();
 
 // Connect to MongoDB
-connectDB();
+connectDB().catch((err) => {
+  console.error("❌ Database connection failed:", err.message);
+  process.exit(1); // Exit the server if DB connection fails
+});
 
 // Initialize Express app
 const app = express();
 
-// Middleware setup
+// ✅ Middleware setup
 app.use(express.json()); // Parse JSON requests
-app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // Allow frontend requests
+app.use(
+  cors({
+    credentials: true,
+    origin: "http://localhost:5173", // Allow frontend requests
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(cookieParser()); // Parse cookies
 
-// Import routes
-import authRoutes from "./routes/authRoutes";
-import userRoutes from "./routes/userRoutes";
-import customerRoutes from "./routes/customerRoutes";
-import invoiceRoutes from "./routes/invoiceRoutes";
-import reportRoutes from "./routes/reportRoutes";
-import securityRoutes from "./routes/securityRoutes";
-import notificationRoutes from "./routes/notificationRoutes";
+// ✅ Import routes with error handling
+let authRoutes, userRoutes, customerRoutes, invoiceRoutes, reportRoutes, securityRoutes, notificationRoutes;
 
-// Use routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/customers", customerRoutes);
-app.use("/api/invoices", invoiceRoutes);
-app.use("/api/reports", reportRoutes);
-app.use("/api/security", securityRoutes);
-app.use("/api/notifications", notificationRoutes);
+try {
+  authRoutes = require("./routes/authRoutes").default;
+  userRoutes = require("./routes/userRoutes").default;
+  customerRoutes = require("./routes/customerRoutes").default;
+  invoiceRoutes = require("./routes/invoiceRoutes").default;
+  reportRoutes = require("./routes/reportRoutes").default;
+  securityRoutes = require("./routes/securityRoutes").default;
+  notificationRoutes = require("./routes/notificationRoutes").default;
+} catch (err) {
+  console.error("❌ Error importing routes:", err.message);
+}
 
-// Root API endpoint
+// ✅ Use routes only if they exist
+if (authRoutes) app.use("/api/auth", authRoutes);
+if (userRoutes) app.use("/api/users", userRoutes);
+if (customerRoutes) app.use("/api/customers", customerRoutes);
+if (invoiceRoutes) app.use("/api/invoices", invoiceRoutes);
+if (reportRoutes) app.use("/api/reports", reportRoutes);
+if (securityRoutes) app.use("/api/security", securityRoutes);
+if (notificationRoutes) app.use("/api/notifications", notificationRoutes);
+
+// ✅ Root API endpoint
 app.get("/", (req, res) => {
-  res.send("API is running...");
+  res.send("✅ API is running...");
 });
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   InvoiceContainer,
   InvoiceTable,
@@ -8,12 +8,14 @@ import {
   TableBody,
   TableData,
   ActionButtons,
-  ExportButton
+  ExportButton,
+  ImportButton,
+  AddInvoiceButton,
 } from "../../styles/InvoiceStyles";
+import InvoiceModal from "./InvoiceModal";
 import axios from "axios";
-import { exportToPDF, exportToExcel } from "../../utils/ExportUtils";
 
-// تعريف نوع الفاتورة
+// Define the structure of an Invoice
 interface Invoice {
   id: number;
   invoiceNumber: string;
@@ -23,77 +25,122 @@ interface Invoice {
 }
 
 const InvoiceList = () => {
+  // State to store invoices
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState(""); // Search functionality
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility
+
+  // Fetch invoices from API
+  const fetchInvoices = useCallback(async () => {
+    try {
+      const response = await axios.get("/api/invoices");
+      
+      // Ensure response is an array before setting state
+      if (Array.isArray(response.data)) {
+        setInvoices(response.data);
+      } else {
+        console.error("Error: API response is not an array", response.data);
+        setInvoices([]); // Set as empty array to prevent filter errors
+      }
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      setInvoices([]); // Prevent issues by ensuring an empty array
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const response = await axios.get("/api/invoices");
-        setInvoices(Array.isArray(response.data) ? response.data : []);
-      } catch (err) {
-        setError("Failed to load invoices.");
-        console.error("Error fetching invoices:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInvoices();
-  }, []);
+  }, [fetchInvoices]);
+
+  // Ensure invoices is always an array before filtering
+  const filteredInvoices = Array.isArray(invoices)
+    ? invoices.filter((invoice) =>
+        invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   return (
     <InvoiceContainer>
-      <h1>Invoice List</h1>
+      <h1>Fakturaer</h1>
 
-      {/* عرض رسالة تحميل */}
-      {loading && <p>Loading invoices...</p>}
+      {/* Search Bar */}
+      <input
+        type="text"
+        placeholder="Search invoices..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        style={{
+          width: "250px",
+          padding: "8px",
+          marginBottom: "10px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+        }}
+      />
 
-      {/* عرض رسالة خطأ إن وجدت */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* زر تصدير البيانات */}
+      {/* Action Buttons */}
       <ActionButtons>
-        <ExportButton 
-          onClick={() => exportToPDF(invoices, "Invoice Report")}
-          disabled={invoices.length === 0}
-        >
-          Export to PDF
+        <ExportButton onClick={() => alert("Exporting to PDF...")}>
+          Export
         </ExportButton>
-        <ExportButton 
-          onClick={() => exportToExcel(invoices, "Invoice Report")}
-          disabled={invoices.length === 0}
-        >
-          Export to Excel
-        </ExportButton>
+        <ImportButton onClick={() => alert("Importing data...")}>
+          Import
+        </ImportButton>
+        <AddInvoiceButton onClick={() => setIsModalOpen(true)}>
+          + Ny faktura
+        </AddInvoiceButton>
       </ActionButtons>
 
-      {/* عرض جدول الفواتير إذا كانت البيانات متاحة */}
-      {!loading && !error && invoices.length > 0 ? (
-        <InvoiceTable>
-          <TableHead>
-            <TableRow>
-              <TableHeader>Invoice #</TableHeader>
-              <TableHeader>Customer</TableHeader>
-              <TableHeader>Amount</TableHeader>
-              <TableHeader>Status</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {invoices.map((invoice) => (
+      {/* Invoice Table */}
+      <InvoiceTable>
+        <TableHead>
+          <TableRow>
+            <TableHeader>Invoice #</TableHeader>
+            <TableHeader>Customer</TableHeader>
+            <TableHeader>Amount</TableHeader>
+            <TableHeader>Status</TableHeader>
+            <TableHeader>Actions</TableHeader>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {filteredInvoices.length > 0 ? (
+            filteredInvoices.map((invoice) => (
               <TableRow key={invoice.id}>
                 <TableData>{invoice.invoiceNumber}</TableData>
                 <TableData>{invoice.customer}</TableData>
                 <TableData>${invoice.amount}</TableData>
                 <TableData>{invoice.status}</TableData>
+                <TableData>
+                  <button
+                    onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}
+                  >
+                    👁
+                  </button>
+                  <button
+                    onClick={() => alert(`Editing invoice ${invoice.invoiceNumber}`)}
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => alert(`Deleting invoice ${invoice.invoiceNumber}`)}
+                  >
+                    🗑
+                  </button>
+                </TableData>
               </TableRow>
-            ))}
-          </TableBody>
-        </InvoiceTable>
-      ) : (
-        !loading && <p>No invoices available.</p>
-      )}
+            ))
+          ) : (
+            <TableRow>
+              <TableData colSpan={5} style={{ textAlign: "center", padding: "15px" }}>
+                No invoices found.
+              </TableData>
+            </TableRow>
+          )}
+        </TableBody>
+      </InvoiceTable>
+
+      {/* Invoice Modal */}
+      {isModalOpen && <InvoiceModal onClose={() => setIsModalOpen(false)} />}
     </InvoiceContainer>
   );
 };
