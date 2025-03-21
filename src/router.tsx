@@ -5,6 +5,10 @@ import Login from "./Pages/Login/Login";
 import Contact from "./Pages/Contact/Contact";
 import Register from "./Pages/Register/Register";
 import Layout from "./Pages/Layout/Layout";
+// dashboard
+import DashboardLayout from "./Pages/DashboardLayout/DashboardLayout";
+import Faktura from "./Pages/Faktura/Faktura";
+
 
 const Router = ()=>{
     return (
@@ -30,6 +34,12 @@ const Router = ()=>{
                 } />
                 <Route path="/register" element={
                         <Register />
+                } />
+                {/* dashboard route */}
+                <Route path="/dashboard" element={
+                    <DashboardLayout>
+                        <Faktura />
+                    </DashboardLayout>
                 } />
             </Routes>
         </>
