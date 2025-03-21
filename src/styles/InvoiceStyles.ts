@@ -244,3 +244,45 @@ export const Select = styled.select`
   background: white;
   cursor: pointer;
 `;
+export const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+  flex-wrap: wrap;
+`;
+
+export const RowsPerPage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+
+  select {
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+`;
+
+export const PageButtons = styled.div`
+  display: flex;
+  gap: 6px;
+
+  button {
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: none;
+    background-color: #f1f1f1;
+    cursor: pointer;
+
+    &.active {
+      background-color: #007bff;
+      color: white;
+    }
+
+    &:hover {
+      background-color: #e0e0e0;
+    }
+  }
+`;
