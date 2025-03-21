@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import {
   InvoiceContainer,
   InvoiceTable,
@@ -8,92 +9,182 @@ import {
   TableBody,
   TableData,
   ActionButtons,
-  ExportButton
+  ExportButton,
+  ImportButton,
+  AddInvoiceButton,
+  PaginationContainer,
+  RowsPerPage,
+  PageButtons
 } from "../../styles/InvoiceStyles";
-import axios from "axios";
-import { exportToPDF, exportToExcel } from "../../utils/ExportUtils";
+import InvoiceModal from "./InvoiceModal";
 
-// تعريف نوع الفاتورة
+// Define the structure of an Invoice
 interface Invoice {
   id: number;
   invoiceNumber: string;
   customer: string;
   amount: number;
   status: string;
+  date: string;
 }
 
 const InvoiceList = () => {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  // Fetch invoices from API with error handling
+  const fetchInvoices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.get("http://localhost:5000/invoices");
+
+      console.log("API Response:", response.data); // Debugging
+
+      if (Array.isArray(response.data)) {
+        setInvoices(response.data);
+      } else {
+        console.error("Error: API response is not an array", response.data);
+        setInvoices([]);
+        setError("Invalid data format received from server.");
+      }
+    } catch (error) {
+      console.error("Error fetching invoices:", error);
+      setInvoices([]);
+      setError("Failed to load invoices. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const response = await axios.get("/api/invoices");
-        setInvoices(Array.isArray(response.data) ? response.data : []);
-      } catch (err) {
-        setError("Failed to load invoices.");
-        console.error("Error fetching invoices:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchInvoices();
-  }, []);
+  }, [fetchInvoices]);
+
+  // Filter invoices based on search query
+  const filteredInvoices = invoices.filter((invoice) =>
+    invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const paginatedInvoices = filteredInvoices.slice(indexOfFirst, indexOfLast);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setItemsPerPage(Number(e.target.value));
+    setCurrentPage(1);
+  };
 
   return (
     <InvoiceContainer>
-      <h1>Invoice List</h1>
+      <h1>Fakturaer</h1>
 
-      {/* عرض رسالة تحميل */}
-      {loading && <p>Loading invoices...</p>}
-
-      {/* عرض رسالة خطأ إن وجدت */}
+      {/* Error Message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* زر تصدير البيانات */}
+      {/* Search Bar */}
+      <input
+        type="text"
+        placeholder="Search invoices..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        style={{
+          width: "250px",
+          padding: "8px",
+          marginBottom: "10px",
+          borderRadius: "5px",
+          border: "1px solid #ccc",
+        }}
+      />
+
+      {/* Action Buttons */}
       <ActionButtons>
-        <ExportButton 
-          onClick={() => exportToPDF(invoices, "Invoice Report")}
-          disabled={invoices.length === 0}
-        >
-          Export to PDF
-        </ExportButton>
-        <ExportButton 
-          onClick={() => exportToExcel(invoices, "Invoice Report")}
-          disabled={invoices.length === 0}
-        >
-          Export to Excel
-        </ExportButton>
+        <ExportButton onClick={() => alert("Exporting to PDF...")}>Export</ExportButton>
+        <ImportButton onClick={() => alert("Importing data...")}>Import</ImportButton>
+        <AddInvoiceButton onClick={() => setIsModalOpen(true)}>+ Ny faktura</AddInvoiceButton>
       </ActionButtons>
 
-      {/* عرض جدول الفواتير إذا كانت البيانات متاحة */}
-      {!loading && !error && invoices.length > 0 ? (
+      {/* Invoice Table */}
+      {loading ? (
+        <p>Loading invoices...</p>
+      ) : (
         <InvoiceTable>
           <TableHead>
             <TableRow>
               <TableHeader>Invoice #</TableHeader>
               <TableHeader>Customer</TableHeader>
+              <TableHeader>Date</TableHeader>
               <TableHeader>Amount</TableHeader>
               <TableHeader>Status</TableHeader>
+              <TableHeader>Actions</TableHeader>
             </TableRow>
           </TableHead>
           <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableData>{invoice.invoiceNumber}</TableData>
-                <TableData>{invoice.customer}</TableData>
-                <TableData>${invoice.amount}</TableData>
-                <TableData>{invoice.status}</TableData>
+            {paginatedInvoices.length > 0 ? (
+              paginatedInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableData>{invoice.invoiceNumber}</TableData>
+                  <TableData>{invoice.customer}</TableData>
+                  <TableData>{invoice.date}</TableData>
+                  <TableData>${invoice.amount}</TableData>
+                  <TableData>{invoice.status}</TableData>
+                  <TableData>
+                    <button onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}>👁 View</button>
+                    <button onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}>⬇ Download</button>
+                    <button onClick={() => alert(`Deleting invoice ${invoice.invoiceNumber}`)}>🗑 Delete</button>
+                  </TableData>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableData colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
+                  No invoices found.
+                </TableData>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </InvoiceTable>
-      ) : (
-        !loading && <p>No invoices available.</p>
       )}
+
+      {/* Pagination Controls */}
+      <PaginationContainer>
+        <RowsPerPage>
+          <label>Rows per page:</label>
+          <select value={itemsPerPage} onChange={handleItemsPerPageChange}>
+            <option value={5}>5</option>
+            <option value={10}>10</option>
+            <option value={25}>25</option>
+            <option value={50}>50</option>
+          </select>
+        </RowsPerPage>
+
+        <PageButtons>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i + 1}
+              onClick={() => goToPage(i + 1)}
+              className={currentPage === i + 1 ? "active" : ""}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </PageButtons>
+      </PaginationContainer>
+
+      {/* Modal */}
+      {isModalOpen && <InvoiceModal onClose={() => setIsModalOpen(false)} />}
     </InvoiceContainer>
   );
 };

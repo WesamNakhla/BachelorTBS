@@ -12,9 +12,20 @@ interface Customer {
 
 const CustomerDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const customer: Customer | null = null; // استبدلها بمنطق جلب البيانات الحقيقي
+const [customer, setCustomer] = React.useState<Customer | null>(null);
 
-  if (!customer) return <p>Loading...</p>;
+React.useEffect(() => {
+  const fetchCustomer = async () => {
+    const response = await fetch(`/api/customers/${id}`);
+    const data = await response.json();
+    setCustomer(data);
+  };
+  fetchCustomer();
+}, [id]);
+
+
+if (!customer) return <p>Loading customer details...</p>;
+
 
   return (
     <CustomerContainer>
