@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "preview": "vite preview"
   },
+  "proxy": "http://localhost:5000",
   "dependencies": {
+    "cors": "^2.8.5",
     "axios": "^1.8.3",
     "classnames": "^2.5.1",
     "file-saver": "^2.0.5",
@@ -40,6 +42,7 @@
     "eslint-plugin-react-refresh": "^0.4.19",
     "globals": "^15.15.0",
     "json-server": "^1.0.0-beta.3",
+    "ts-node": "^10.9.2",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
     "vite": "^6.2.2"

@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import {
   InvoiceContainer,
   InvoiceTable,
@@ -16,7 +17,6 @@ import {
   PageButtons
 } from "../../styles/InvoiceStyles";
 import InvoiceModal from "./InvoiceModal";
-import axios from "axios";
 
 // Define the structure of an Invoice
 interface Invoice {
@@ -34,20 +34,32 @@ const InvoiceList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch invoices from API
+  // Fetch invoices from API with error handling
   const fetchInvoices = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
     try {
-      const response = await axios.get("/api/invoices");
+      const response = await axios.get("http://localhost:5000/invoices");
+
+      console.log("API Response:", response.data); // Debugging
+
       if (Array.isArray(response.data)) {
         setInvoices(response.data);
       } else {
         console.error("Error: API response is not an array", response.data);
         setInvoices([]);
+        setError("Invalid data format received from server.");
       }
     } catch (error) {
       console.error("Error fetching invoices:", error);
       setInvoices([]);
+      setError("Failed to load invoices. Please try again.");
+    } finally {
+      setLoading(false);
     }
   }, []);
 
@@ -79,6 +91,9 @@ const InvoiceList = () => {
     <InvoiceContainer>
       <h1>Fakturaer</h1>
 
+      {/* Error Message */}
+      {error && <p style={{ color: "red" }}>{error}</p>}
+
       {/* Search Bar */}
       <input
         type="text"
@@ -102,42 +117,46 @@ const InvoiceList = () => {
       </ActionButtons>
 
       {/* Invoice Table */}
-      <InvoiceTable>
-        <TableHead>
-          <TableRow>
-            <TableHeader>Invoice #</TableHeader>
-            <TableHeader>Customer</TableHeader>
-            <TableHeader>Date</TableHeader>
-            <TableHeader>Amount</TableHeader>
-            <TableHeader>Status</TableHeader>
-            <TableHeader>Actions</TableHeader>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {paginatedInvoices.length > 0 ? (
-            paginatedInvoices.map((invoice) => (
-              <TableRow key={invoice.id}>
-                <TableData>{invoice.invoiceNumber}</TableData>
-                <TableData>{invoice.customer}</TableData>
-                <TableData>{invoice.date}</TableData>
-                <TableData>${invoice.amount}</TableData>
-                <TableData>{invoice.status}</TableData>
-                <TableData>
-                  <button onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}>👁 View</button>
-                  <button onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}>⬇ Download</button>
-                  <button onClick={() => alert(`Deleting invoice ${invoice.invoiceNumber}`)}>🗑 Delete</button>
+      {loading ? (
+        <p>Loading invoices...</p>
+      ) : (
+        <InvoiceTable>
+          <TableHead>
+            <TableRow>
+              <TableHeader>Invoice #</TableHeader>
+              <TableHeader>Customer</TableHeader>
+              <TableHeader>Date</TableHeader>
+              <TableHeader>Amount</TableHeader>
+              <TableHeader>Status</TableHeader>
+              <TableHeader>Actions</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedInvoices.length > 0 ? (
+              paginatedInvoices.map((invoice) => (
+                <TableRow key={invoice.id}>
+                  <TableData>{invoice.invoiceNumber}</TableData>
+                  <TableData>{invoice.customer}</TableData>
+                  <TableData>{invoice.date}</TableData>
+                  <TableData>${invoice.amount}</TableData>
+                  <TableData>{invoice.status}</TableData>
+                  <TableData>
+                    <button onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}>👁 View</button>
+                    <button onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}>⬇ Download</button>
+                    <button onClick={() => alert(`Deleting invoice ${invoice.invoiceNumber}`)}>🗑 Delete</button>
+                  </TableData>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableData colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
+                  No invoices found.
                 </TableData>
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableData colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
-                No invoices found.
-              </TableData>
-            </TableRow>
-          )}
-        </TableBody>
-      </InvoiceTable>
+            )}
+          </TableBody>
+        </InvoiceTable>
+      )}
 
       {/* Pagination Controls */}
       <PaginationContainer>

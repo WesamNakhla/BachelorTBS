@@ -1,64 +1,77 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db";
 
-// Load environment variables
+// Load environment variables from .env file
 dotenv.config();
 
-// Connect to MongoDB
-connectDB().catch((err) => {
-  console.error("❌ Database connection failed:", err.message);
-  process.exit(1); // Exit the server if DB connection fails
-});
-
-// Initialize Express app
 const app = express();
-
-// ✅ Middleware setup
-app.use(express.json()); // Parse JSON requests
-app.use(
-  cors({
-    credentials: true,
-    origin: "http://localhost:5173", // Allow frontend requests
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
-app.use(cookieParser()); // Parse cookies
-
-// ✅ Import routes with error handling
-let authRoutes, userRoutes, customerRoutes, invoiceRoutes, reportRoutes, securityRoutes, notificationRoutes;
-
-try {
-  authRoutes = require("./routes/authRoutes").default;
-  userRoutes = require("./routes/userRoutes").default;
-  customerRoutes = require("./routes/customerRoutes").default;
-  invoiceRoutes = require("./routes/invoiceRoutes").default;
-  reportRoutes = require("./routes/reportRoutes").default;
-  securityRoutes = require("./routes/securityRoutes").default;
-  notificationRoutes = require("./routes/notificationRoutes").default;
-} catch (err) {
-  console.error("❌ Error importing routes:", err.message);
-}
-
-// ✅ Use routes only if they exist
-if (authRoutes) app.use("/api/auth", authRoutes);
-if (userRoutes) app.use("/api/users", userRoutes);
-if (customerRoutes) app.use("/api/customers", customerRoutes);
-if (invoiceRoutes) app.use("/api/invoices", invoiceRoutes);
-if (reportRoutes) app.use("/api/reports", reportRoutes);
-if (securityRoutes) app.use("/api/security", securityRoutes);
-if (notificationRoutes) app.use("/api/notifications", notificationRoutes);
-
-// ✅ Root API endpoint
-app.get("/", (req, res) => {
-  res.send("✅ API is running...");
-});
-
-// ✅ Start server
 const PORT = process.env.PORT || 5000;
+
+// ... your routes and middleware
+    // Middleware: Parse incoming JSON requests
+    app.use(express.json());
+
+    // Middleware: Parse cookies
+    app.use(cookieParser());
+
+    // Middleware: Enable CORS for frontend requests
+    const allowedOrigins = ["http://localhost:5173"];
+    app.use(
+      cors({
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      })
+    );
+
+    // Route modules
+    const routes = [
+      { path: "/api/auth", module: "./routes/authRoutes" },
+      { path: "/api/users", module: "./routes/userRoutes" },
+      { path: "/api/customers", module: "./routes/customerRoutes" },
+      { path: "/api/invoices", module: "./routes/invoiceRoutes" },
+      { path: "/api/reports", module: "./routes/reportRoutes" },
+      { path: "/api/security", module: "./routes/securityRoutes" },
+      { path: "/api/notifications", module: "./routes/notificationRoutes" },
+    ];
+
+    // Load routes dynamically
+    routes.forEach(({ path, module }) => {
+      try {
+        const routeModule = require(module).default;
+        if (routeModule) {
+          app.use(path, routeModule);
+          console.log(`✅ Route loaded: ${path}`);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(`❌ Error loading route ${path}:`, error.message);
+        } else {
+          console.error(`❌ Unknown error loading route ${path}:`, error);
+        }
+      }
+    });
+
+    // Root endpoint
+    app.get("/", (req: Request, res: Response) => {
+      res.json({ message: "✅ API is running" });
+    });
+
+    // Global error handler
+    app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+      if (err instanceof Error) {
+        console.error("❌ Internal server error:", err.message);
+      } else {
+        console.error("❌ Unknown error:", err);
+      }
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+
+// Start the server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

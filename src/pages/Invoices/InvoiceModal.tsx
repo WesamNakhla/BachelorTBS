@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   ModalOverlay,
   ModalContent,
@@ -29,55 +29,87 @@ const InvoiceModal = ({ onClose }: { onClose: () => void }) => {
     address: "",
     city: "",
   });
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Fetch customers from API
-  const fetchCustomers = useCallback(() => {
-    axios
-      .get("/api/customers")
-      .then((response) => {
+  const fetchCustomers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.get("http://localhost:5000/customers"); // تأكد من صحة الرابط
+
+      console.log("Customers API Response:", response.data); // Debugging
+
+      if (Array.isArray(response.data)) {
         setCustomers(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching customers:", error);
-      });
+      } else {
+        console.error("Error: API response is not an array", response.data);
+        setCustomers([]);
+        setError("Invalid data format received from server.");
+      }
+    } catch (error) {
+      console.error("Error fetching customers:", error);
+      setCustomers([]);
+      setError("Failed to load customers. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  // Memoized function to handle customer selection
-  const handleCustomerSelect = useCallback(
-    (customerId: string) => {
-      const customer = customers.find((c) => c.id === customerId);
-      if (customer) {
-        setInvoiceData({
-          email: customer.email,
-          orgNumber: customer.orgNumber,
-          postCode: customer.postCode,
-          address: customer.address,
-          city: customer.city,
-        });
-        setSelectedCustomer(customerId);
-      }
-    },
-    [customers]
-  );
+  // Handle customer selection
+  const handleCustomerSelect = (customerId: string) => {
+    const customer = customers.find((c) => c.id === customerId);
+    if (customer) {
+      setInvoiceData({
+        email: customer.email,
+        orgNumber: customer.orgNumber,
+        postCode: customer.postCode,
+        address: customer.address,
+        city: customer.city,
+      });
+      setSelectedCustomer(customerId);
+    }
+  };
 
   return (
     <ModalOverlay>
       <ModalContent>
         <h2>Ny Faktura</h2>
 
+        {/* Show error message if there's an issue loading customers */}
+        {error && (
+          <div style={{ color: "red", marginBottom: "10px", textAlign: "center" }}>
+            {error}
+            <br />
+            <Button onClick={fetchCustomers} style={{ backgroundColor: "#d9534f", marginTop: "5px" }}>
+              Retry
+            </Button>
+          </div>
+        )}
+
         {/* Customer Selection */}
-        <Select value={selectedCustomer} onChange={(e) => handleCustomerSelect(e.target.value)}>
-          <option value="">Velg kunde</option>
-          {customers.map((customer) => (
-            <option key={customer.id} value={customer.id}>
-              {customer.name}
-            </option>
-          ))}
-        </Select>
+        {loading ? (
+          <p>Loading customers...</p>
+        ) : (
+          <Select value={selectedCustomer} onChange={(e) => handleCustomerSelect(e.target.value)}>
+            <option value="">Velg kunde</option>
+            {Array.isArray(customers) && customers.length > 0 ? (
+              customers.map((customer) => (
+                <option key={customer.id} value={customer.id}>
+                  {customer.name}
+                </option>
+              ))
+            ) : (
+              <option disabled>No customers available</option>
+            )}
+          </Select>
+        )}
 
         {/* Customer Details Fields */}
         <Input type="email" placeholder="E-post" value={invoiceData.email} readOnly />
