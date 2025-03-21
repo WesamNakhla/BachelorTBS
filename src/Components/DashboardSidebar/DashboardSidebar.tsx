@@ -41,7 +41,7 @@ const DashboardSidebar = ()=>{
                         </NavLink>
                         <p className="flex justify-center items-center font-lexend font-light text-base">
                             <p className="mr-2"><IoSettingsOutline /></p>
-                            Setting
+                            Settings
                         </p>
                     </div>
                     <div className="flex justify-between">

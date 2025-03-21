@@ -1,7 +1,7 @@
 const Faktura = ()=>{
     return(
         <>
-            <div>sdlkmklsdvmklslm dmklv</div>
+            <div>sfaktura</div>
         </>
     );
 }

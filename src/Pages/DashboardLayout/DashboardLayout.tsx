@@ -6,7 +6,7 @@ const DashboardLayout = ({children}: any)=>{
         <>
             <div className="flex w-full h-full">
                 <DashboardSidebar />
-                <div>
+                <div className="p-5 w-[75%]">
                     <DashboardHeader />
                     {children}
                 </div>
