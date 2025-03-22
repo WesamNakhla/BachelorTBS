@@ -18,6 +18,7 @@
       "@utils/*": ["src/utils/*"]
     }
   },
-  "include": ["src"],
+  "include": ["src", "backend"],
+
   "exclude": ["node_modules", "dist"]
 }

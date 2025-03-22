@@ -54,10 +54,10 @@ const InvoiceList = () => {
         setInvoices([]);
         setError("Invalid data format received from server.");
       }
-    } catch (error) {
+    } catch (error: unknown) { // Explicitly typing the error
       console.error("Error fetching invoices:", error);
+      setError("Failed to load invoices. Please try again. Error: " + (error as Error).message);
       setInvoices([]);
-      setError("Failed to load invoices. Please try again.");
     } finally {
       setLoading(false);
     }

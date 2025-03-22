@@ -1,280 +1,255 @@
 import styled from "styled-components";
 
-// 🎨 Invoice list container
+// 🧾 Invoice Container
 export const InvoiceContainer = styled.div`
-  padding: 20px;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeIn 0.5s ease-in-out;
+  transition: all 0.3s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `;
 
-// 📑 Invoice table styles
+// 📋 Table
 export const InvoiceTable = styled.table`
   width: 100%;
   border-collapse: collapse;
-  margin-top: 20px;
-  background: white;
-  border-radius: 8px;
+  margin-top: 24px;
+  background: #fff;
+  border-radius: 10px;
   overflow: hidden;
 `;
 
 export const TableHead = styled.thead`
-  background: #6a11cb;
+  background: linear-gradient(90deg, #6a11cb, #2575fc);
   color: white;
 `;
 
 export const TableRow = styled.tr`
+  transition: background-color 0.3s;
+
   &:nth-child(even) {
-    background: #f9f9f9;
+    background: #f7f7f7;
+  }
+
+  &:hover {
+    background: #f0f0f0;
   }
 `;
 
 export const TableHeader = styled.th`
-  padding: 12px;
+  padding: 14px;
   text-align: left;
   font-size: 14px;
+  font-weight: 600;
 `;
 
 export const TableBody = styled.tbody``;
 
 export const TableData = styled.td`
-  padding: 12px;
-  border-bottom: 1px solid #ddd;
+  padding: 14px;
+  border-bottom: 1px solid #e0e0e0;
   font-size: 14px;
-  color: #333;
+  color: #444;
 `;
 
-// 🎭 Action buttons for table
+// 🎯 Action Buttons
 export const ActionButtons = styled.div`
   display: flex;
-  gap: 8px;
+  gap: 10px;
 `;
 
-// 🔵 View Button
-export const ViewButton = styled.button`
-  background: #007bff;
+const baseButton = styled.button`
+  padding: 8px 14px;
   color: white;
-  padding: 6px 12px;
   border: none;
-  border-radius: 4px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: 0.3s;
+  font-size: 13px;
+  font-weight: 500;
+  transition: transform 0.2s ease, background 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+`;
+
+export const ViewButton = styled(baseButton)`
+  background: #007bff;
 
   &:hover {
     background: #0056b3;
   }
 `;
 
-// 🟢 Edit Button
-export const EditButton = styled.button`
+export const EditButton = styled(baseButton)`
   background: #28a745;
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.3s;
 
   &:hover {
-    background: #218838;
+    background: #1e7e34;
   }
 `;
 
-// 🔴 Delete Button
-export const DeleteButton = styled.button`
+export const DeleteButton = styled(baseButton)`
   background: #dc3545;
-  color: white;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.3s;
 
   &:hover {
-    background: #c82333;
+    background: #bd2130;
   }
 `;
 
-// 📝 Invoice form styles
+// 🧾 Invoice Form
 export const InvoiceFormContainer = styled.div`
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-  max-width: 600px;
-  margin: auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+  max-width: 620px;
+  margin: 0 auto;
 `;
 
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 16px;
 `;
 
 export const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
   font-size: 14px;
 `;
 
-// ✅ Submit Button
-export const SubmitButton = styled.button`
+// 📤 Export / Import / Submit
+export const ExportButton = styled(baseButton)`
   background: #6a11cb;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.3s;
 
   &:hover {
-    background: #4e0ca0;
+    background: #5011a5;
   }
 `;
 
-// 📥 Export and Import Buttons
-export const ExportButton = styled.button`
-  background: #6a11cb;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.3s;
-  margin-right: 10px;
-
-  &:hover {
-    background: #4e0ca0;
-  }
-`;
-
-export const ImportButton = styled.button`
+export const ImportButton = styled(baseButton)`
   background: #17a2b8;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.3s;
 
   &:hover {
-    background: #117a8b;
+    background: #128293;
   }
 `;
 
-// ➕ Add Invoice Button
-export const AddInvoiceButton = styled.button`
+export const AddInvoiceButton = styled(baseButton)`
   background: #28a745;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: 0.3s;
 
   &:hover {
-    background: #218838;
+    background: #1e7e34;
   }
 `;
 
-// 🖼 Modal styles for invoice form popup
+export const SubmitButton = styled(baseButton)`
+  background: #6a11cb;
+
+  &:hover {
+    background: #5011a5;
+  }
+`;
+
+// 📦 Modal
 export const ModalOverlay = styled.div`
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1001;
 `;
 
 export const ModalContainer = styled.div`
-  background: white;
-  padding: 20px;
-  border-radius: 8px;
-  width: 500px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  background: #fff;
+  padding: 24px;
+  border-radius: 10px;
+  width: 520px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
 `;
 
 export const ModalHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #ddd;
 `;
 
 export const CloseButton = styled.button`
   background: transparent;
   border: none;
-  font-size: 18px;
-  cursor: pointer;
+  font-size: 20px;
   color: #888;
-`;
-
-export const ModalContent = styled.div`
-  padding: 20px 0;
-`;
-
-// 🟣 General Button Style
-export const Button = styled.button`
-  background: #6a11cb;
-  color: white;
-  padding: 10px 15px;
-  border: none;
-  border-radius: 4px;
   cursor: pointer;
-  transition: 0.3s;
+`;
+
+// 🎛️ Controls
+export const Button = styled(baseButton)`
+  background: #6a11cb;
 
   &:hover {
-    background: #4e0ca0;
+    background: #5011a5;
   }
 `;
 
-// 🔽 Select Dropdown
 export const Select = styled.select`
   padding: 10px;
   border: 1px solid #ddd;
-  border-radius: 5px;
+  border-radius: 6px;
   font-size: 14px;
-  background: white;
+  background: #fff;
   cursor: pointer;
 `;
+
 export const PaginationContainer = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 20px;
+  margin-top: 24px;
   flex-wrap: wrap;
 `;
 
 export const RowsPerPage = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   font-size: 14px;
 
   select {
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 6px 10px;
+    border-radius: 6px;
     border: 1px solid #ccc;
   }
 `;
 
 export const PageButtons = styled.div`
   display: flex;
-  gap: 6px;
+  gap: 8px;
 
   button {
-    padding: 6px 10px;
-    border-radius: 4px;
+    padding: 6px 12px;
+    border-radius: 6px;
     border: none;
     background-color: #f1f1f1;
     cursor: pointer;
+    font-weight: 500;
 
     &.active {
       background-color: #007bff;
@@ -283,6 +258,21 @@ export const PageButtons = styled.div`
 
     &:hover {
       background-color: #e0e0e0;
+    }
+  }
+`;
+export const ModalContent = styled.div`
+  padding: 20px 0;
+  animation: fadeIn 0.4s ease-in-out;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
 `;
