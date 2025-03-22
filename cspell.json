@@ -13,6 +13,8 @@
     "yup",
     "devDependencies",
     "tsconfig",
-    "reactify"
+    "reactify",
+    "Fakturaer",
+    "Kunder",
   ]
 }
