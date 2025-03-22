@@ -1,14 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
+import axios from "axios";
 import {
   ModalOverlay,
+  ModalContainer,
+  ModalHeader,
+  CloseButton,
   ModalContent,
   Input,
   Select,
-  Button,
 } from "../../styles/InvoiceStyles";
-import axios from "axios";
+import { Button } from "../../components/ui/Button";
+import { toast } from "react-toastify"; // ✅ Toast import
 
-// Define Customer interface
 interface Customer {
   id: string;
   name: string;
@@ -19,7 +22,11 @@ interface Customer {
   city: string;
 }
 
-const InvoiceModal = ({ onClose }: { onClose: () => void }) => {
+interface InvoiceModalProps {
+  onClose: () => void;
+}
+
+const InvoiceModal = ({ onClose }: InvoiceModalProps) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
   const [invoiceData, setInvoiceData] = useState({
@@ -32,26 +39,17 @@ const InvoiceModal = ({ onClose }: { onClose: () => void }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch customers from API
   const fetchCustomers = useCallback(async () => {
     setLoading(true);
     setError(null);
-
     try {
-      const response = await axios.get("http://localhost:5000/customers"); // تأكد من صحة الرابط
-
-      console.log("Customers API Response:", response.data); // Debugging
-
+      const response = await axios.get("http://localhost:5000/customers");
       if (Array.isArray(response.data)) {
         setCustomers(response.data);
       } else {
-        console.error("Error: API response is not an array", response.data);
-        setCustomers([]);
         setError("Invalid data format received from server.");
       }
-    } catch (error) {
-      console.error("Error fetching customers:", error);
-      setCustomers([]);
+    } catch (err: any) {
       setError("Failed to load customers. Please try again.");
     } finally {
       setLoading(false);
@@ -62,7 +60,6 @@ const InvoiceModal = ({ onClose }: { onClose: () => void }) => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  // Handle customer selection
   const handleCustomerSelect = (customerId: string) => {
     const customer = customers.find((c) => c.id === customerId);
     if (customer) {
@@ -77,55 +74,70 @@ const InvoiceModal = ({ onClose }: { onClose: () => void }) => {
     }
   };
 
+  const handleAddInvoice = async () => {
+    if (!selectedCustomer) {
+      toast.warning("Please select a customer first.");
+      return;
+    }
+
+    try {
+      await axios.post("http://localhost:5000/invoices", {
+        customerId: selectedCustomer,
+        ...invoiceData,
+      });
+      toast.success("✅ Invoice created successfully!");
+      onClose();
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Failed to create invoice.");
+    }
+  };
+
   return (
     <ModalOverlay>
-      <ModalContent>
-        <h2>Ny Faktura</h2>
+      <ModalContainer>
+        <ModalHeader>
+          <h3>Create New Invoice</h3>
+          <CloseButton onClick={onClose}>×</CloseButton>
+        </ModalHeader>
 
-        {/* Show error message if there's an issue loading customers */}
-        {error && (
-          <div style={{ color: "red", marginBottom: "10px", textAlign: "center" }}>
-            {error}
-            <br />
-            <Button onClick={fetchCustomers} style={{ backgroundColor: "#d9534f", marginTop: "5px" }}>
-              Retry
-            </Button>
-          </div>
-        )}
+        <ModalContent>
+          {error && (
+            <div style={{ color: "red", textAlign: "center", marginBottom: "10px" }}>
+              {error}
+              <Button onClick={fetchCustomers} style={{ marginTop: "10px" }}>
+                Retry
+              </Button>
+            </div>
+          )}
 
-        {/* Customer Selection */}
-        {loading ? (
-          <p>Loading customers...</p>
-        ) : (
-          <Select value={selectedCustomer} onChange={(e) => handleCustomerSelect(e.target.value)}>
-            <option value="">Velg kunde</option>
-            {Array.isArray(customers) && customers.length > 0 ? (
-              customers.map((customer) => (
+          {loading ? (
+            <p>Loading customers...</p>
+          ) : (
+            <Select value={selectedCustomer} onChange={(e) => handleCustomerSelect(e.target.value)}>
+              <option value="">Select Customer</option>
+              {customers.map((customer) => (
                 <option key={customer.id} value={customer.id}>
                   {customer.name}
                 </option>
-              ))
-            ) : (
-              <option disabled>No customers available</option>
-            )}
-          </Select>
-        )}
+              ))}
+            </Select>
+          )}
 
-        {/* Customer Details Fields */}
-        <Input type="email" placeholder="E-post" value={invoiceData.email} readOnly />
-        <Input type="text" placeholder="Org nr" value={invoiceData.orgNumber} readOnly />
-        <Input type="text" placeholder="Postnr" value={invoiceData.postCode} readOnly />
-        <Input type="text" placeholder="Adresse" value={invoiceData.address} readOnly />
-        <Input type="text" placeholder="Sted" value={invoiceData.city} readOnly />
+          <Input type="email" placeholder="Email" value={invoiceData.email} readOnly />
+          <Input type="text" placeholder="Organization Number" value={invoiceData.orgNumber} readOnly />
+          <Input type="text" placeholder="Post Code" value={invoiceData.postCode} readOnly />
+          <Input type="text" placeholder="Address" value={invoiceData.address} readOnly />
+          <Input type="text" placeholder="City" value={invoiceData.city} readOnly />
 
-        {/* Action Buttons */}
-        <div style={{ display: "flex", justifyContent: "space-between", marginTop: "10px" }}>
-          <Button onClick={onClose} style={{ backgroundColor: "#ccc" }}>
-            Cancel
-          </Button>
-          <Button onClick={() => alert("Invoice added!")}>Add</Button>
-        </div>
-      </ModalContent>
+          <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "20px" }}>
+            <Button style={{ backgroundColor: "#ccc", color: "#333" }} onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={handleAddInvoice}>Add Invoice</Button>
+          </div>
+        </ModalContent>
+      </ModalContainer>
     </ModalOverlay>
   );
 };

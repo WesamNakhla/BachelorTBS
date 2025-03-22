@@ -9,16 +9,15 @@ import {
   TableBody,
   TableData,
   ActionButtons,
-  ExportButton,
-  ImportButton,
-  AddInvoiceButton,
   PaginationContainer,
   RowsPerPage,
-  PageButtons
+  PageButtons,
 } from "../../styles/InvoiceStyles";
 import InvoiceModal from "./InvoiceModal";
+import { Button } from "../../components/ui/Button";
+import { toast } from "react-toastify";
 
-// Define the structure of an Invoice
+// Invoice type definition
 interface Invoice {
   id: number;
   invoiceNumber: string;
@@ -37,7 +36,6 @@ const InvoiceList = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Fetch invoices from API with error handling
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -45,18 +43,14 @@ const InvoiceList = () => {
     try {
       const response = await axios.get("http://localhost:5000/invoices");
 
-      console.log("API Response:", response.data); // Debugging
-
       if (Array.isArray(response.data)) {
         setInvoices(response.data);
       } else {
-        console.error("Error: API response is not an array", response.data);
         setInvoices([]);
         setError("Invalid data format received from server.");
       }
-    } catch (error: unknown) { // Explicitly typing the error
-      console.error("Error fetching invoices:", error);
-      setError("Failed to load invoices. Please try again. Error: " + (error as Error).message);
+    } catch (error: unknown) {
+      setError("Failed to load invoices. Error: " + (error as Error).message);
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -67,20 +61,27 @@ const InvoiceList = () => {
     fetchInvoices();
   }, [fetchInvoices]);
 
-  // Filter invoices based on search query
+  const handleDelete = async (id: number) => {
+    try {
+      await axios.delete(`http://localhost:5000/invoices/${id}`);
+      toast.success("✅ Invoice deleted successfully!");
+      fetchInvoices(); // Refresh list
+    } catch (err) {
+      console.error(err);
+      toast.error("❌ Failed to delete invoice.");
+    }
+  };
+
   const filteredInvoices = invoices.filter((invoice) =>
     invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
   const paginatedInvoices = filteredInvoices.slice(indexOfFirst, indexOfLast);
 
-  const goToPage = (page: number) => {
-    setCurrentPage(page);
-  };
+  const goToPage = (page: number) => setCurrentPage(page);
 
   const handleItemsPerPageChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setItemsPerPage(Number(e.target.value));
@@ -89,80 +90,115 @@ const InvoiceList = () => {
 
   return (
     <InvoiceContainer>
-      <h1>Fakturaer</h1>
+      <h1>Invoices</h1>
 
       {/* Error Message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Search Bar */}
+      {/* Search Input */}
       <input
         type="text"
         placeholder="Search invoices..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
         style={{
-          width: "250px",
-          padding: "8px",
-          marginBottom: "10px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
+          width: "100%",
+          maxWidth: "300px",
+          padding: "10px",
+          marginBottom: "12px",
+          borderRadius: "8px",
+          border: "1px solid #d1d5db",
         }}
       />
 
       {/* Action Buttons */}
-      <ActionButtons>
-        <ExportButton onClick={() => alert("Exporting to PDF...")}>Export</ExportButton>
-        <ImportButton onClick={() => alert("Importing data...")}>Import</ImportButton>
-        <AddInvoiceButton onClick={() => setIsModalOpen(true)}>+ Ny faktura</AddInvoiceButton>
+      <ActionButtons style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "16px 0" }}>
+        <Button variant="ghost" onClick={() => alert("Exporting to PDF...")}>Export</Button>
+        <Button variant="ghost" onClick={() => alert("Importing data...")}>Import</Button>
+        <Button variant="primary" onClick={() => setIsModalOpen(true)}>+ New Invoice</Button>
       </ActionButtons>
 
-      {/* Invoice Table */}
+      {/* Table */}
       {loading ? (
         <p>Loading invoices...</p>
       ) : (
-        <InvoiceTable>
-          <TableHead>
-            <TableRow>
-              <TableHeader>Invoice #</TableHeader>
-              <TableHeader>Customer</TableHeader>
-              <TableHeader>Date</TableHeader>
-              <TableHeader>Amount</TableHeader>
-              <TableHeader>Status</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedInvoices.length > 0 ? (
-              paginatedInvoices.map((invoice) => (
-                <TableRow key={invoice.id}>
-                  <TableData>{invoice.invoiceNumber}</TableData>
-                  <TableData>{invoice.customer}</TableData>
-                  <TableData>{invoice.date}</TableData>
-                  <TableData>${invoice.amount}</TableData>
-                  <TableData>{invoice.status}</TableData>
-                  <TableData>
-                    <button onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}>👁 View</button>
-                    <button onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}>⬇ Download</button>
-                    <button onClick={() => alert(`Deleting invoice ${invoice.invoiceNumber}`)}>🗑 Delete</button>
+        <div style={{ overflowX: "auto" }}>
+          <InvoiceTable>
+            <TableHead>
+              <TableRow>
+                <TableHeader>Invoice #</TableHeader>
+                <TableHeader>Customer</TableHeader>
+                <TableHeader>Date</TableHeader>
+                <TableHeader className="hide-sm">Amount</TableHeader>
+                <TableHeader className="hide-sm">Status</TableHeader>
+                <TableHeader>Actions</TableHeader>
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {paginatedInvoices.length > 0 ? (
+                paginatedInvoices.map((invoice) => (
+                  <TableRow key={invoice.id}>
+                    <TableData>{invoice.invoiceNumber}</TableData>
+                    <TableData>{invoice.customer}</TableData>
+                    <TableData>{invoice.date}</TableData>
+                    <TableData className="hide-sm">${invoice.amount.toFixed(2)}</TableData>
+                    <TableData className="hide-sm">
+                      <span style={{
+                        padding: "5px 12px",
+                        borderRadius: "20px",
+                        fontWeight: 500,
+                        fontSize: "13px",
+                        backgroundColor: invoice.status === "Paid" ? "#d1fae5" : "#fef9c3",
+                        color: invoice.status === "Paid" ? "#065f46" : "#92400e",
+                      }}>
+                        {invoice.status}
+                      </span>
+                    </TableData>
+                    <TableData>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                        <Button
+                          variant="ghost"
+                          title="View"
+                          onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}
+                        >
+                          👁
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          title="Download"
+                          onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}
+                        >
+                          ⬇
+                        </Button>
+                        <Button
+                          variant="danger"
+                          title="Delete"
+                          onClick={() => handleDelete(invoice.id)}
+                        >
+                          🗑
+                        </Button>
+                      </div>
+                    </TableData>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableData colSpan={6} style={{ textAlign: "center", padding: "20px" }}>
+                    No invoices found.
                   </TableData>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableData colSpan={6} style={{ textAlign: "center", padding: "15px" }}>
-                  No invoices found.
-                </TableData>
-              </TableRow>
-            )}
-          </TableBody>
-        </InvoiceTable>
+              )}
+            </TableBody>
+          </InvoiceTable>
+        </div>
       )}
 
       {/* Pagination Controls */}
       <PaginationContainer>
         <RowsPerPage>
-          <label>Rows per page:</label>
-          <select value={itemsPerPage} onChange={handleItemsPerPageChange}>
+          <label htmlFor="rows">Rows per page:</label>
+          <select id="rows" value={itemsPerPage} onChange={handleItemsPerPageChange}>
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={25}>25</option>
