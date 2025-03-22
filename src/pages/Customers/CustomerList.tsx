@@ -12,7 +12,11 @@ import {
   ActionButtons,
   ViewButton,
   EditButton,
-  DeleteButton
+  DeleteButton,
+  TopBar,
+  SearchInput,
+  AddButton,
+  InfoText,
 } from "../../styles/CustomerStyles";
 
 // Define the Customer interface
@@ -24,10 +28,12 @@ interface Customer {
 }
 
 const CustomerList = () => {
-  // State to store customers
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [filteredCustomers, setFilteredCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const navigate = useNavigate();
 
   // Fetch customers from API when component mounts
@@ -35,7 +41,9 @@ const CustomerList = () => {
     const fetchCustomers = async () => {
       try {
         const response = await axios.get("/api/customers");
-        setCustomers(Array.isArray(response.data) ? response.data : []);
+        const data = Array.isArray(response.data) ? response.data : [];
+        setCustomers(data);
+        setFilteredCustomers(data);
       } catch (err) {
         setError("Failed to load customers.");
         console.error("Error fetching customers:", err);
@@ -47,11 +55,28 @@ const CustomerList = () => {
     fetchCustomers();
   }, []);
 
-  // Function to delete a customer
+  // Filter customers based on search input
+  useEffect(() => {
+    const query = searchQuery.toLowerCase();
+    const filtered = customers.filter(
+      (customer) =>
+        customer.name.toLowerCase().includes(query) ||
+        customer.email.toLowerCase().includes(query) ||
+        customer.phone.includes(query)
+    );
+    setFilteredCustomers(filtered);
+  }, [searchQuery, customers]);
+
+  // Delete a customer
   const handleDelete = async (customerId: number) => {
+    const confirmDelete = window.confirm("Are you sure you want to delete this customer?");
+    if (!confirmDelete) return;
+
     try {
       await axios.delete(`/api/customers/${customerId}`);
-      setCustomers((prevCustomers) => prevCustomers.filter((customer) => customer.id !== customerId));
+      const updated = customers.filter((customer) => customer.id !== customerId);
+      setCustomers(updated);
+      setFilteredCustomers(updated);
     } catch (err) {
       console.error("Error deleting customer:", err);
       setError("Failed to delete customer.");
@@ -60,46 +85,59 @@ const CustomerList = () => {
 
   return (
     <CustomerContainer>
-      <h1>Customer List</h1>
+      <TopBar>
+        <h1>Customer List</h1>
+        <AddButton onClick={() => navigate("/customers/create")}>+ New Customer</AddButton>
+      </TopBar>
 
-      {/* Display loading message */}
+      <SearchInput
+        type="text"
+        placeholder="Search by name, email or phone..."
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+      />
+
+      {/* Display loading state */}
       {loading && <p>Loading customers...</p>}
 
-      {/* Display error message if any */}
+      {/* Display error */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Display table only if customers exist */}
-      {!loading && !error && customers.length > 0 ? (
-        <CustomerTable>
-          <TableHead>
-            <TableRow>
-              <TableHeader>Customer ID</TableHeader>
-              <TableHeader>Name</TableHeader>
-              <TableHeader>Email</TableHeader>
-              <TableHeader>Phone</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {customers.map((customer) => (
-              <TableRow key={customer.id}>
-                <TableData>{customer.id}</TableData>
-                <TableData>{customer.name}</TableData>
-                <TableData>{customer.email}</TableData>
-                <TableData>{customer.phone}</TableData>
-                <TableData>
-                  <ActionButtons>
-                    <ViewButton onClick={() => navigate(`/customers/${customer.id}`)}>View</ViewButton>
-                    <EditButton onClick={() => navigate(`/customers/edit/${customer.id}`)}>Edit</EditButton>
-                    <DeleteButton onClick={() => handleDelete(customer.id)}>Delete</DeleteButton>
-                  </ActionButtons>
-                </TableData>
+      {/* Display customer table */}
+      {!loading && !error && filteredCustomers.length > 0 ? (
+        <>
+          <CustomerTable>
+            <TableHead>
+              <TableRow>
+                <TableHeader>ID</TableHeader>
+                <TableHeader>Name</TableHeader>
+                <TableHeader>Email</TableHeader>
+                <TableHeader>Phone</TableHeader>
+                <TableHeader>Actions</TableHeader>
               </TableRow>
-            ))}
-          </TableBody>
-        </CustomerTable>
+            </TableHead>
+            <TableBody>
+              {filteredCustomers.map((customer) => (
+                <TableRow key={customer.id}>
+                  <TableData>{customer.id}</TableData>
+                  <TableData>{customer.name}</TableData>
+                  <TableData>{customer.email}</TableData>
+                  <TableData>{customer.phone}</TableData>
+                  <TableData>
+                    <ActionButtons>
+                      <ViewButton onClick={() => navigate(`/customers/${customer.id}`)}>View</ViewButton>
+                      <EditButton onClick={() => navigate(`/customers/edit/${customer.id}`)}>Edit</EditButton>
+                      <DeleteButton onClick={() => handleDelete(customer.id)}>Delete</DeleteButton>
+                    </ActionButtons>
+                  </TableData>
+                </TableRow>
+              ))}
+            </TableBody>
+          </CustomerTable>
+          <InfoText>{filteredCustomers.length} customer(s) found</InfoText>
+        </>
       ) : (
-        !loading && <p>No customers found.</p>
+        !loading && filteredCustomers.length === 0 && <p>No customers found.</p>
       )}
     </CustomerContainer>
   );

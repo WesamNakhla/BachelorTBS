@@ -1,7 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { CustomerContainer } from "../../styles/CustomerStyles";
+import axios from "axios";
+import { toast } from "react-toastify";
+import {
+  CustomerContainer,
+  InfoText,
+} from "../../styles/CustomerStyles";
 
+// Define the Customer interface
 interface Customer {
   id: string;
   name: string;
@@ -12,29 +18,37 @@ interface Customer {
 
 const CustomerDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-const [customer, setCustomer] = React.useState<Customer | null>(null);
+  const [customer, setCustomer] = useState<Customer | null>(null);
+  const [loading, setLoading] = useState(true);
 
-React.useEffect(() => {
-  const fetchCustomer = async () => {
-    const response = await fetch(`/api/customers/${id}`);
-    const data = await response.json();
-    setCustomer(data);
-  };
-  fetchCustomer();
-}, [id]);
+  // Fetch customer by ID
+  useEffect(() => {
+    const fetchCustomer = async () => {
+      try {
+        const response = await axios.get(`/api/customers/${id}`);
+        setCustomer(response.data);
+      } catch (error) {
+        toast.error("Failed to load customer details.");
+        console.error("Error fetching customer:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
+    fetchCustomer();
+  }, [id]);
 
-if (!customer) return <p>Loading customer details...</p>;
-
+  if (loading) return <p>Loading customer details...</p>;
+  if (!customer) return <p>No customer data found.</p>;
 
   return (
     <CustomerContainer>
-      <h2>Customer Details</h2>
-      <p><strong>ID:</strong> {customer.id}</p>
-      <p><strong>Name:</strong> {customer.name}</p>
-      <p><strong>Email:</strong> {customer.email}</p>
-      <p><strong>Phone:</strong> {customer.phone}</p>
-      <p><strong>Address:</strong> {customer.address}</p>
+      <h1>Customer Details</h1>
+      <InfoText><strong>ID:</strong> {customer.id}</InfoText>
+      <InfoText><strong>Name:</strong> {customer.name}</InfoText>
+      <InfoText><strong>Email:</strong> {customer.email}</InfoText>
+      <InfoText><strong>Phone:</strong> {customer.phone}</InfoText>
+      <InfoText><strong>Address:</strong> {customer.address}</InfoText>
     </CustomerContainer>
   );
 };
