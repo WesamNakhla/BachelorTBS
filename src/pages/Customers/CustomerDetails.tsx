@@ -1,41 +1,30 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
-import { toast } from "react-toastify";
 import {
   CustomerContainer,
   InfoText,
 } from "../../styles/CustomerStyles";
+import { getCustomerById, Customer } from "../../api/customerAPI";
+import { toast } from "react-toastify";
 
-// Define the Customer interface
-interface Customer {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  address: string;
-}
-
-const CustomerDetails: React.FC = () => {
+const CustomerDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [customer, setCustomer] = useState<Customer | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch customer by ID
   useEffect(() => {
-    const fetchCustomer = async () => {
+    const fetch = async () => {
       try {
-        const response = await axios.get(`/api/customers/${id}`);
-        setCustomer(response.data);
+        if (!id) return;
+        const data = await getCustomerById(id);
+        setCustomer(data);
       } catch (error) {
         toast.error("Failed to load customer details.");
-        console.error("Error fetching customer:", error);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCustomer();
+    fetch();
   }, [id]);
 
   if (loading) return <p>Loading customer details...</p>;

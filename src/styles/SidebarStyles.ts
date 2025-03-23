@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-// Sidebar for desktop screens (always visible)
+// Container for the sidebar (desktop)
 export const SidebarContainer = styled.div`
   width: 250px;
   height: 100vh;
@@ -12,14 +12,13 @@ export const SidebarContainer = styled.div`
   z-index: 1000;
   padding: 24px 16px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
-
   @media (max-width: 768px) {
     display: none;
   }
 `;
 
-// Sidebar for mobile (slide-in/out animation)
-export const MobileSidebar = styled.div<{ isOpen?: boolean }>`
+// Mobile sidebar with slide-in effect
+export const MobileSidebar = styled.div<{ $isOpen?: boolean }>`
   width: 240px;
   height: 100vh;
   background-color: #ffffff;
@@ -29,15 +28,15 @@ export const MobileSidebar = styled.div<{ isOpen?: boolean }>`
   padding: 24px 16px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   z-index: 1100;
-  transition: transform 0.3s ease-in-out;
-  transform: ${({ isOpen }) => (isOpen ? "translateX(0)" : "translateX(-100%)")};
-
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  transform: ${({ $isOpen }) => ($isOpen ? "translateX(0)" : "translateX(-100%)")};
+  opacity: ${({ $isOpen }) => ($isOpen ? 1 : 0)};
   @media (min-width: 769px) {
     display: none;
   }
 `;
 
-// Hamburger button for mobile
+// Hamburger menu button (mobile)
 export const HamburgerButton = styled.button`
   position: fixed;
   top: 20px;
@@ -47,33 +46,22 @@ export const HamburgerButton = styled.button`
   border: none;
   cursor: pointer;
   display: none;
-
   @media (max-width: 768px) {
     display: block;
   }
 `;
 
-// Overlay background with fade-in effect
+// Overlay when sidebar is open on mobile
 export const MobileOverlay = styled.div`
   @media (max-width: 768px) {
     position: fixed;
     inset: 0;
     background-color: rgba(0, 0, 0, 0.4);
     z-index: 1000;
-    animation: fadeIn 0.3s ease-in-out;
-  }
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
   }
 `;
 
-// Logo section (top of sidebar)
+// Logo styling
 export const Logo = styled.h2`
   font-size: 22px;
   font-weight: 700;
@@ -89,7 +77,7 @@ export const Nav = styled.nav`
   gap: 8px;
 `;
 
-// Navigation item container
+// Navigation item wrapper
 export const NavItem = styled.div`
   &.active a {
     background-color: #ede9fe;
@@ -98,7 +86,7 @@ export const NavItem = styled.div`
   }
 `;
 
-// Styled link for navigation items
+// Styled navigation link
 export const NavLinkStyled = styled(NavLink)`
   display: flex;
   align-items: center;
@@ -115,7 +103,7 @@ export const NavLinkStyled = styled(NavLink)`
   }
 `;
 
-// Wrapper for navigation icons
+// Icon wrapper
 export const IconWrapper = styled.span`
   display: flex;
   align-items: center;

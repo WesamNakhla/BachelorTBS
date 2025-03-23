@@ -1,95 +1,87 @@
 import React, { useState } from "react";
-import { useLocation } from "react-router-dom";
 import {
   SidebarContainer,
+  MobileSidebar,
+  HamburgerButton,
+  MobileOverlay,
   Logo,
   Nav,
   NavItem,
   NavLinkStyled,
   IconWrapper,
-  HamburgerButton,
-  MobileOverlay,
-  MobileSidebar,
 } from "../styles/SidebarStyles";
 
-import NotificationBell from "./NotificationBell";
-
 import {
-  LayoutDashboard,
-  FileText,
-  UserRound,
+  Home,
   Users,
-  FileSignature,
-  Shield,
-  Activity,
-  FileBarChart,
-  Bell,
+  FileText,
   Settings,
+  Lock,
+  Bell,
+  Shield,
+  FileSignature,
   Menu,
   X,
 } from "lucide-react";
-
-// Navigation items with icons and paths
-const menuItems = [
-  { id: "dashboard", label: "Dashboard", path: "/dashboard", icon: <LayoutDashboard size={18} /> },
-  { id: "invoices", label: "Fakturaer", path: "/invoices", icon: <FileText size={18} /> },
-  { id: "customers", label: "Kunder", path: "/customers", icon: <UserRound size={18} /> },
-  { id: "users", label: "Users", path: "/users", icon: <Users size={18} /> },
-  { id: "roles", label: "Roles", path: "/users/roles", icon: <FileSignature size={18} /> },
-  { id: "security-settings", label: "Security Settings", path: "/security", icon: <Shield size={18} /> },
-  { id: "activity-logs", label: "Activity Logs", path: "/security/logs", icon: <Activity size={18} /> },
-  { id: "reports", label: "Reports", path: "/reports", icon: <FileBarChart size={18} /> },
-  { id: "notifications", label: "Notifications", path: "/notifications", icon: <Bell size={18} /> },
-  { id: "settings", label: "Settings", path: "/settings", icon: <Settings size={18} /> },
-];
+import { useLocation } from "react-router-dom";
 
 const Sidebar: React.FC = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
-  const [isOpen, setIsOpen] = useState(false); // Sidebar toggle for mobile
 
-  // Toggle sidebar visibility
-  const handleToggle = () => setIsOpen((prev) => !prev);
-
-  // Close sidebar (for overlay or after clicking link)
-  const handleClose = () => setIsOpen(false);
-
-  // Render nav items, optionally pass close function for mobile
-  const renderNavItems = (isMobile: boolean = false) =>
-    menuItems.map((item) => (
-      <NavItem
-        key={item.id}
-        className={location.pathname === item.path ? "active" : ""}
-        onClick={isMobile ? handleClose : undefined}
-      >
-        <NavLinkStyled to={item.path}>
-          <IconWrapper>{item.icon}</IconWrapper>
-          {item.label}
-        </NavLinkStyled>
-      </NavItem>
-    ));
+  // Navigation links
+  const navLinks = [
+    { to: "/dashboard", label: "Dashboard", icon: <Home /> },
+    { to: "/invoices", label: "Fakturaer", icon: <FileText /> },
+    { to: "/customers", label: "Kunder", icon: <Users /> },
+    { to: "/users", label: "Users", icon: <Users /> },
+    { to: "/users/roles", label: "Roles", icon: <Shield /> },
+    { to: "/security", label: "Security Settings", icon: <Lock /> },
+    { to: "/security/logs", label: "Activity Logs", icon: <FileSignature /> },
+    { to: "/reports", label: "Reports", icon: <FileText /> },
+    { to: "/notifications", label: "Notifications", icon: <Bell /> },
+    { to: "/settings", label: "Settings", icon: <Settings /> },
+  ];
 
   return (
     <>
-      {/* Hamburger button (visible on mobile only) */}
-      <HamburgerButton onClick={handleToggle}>
-        {isOpen ? <X size={22} /> : <Menu size={22} />}
+      {/* Mobile Sidebar Toggle Button */}
+      <HamburgerButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+        {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </HamburgerButton>
 
       {/* Sidebar for desktop */}
       <SidebarContainer>
         <Logo>TBS</Logo>
-        <Nav>{renderNavItems()}</Nav>
-        <NotificationBell />
+        <Nav>
+          {navLinks.map((link) => (
+            <NavItem key={link.to} className={location.pathname === link.to ? "active" : ""}>
+              <NavLinkStyled to={link.to}>
+                <IconWrapper>{link.icon}</IconWrapper>
+                {link.label}
+              </NavLinkStyled>
+            </NavItem>
+          ))}
+        </Nav>
       </SidebarContainer>
 
-      {/* Mobile overlay to close sidebar */}
-      {isOpen && <MobileOverlay onClick={handleClose} />}
-
-      {/* Sidebar for mobile (slide-in) */}
-      <MobileSidebar isOpen={isOpen}>
+      {/* Sidebar for mobile */}
+      <MobileSidebar $isOpen={isSidebarOpen}>
         <Logo>TBS</Logo>
-        <Nav>{renderNavItems(true)}</Nav>
+        <Nav>
+          {navLinks.map((link) => (
+            <NavItem key={link.to} className={location.pathname === link.to ? "active" : ""}>
+              <NavLinkStyled to={link.to} onClick={() => setIsSidebarOpen(false)}>
+                <IconWrapper>{link.icon}</IconWrapper>
+                {link.label}
+              </NavLinkStyled>
+            </NavItem>
+          ))}
+        </Nav>
       </MobileSidebar>
+
+      {/* Background overlay for mobile */}
+      {isSidebarOpen && <MobileOverlay onClick={() => setIsSidebarOpen(false)} />}
     </>
   );
 };

@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "axios";
 import {
   CustomerFormContainer,
   Form,
@@ -12,8 +11,13 @@ import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { toast } from "react-toastify";
+import {
+  getCustomerById,
+  updateCustomer,
+  Customer,
+} from "../../api/customerAPI";
 
-// Define form type
+// Define form data interface
 interface CustomerFormData {
   name: string;
   email: string;
@@ -21,64 +25,53 @@ interface CustomerFormData {
   address: string;
 }
 
-// Define Yup validation schema
-const customerSchema = yup.object().shape({
+// Validation schema using Yup
+const schema = yup.object().shape({
   name: yup.string().required("Name is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  phone: yup
-    .string()
-    .matches(/^[0-9]+$/, "Phone must be digits only")
-    .min(8, "Phone must be at least 8 digits")
-    .required("Phone is required"),
+  email: yup.string().email().required("Email is required"),
+  phone: yup.string().min(8).required("Phone is required"),
   address: yup.string().required("Address is required"),
 });
 
 const EditCustomer = () => {
-  const { id } = useParams(); // Get customer ID from route
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
-  // Form setup
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors, isSubmitting },
   } = useForm<CustomerFormData>({
-    resolver: yupResolver(customerSchema),
+    resolver: yupResolver(schema),
   });
 
-  // Fetch existing customer data
   useEffect(() => {
-    const fetchCustomer = async () => {
+    const fetch = async () => {
       try {
-        const response = await axios.get(`/api/customers/${id}`);
-        const data = response.data;
-
-        // Fill form with customer data
+        if (!id) return;
+        const data = await getCustomerById(id);
         setValue("name", data.name);
         setValue("email", data.email);
         setValue("phone", data.phone);
         setValue("address", data.address);
       } catch (error) {
-        console.error("Error loading customer:", error);
-        toast.error("Failed to load customer data.");
+        toast.error("Failed to load customer.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCustomer();
+    fetch();
   }, [id, setValue]);
 
-  // Submit updated data
   const onSubmit = async (data: CustomerFormData) => {
     try {
-      await axios.put(`/api/customers/${id}`, data);
-      toast.success("Customer updated successfully!");
+      if (!id) return;
+      await updateCustomer(id, data);
+      toast.success("Customer updated!");
       navigate("/customers");
     } catch (error) {
-      console.error("Error updating customer:", error);
       toast.error("Failed to update customer.");
     }
   };
@@ -86,12 +79,11 @@ const EditCustomer = () => {
   return (
     <CustomerFormContainer>
       <h1>Edit Customer</h1>
-
       {loading ? (
-        <p>Loading customer data...</p>
+        <p>Loading customer...</p>
       ) : (
         <Form onSubmit={handleSubmit(onSubmit)}>
-          <Input {...register("name")} placeholder="Full Name" />
+          <Input {...register("name")} placeholder="Name" />
           {errors.name && <p style={{ color: "red" }}>{errors.name.message}</p>}
 
           <Input {...register("email")} placeholder="Email" />
