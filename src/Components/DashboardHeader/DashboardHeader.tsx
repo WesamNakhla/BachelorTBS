@@ -13,9 +13,6 @@ const DashboardHeader = ()=>{
         setPathName(location.pathname.slice(1));
     }, [location.pathname])
 
-
-
-
     return(
         <>
             <div className="flex justify-between w-full items-center">

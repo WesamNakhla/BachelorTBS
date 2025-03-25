@@ -37,12 +37,12 @@ const Router = ()=>{
                         <Register />
                 } />
                 {/* dashboard route */}
-                <Route path="/dashboard" element={
+                <Route path="/Faktura" element={
                     <DashboardLayout>
                         <Faktura />
                     </DashboardLayout>
                 } />
-                 <Route path="/kunde" element={
+                 <Route path="/Kunder" element={
                     <DashboardLayout>
                         <Kunde />
                     </DashboardLayout>
