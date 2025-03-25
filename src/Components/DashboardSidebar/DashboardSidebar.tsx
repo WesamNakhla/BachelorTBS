@@ -17,7 +17,7 @@ const DashboardSidebar = ()=>{
                         </p>
                         <NavLink 
                             to="/dashboard"
-                            className={({isActive}: NavLinkRenderProps)=> 
+                            className={({isActive}: NavLinkRenderProps)=>
                             isActive ?
                             "!bg-[#7152F3]/5 flex justify-center items-center w-[220px] h-[50px] flex p-5 font-lexend font-semibold text-[#7152F3] text-base border-l-2 border-[#7152F3] mb-4" :
                             "w-[220px] h-[50px] flex justify-center items-center flex p-5 font-lexend font-light text-[#000] text-base mb-4"}>
