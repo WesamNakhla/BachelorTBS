@@ -30,7 +30,7 @@ const Kunde = ()=>{
                         <button className="flex items-center justify-center cursor-pointer font-semibold w-[150px] h-[50px] rounded-md bg-[#7152F3] text-[#fff]"
                          type="button"
                          onClick={()=>setShowModal(!showModal)}>
-                            <p className="text-xl font-semibold mr-2"><GoPlusCircle /></p>Ny faktura
+                            <p className="text-xl font-semibold mr-2"><GoPlusCircle /></p>Ny Kunde
                         </button>
                 </div>
                 <div className="flex mt-10">
@@ -98,13 +98,13 @@ const Kunde = ()=>{
                     showModal &&
                     <Modal>
                         <div className="flex flex-col">
-                            <h3 className="text-bold font-lexend text-base">Ny Faktura</h3>
+                            <h3 className="text-bold font-lexend text-base">Ny Kunde</h3>
                             <div className="w-full h-[1px] bg-[#A2A1A8]/20 mt-5"></div>
                             <div className="flex ">
                                 <FormInput 
                                     type="text" 
-                                    label="Velg kunde"  
-                                    placeholder="Velg kunde" 
+                                    label="Kunde"  
+                                    placeholder="Kunde" 
                                     onChange={handleKunde}
                                     value={kunde} />
                                 <FormInput 
