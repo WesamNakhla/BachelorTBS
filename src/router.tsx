@@ -8,6 +8,7 @@ import Layout from "./Pages/Layout/Layout";
 // dashboard
 import DashboardLayout from "./Pages/DashboardLayout/DashboardLayout";
 import Faktura from "./Pages/Faktura/Faktura";
+import Kunde from "./Pages/Kunde/Kunde";
 
 
 const Router = ()=>{
@@ -39,6 +40,11 @@ const Router = ()=>{
                 <Route path="/dashboard" element={
                     <DashboardLayout>
                         <Faktura />
+                    </DashboardLayout>
+                } />
+                 <Route path="/kunde" element={
+                    <DashboardLayout>
+                        <Kunde />
                     </DashboardLayout>
                 } />
             </Routes>

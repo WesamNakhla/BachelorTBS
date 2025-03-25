@@ -6,7 +6,7 @@ import { LuPencilLine } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import Modal from "../../Components/Modal/Modal";
 import FormInput from "../../Components/FormInput/FormInput";
-const Faktura = ()=>{
+const Kunde = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
     const [ kunde, setKunde ] = useState<string>("");
 
@@ -206,4 +206,4 @@ const Faktura = ()=>{
         </>
     );
 }
-export default Faktura;
+export default Kunde;
