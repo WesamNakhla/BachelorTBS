@@ -37,14 +37,8 @@ const Kunde = ()=>{
                     <table className="table-fixed w-full ">
                         <tbody>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
+                                <td className="py-4">Sjømat As</td>
                                 <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -52,14 +46,8 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">Domstein Øst</td>
+                                <td className="py-4">DS</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -67,14 +55,8 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">Sjømathuset</td>
+                                <td className="py-4">Sj</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -82,14 +64,8 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">Domstein Kr.sand</td>
+                                <td className="py-4">DS Kr.S</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -97,14 +73,8 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">FiskeCentralen</td>
+                                <td className="py-4">FC</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -112,14 +82,8 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">Asia Engros</td>
+                                <td className="py-4">ASIA</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
