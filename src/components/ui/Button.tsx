@@ -1,9 +1,10 @@
 // src/components/ui/Button.tsx
 import styled, { css } from "styled-components";
 
+// Using transient props ($variant, $fullWidth)
 interface ButtonProps {
-  variant?: "primary" | "secondary" | "danger" | "ghost";
-  fullWidth?: boolean;
+  $variant?: "primary" | "secondary" | "danger" | "ghost";
+  $fullWidth?: boolean;
 }
 
 export const Button = styled.button<ButtonProps>`
@@ -20,13 +21,13 @@ export const Button = styled.button<ButtonProps>`
   white-space: nowrap;
 
   ${(props) =>
-    props.fullWidth &&
+    props.$fullWidth &&
     css`
       width: 100%;
     `}
 
   ${(props) =>
-    props.variant === "primary" &&
+    props.$variant === "primary" &&
     css`
       background-color: #3b82f6;
       color: white;
@@ -38,7 +39,7 @@ export const Button = styled.button<ButtonProps>`
     `}
 
   ${(props) =>
-    props.variant === "secondary" &&
+    props.$variant === "secondary" &&
     css`
       background-color: #e0e7ff;
       color: #1e3a8a;
@@ -49,7 +50,7 @@ export const Button = styled.button<ButtonProps>`
     `}
 
   ${(props) =>
-    props.variant === "danger" &&
+    props.$variant === "danger" &&
     css`
       background-color: #ef4444;
       color: white;
@@ -60,7 +61,7 @@ export const Button = styled.button<ButtonProps>`
     `}
 
   ${(props) =>
-    props.variant === "ghost" &&
+    props.$variant === "ghost" &&
     css`
       background-color: transparent;
       color: #374151;

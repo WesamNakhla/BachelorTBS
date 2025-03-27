@@ -113,9 +113,9 @@ const InvoiceList = () => {
 
       {/* Action Buttons */}
       <ActionButtons style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "16px 0" }}>
-        <Button variant="ghost" onClick={() => alert("Exporting to PDF...")}>Export</Button>
-        <Button variant="ghost" onClick={() => alert("Importing data...")}>Import</Button>
-        <Button variant="primary" onClick={() => setIsModalOpen(true)}>+ New Invoice</Button>
+        <Button $variant="ghost" onClick={() => alert("Exporting to PDF...")}>Export</Button>
+        <Button $variant="ghost" onClick={() => alert("Importing data...")}>Import</Button>
+        <Button $variant="primary" onClick={() => setIsModalOpen(true)}>+ New Invoice</Button>
       </ActionButtons>
 
       {/* Table */}
@@ -158,21 +158,21 @@ const InvoiceList = () => {
                     <TableData>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
                         <Button
-                          variant="ghost"
+                          $variant="ghost"
                           title="View"
                           onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}
                         >
                           👁
                         </Button>
                         <Button
-                          variant="ghost"
+                          $variant="ghost"
                           title="Download"
                           onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}
                         >
                           ⬇
                         </Button>
                         <Button
-                          variant="danger"
+                          $variant="danger"
                           title="Delete"
                           onClick={() => handleDelete(invoice.id)}
                         >

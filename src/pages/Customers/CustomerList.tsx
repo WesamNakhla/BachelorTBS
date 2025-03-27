@@ -43,6 +43,7 @@ const CustomerList = () => {
           toast.error("Invalid customer data format from server.");
         }
       } catch (err) {
+        console.error("Error loading customers:", err);
         toast.error("Error loading customers.");
       } finally {
         setLoading(false);
@@ -74,6 +75,7 @@ const CustomerList = () => {
       setFilteredCustomers(updatedList);
       toast.success("Customer deleted successfully.");
     } catch (err) {
+      console.error("Failed to delete customer:", err);
       toast.error("Failed to delete customer.");
     }
   };

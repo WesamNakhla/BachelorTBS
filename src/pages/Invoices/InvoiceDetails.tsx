@@ -29,9 +29,13 @@ const InvoiceDetails = () => {
       try {
         const response = await axios.get(`http://localhost:5000/invoices/${id}`);
         setInvoice(response.data);
-      } catch (err: any) {
+      } catch (err: unknown) {
+        if (err instanceof Error) {
+          console.error("Failed to fetch invoice:", err.message);
+        } else {
+          console.error("Unknown error while fetching invoice:", err);
+        }
         setError("Failed to fetch invoice details. Please try again.");
-        console.error(err);
       } finally {
         setLoading(false);
       }
@@ -85,8 +89,7 @@ const InvoiceDetails = () => {
             style={{
               padding: "4px 10px",
               borderRadius: "16px",
-              backgroundColor:
-                invoice.status === "Paid" ? "#d1fae5" : "#fef3c7",
+              backgroundColor: invoice.status === "Paid" ? "#d1fae5" : "#fef3c7",
               color: invoice.status === "Paid" ? "#065f46" : "#92400e",
               fontSize: "13px",
               fontWeight: 500,

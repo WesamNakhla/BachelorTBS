@@ -50,7 +50,9 @@ const CreateInvoice = () => {
     fetchCustomers();
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
@@ -82,9 +84,17 @@ const CreateInvoice = () => {
     <InvoiceContainer style={{ maxWidth: "600px", margin: "0 auto" }}>
       <h1>Create Invoice</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+      >
         {/* Customer dropdown */}
-        <Select name="customerId" value={formData.customerId} onChange={handleChange} required>
+        <Select
+          name="customerId"
+          value={formData.customerId}
+          onChange={handleChange}
+          required
+        >
           <option value="">Select Customer</option>
           {customers.map((customer) => (
             <option key={customer.id} value={customer.id}>
@@ -121,7 +131,7 @@ const CreateInvoice = () => {
         />
 
         {/* Submit button */}
-        <Button variant="primary" type="submit" fullWidth>
+        <Button $variant="primary" type="submit" $fullWidth>
           {loading ? "Creating..." : "Create Invoice"}
         </Button>
       </form>

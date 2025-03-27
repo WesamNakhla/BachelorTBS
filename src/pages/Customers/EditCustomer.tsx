@@ -37,6 +37,7 @@ const EditCustomer = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [customerData, setCustomerData] = useState<Customer | null>(null);
 
   const {
     register,
@@ -48,15 +49,17 @@ const EditCustomer = () => {
   });
 
   useEffect(() => {
-    const fetch = async () => {
+    const fetch = async (): Promise<void> => {
       try {
         if (!id) return;
-        const data = await getCustomerById(id);
+        const data: Customer = await getCustomerById(id);
+        setCustomerData(data);
         setValue("name", data.name);
         setValue("email", data.email);
         setValue("phone", data.phone);
         setValue("address", data.address);
       } catch (error) {
+        console.error("Failed to load customer:", error);
         toast.error("Failed to load customer.");
       } finally {
         setLoading(false);
@@ -72,13 +75,22 @@ const EditCustomer = () => {
       toast.success("Customer updated!");
       navigate("/customers");
     } catch (error) {
+      console.error("Failed to update customer:", error);
       toast.error("Failed to update customer.");
     }
   };
 
   return (
     <CustomerFormContainer>
-      <h1>Edit Customer</h1>
+      <h1>
+        Edit Customer
+        {customerData?.name && (
+          <span style={{ fontWeight: "normal", fontSize: "0.9em", marginLeft: "10px", color: "#6b7280" }}>
+            ({customerData.name})
+          </span>
+        )}
+      </h1>
+
       {loading ? (
         <p>Loading customer...</p>
       ) : (

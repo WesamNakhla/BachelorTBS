@@ -19,6 +19,7 @@ const CustomerDetails = () => {
         const data = await getCustomerById(id);
         setCustomer(data);
       } catch (error) {
+        console.error("Failed to load customer details:", error);
         toast.error("Failed to load customer details.");
       } finally {
         setLoading(false);

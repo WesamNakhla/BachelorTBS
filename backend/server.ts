@@ -66,10 +66,15 @@ app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "✅ API is running" });
 });
 
-// ✅ Global error handler
+// ✅ Global error handler with proper use of `next`
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   console.error("❌ Unhandled error:", err instanceof Error ? err.message : err);
+
+  // Send error response
   res.status(500).json({ error: "Internal Server Error" });
+
+  // Optional: Forward to the next error handler if any (best practice for flexibility)
+  next(err);
 });
 
 // ✅ Start server after successful DB connection
