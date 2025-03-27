@@ -1,4 +1,3 @@
-// src/components/ui/Button.tsx
 import styled, { css } from "styled-components";
 
 // Using transient props ($variant, $fullWidth)

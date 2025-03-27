@@ -14,6 +14,7 @@ import {
   TableBody,
   TableData,
 } from "../../styles/UserStyles";
+import { Button } from "../../components/ui/Button";
 import axios from "axios";
 import {
   BarChart,
@@ -29,7 +30,6 @@ import {
   Legend,
 } from "recharts";
 
-// Define the type for an invoice
 interface Invoice {
   id: number;
   invoiceNumber: string;
@@ -57,7 +57,6 @@ const Dashboard: React.FC = () => {
   const [recentInvoices, setRecentInvoices] = useState<Invoice[]>([]);
   const [monthlyRevenue, setMonthlyRevenue] = useState<{ month: string; revenue: number }[]>([]);
 
-  // Filters
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [customerFilter, setCustomerFilter] = useState("");
@@ -82,16 +81,13 @@ const Dashboard: React.FC = () => {
 
         const invoicesResponse = await axios.get("/api/dashboard/recent-invoices");
         const invoices = Array.isArray(invoicesResponse.data) ? invoicesResponse.data : [];
-
         setRecentInvoices(invoices);
 
-        // Revenue by month
         const revenueByMonth: { [key: string]: number } = {};
         invoices.forEach((inv: Invoice) => {
           const month = new Date(inv.dateIssued).toLocaleString("default", { month: "short", year: "numeric" });
           revenueByMonth[month] = (revenueByMonth[month] || 0) + inv.amount;
         });
-
         const chartData = Object.entries(revenueByMonth).map(([month, revenue]) => ({ month, revenue }));
         setMonthlyRevenue(chartData);
       } catch (error) {
@@ -106,76 +102,17 @@ const Dashboard: React.FC = () => {
     <DashboardContainer>
       <h1>Dashboard</h1>
 
-      {/* Quick Actions */}
       <div style={{ display: "flex", gap: "12px", margin: "20px 0", flexWrap: "wrap" }}>
-        <button
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#3b82f6",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: 500,
-          }}
-          onClick={() => navigate("/invoices/create")}
-        >
-          + New Invoice
-        </button>
-
-        <button
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#10b981",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: 500,
-          }}
-          onClick={() => navigate("/customers/create")}
-        >
-          + Add Customer
-        </button>
-
-        <button
-          style={{
-            padding: "10px 20px",
-            backgroundColor: "#f59e0b",
-            color: "#fff",
-            border: "none",
-            borderRadius: "8px",
-            cursor: "pointer",
-            fontWeight: 500,
-          }}
-          onClick={() => alert("Exporting report... (to be implemented)")}
-        >
-          Export Report
-        </button>
+        <Button $variant="primary" onClick={() => navigate("/invoices/create")}>+ New Invoice</Button>
+        <Button $variant="secondary" onClick={() => navigate("/customers/create")}>+ Add Customer</Button>
+        <Button $variant="danger" onClick={() => alert("Exporting report... (to be implemented)")}>Export Report</Button>
       </div>
 
-      {/* Filters Section */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "30px" }}>
-        <input
-          type="date"
-          onChange={(e) => setStartDate(e.target.value)}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}
-        />
-        <input
-          type="date"
-          onChange={(e) => setEndDate(e.target.value)}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}
-        />
-        <input
-          type="text"
-          placeholder="Filter by customer"
-          onChange={(e) => setCustomerFilter(e.target.value)}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}
-        />
-        <select
-          onChange={(e) => setStatusFilter(e.target.value)}
-          style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}
-        >
+        <input type="date" onChange={(e) => setStartDate(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
+        <input type="date" onChange={(e) => setEndDate(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
+        <input type="text" placeholder="Filter by customer" onChange={(e) => setCustomerFilter(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
+        <select onChange={(e) => setStatusFilter(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}>
           <option value="">All Statuses</option>
           <option value="Paid">Paid</option>
           <option value="Pending">Pending</option>
@@ -183,7 +120,6 @@ const Dashboard: React.FC = () => {
         </select>
       </div>
 
-      {/* Statistics Grid */}
       <StatsGrid>
         <StatCard>
           <h3>Total Invoices</h3>
@@ -199,7 +135,6 @@ const Dashboard: React.FC = () => {
         </StatCard>
       </StatsGrid>
 
-      {/* Monthly Revenue Chart */}
       <div style={{ marginTop: "40px" }}>
         <h2>Monthly Revenue</h2>
         {monthlyRevenue.length > 0 ? (
@@ -217,14 +152,13 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Invoice Status Distribution */}
       <div style={{ marginTop: "40px" }}>
         <h2>Invoice Status Distribution</h2>
         {recentInvoices.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={["Paid", "Pending", "Overdue"].map((status) => ({
+                data={['Paid', 'Pending', 'Overdue'].map((status) => ({
                   name: status,
                   value: recentInvoices.filter((inv) => inv.status === status).length,
                 }))}
@@ -233,8 +167,8 @@ const Dashboard: React.FC = () => {
                 outerRadius={100}
                 label
               >
-                {["Paid", "Pending", "Overdue"].map((status, index) => (
-                  <Cell key={`cell-${index}`} fill={STATUS_COLORS[status as Invoice["status"]]} />
+                {['Paid', 'Pending', 'Overdue'].map((status, index) => (
+                  <Cell key={`cell-${index}`} fill={STATUS_COLORS[status as Invoice['status']]} />
                 ))}
               </Pie>
               <Legend />
@@ -245,7 +179,6 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Overdue Invoices Alerts */}
       <div style={{ marginTop: "40px" }}>
         <h2>Overdue Invoices</h2>
         {filteredInvoices.filter(inv => inv.status === "Overdue").length > 0 ? (
@@ -259,16 +192,14 @@ const Dashboard: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredInvoices
-                .filter(inv => inv.status === "Overdue")
-                .map(inv => (
-                  <TableRow key={inv.id}>
-                    <TableData>{inv.invoiceNumber}</TableData>
-                    <TableData>{inv.customer}</TableData>
-                    <TableData>${inv.amount.toFixed(2)}</TableData>
-                    <TableData>{new Date(inv.dateIssued).toLocaleDateString()}</TableData>
-                  </TableRow>
-                ))}
+              {filteredInvoices.filter(inv => inv.status === "Overdue").map((inv) => (
+                <TableRow key={inv.id}>
+                  <TableData>{inv.invoiceNumber}</TableData>
+                  <TableData>{inv.customer}</TableData>
+                  <TableData>${inv.amount.toFixed(2)}</TableData>
+                  <TableData>{new Date(inv.dateIssued).toLocaleDateString()}</TableData>
+                </TableRow>
+              ))}
             </TableBody>
           </UserTable>
         ) : (
@@ -276,7 +207,6 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Top Customers by Revenue */}
       <div style={{ marginTop: "40px" }}>
         <h2>Top Customers by Revenue</h2>
         {filteredInvoices.length > 0 ? (
@@ -309,7 +239,6 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Analytics Section */}
       <div style={{ marginTop: "40px" }}>
         <h2>Average Invoice Amount</h2>
         {filteredInvoices.length > 0 ? (
