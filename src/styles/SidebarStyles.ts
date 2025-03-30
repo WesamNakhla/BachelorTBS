@@ -83,6 +83,7 @@ export const NavItem = styled.div`
     background-color: #ede9fe;
     color: #6a11cb;
     font-weight: 600;
+    
   }
 `;
 
@@ -100,6 +101,7 @@ export const NavLinkStyled = styled(NavLink)`
   &:hover {
     background-color: #f3f4f6;
     color: #6a11cb;
+    text-decoration: none;
   }
 `;
 
