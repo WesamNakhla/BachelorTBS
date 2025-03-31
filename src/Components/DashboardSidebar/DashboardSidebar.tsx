@@ -11,8 +11,9 @@ const navigation = [
     { "to": "/Profiler", "text": " Profiler"  },
     { "to": "/Settings", "text": "Settings"  },
     { "to": "/User", "text": "User"  },
+    { "to": "/role", "text": "Role"  },
     { "to": "/Security", "text": "Security Settings"  },
-    { "to": "/logs", "text": "Activity Log"  },
+    { "to": "/Logs", "text": "Activity Log"  },
     
     
 

@@ -82,22 +82,22 @@ const Router = ()=>{
                         <UserManagement />
                     </DashboardLayout>
                 } />
-                 <Route path="/User/role" element={
+                 <Route path="/Role" element={
                     <DashboardLayout>
                         <RolePermissions />
                     </DashboardLayout>
                 } />
-                 <Route path="/security" element={
+                 <Route path="/Security" element={
                     <DashboardLayout>
                         <SecuritySettings />
                     </DashboardLayout>
                 } />
-                 <Route path="/security/enable-2fa" element={
+                 <Route path="/Enable-2fa" element={
                     <DashboardLayout>
                         <Enable2FA />
                     </DashboardLayout>
                 } />
-                <Route path="/security/logs" element={
+                <Route path="/Logs" element={
                     <DashboardLayout>
                         <ActivityLogs />
                     </DashboardLayout>
