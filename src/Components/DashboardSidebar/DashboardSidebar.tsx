@@ -41,7 +41,7 @@ const DashboardSidebar = ()=>{
                                     className={({isActive}: NavLinkRenderProps)=>
                                     isActive ?
                                     "!bg-[#7152F3]/5 flex items-center w-full h-[50px] flex p-5 font-lexend font-semibold text-[#7152F3] text-base border-l-2 border-[#7152F3] mb-4" :
-                                    "border-2 border-yellow-500 w-full h-[50px] flex items-center p-5 font-lexend font-light text-[#000] text-base mb-4"}>
+                                    "w-full h-[50px] flex items-center p-5 font-lexend font-light text-[#000] text-base mb-4"}>
                                     <p className="font-light text-base">{link.icon}</p>&nbsp;{link.text}
                                 </NavLink>
                             ))
