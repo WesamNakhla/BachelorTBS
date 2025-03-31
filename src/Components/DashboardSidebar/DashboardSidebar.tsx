@@ -14,6 +14,8 @@ const navigation = [
     { "to": "/role", "text": "Role"  },
     { "to": "/Security", "text": "Security Settings"  },
     { "to": "/Logs", "text": "Activity Log"  },
+    { "to": "/Reports", "text": "Reports"  },
+    { "to": "/Notifications", "text": "Notifications"  },
     
     
 

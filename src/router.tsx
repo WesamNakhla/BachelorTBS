@@ -19,6 +19,8 @@ import RolePermissions from "./Pages/Users/RolePermissions";
 import SecuritySettings from "./Pages/Security/SecuritySettings";
 import Enable2FA from "./Pages/Security/Enable2FA";
 import ActivityLogs from "./Pages/Security/ActivityLogs";
+import Reports from "./Pages/Reports/Reports";
+import Notifications from "./Pages/Notifications/Notifications";
 
 
 const Router = ()=>{
@@ -100,6 +102,16 @@ const Router = ()=>{
                 <Route path="/Logs" element={
                     <DashboardLayout>
                         <ActivityLogs />
+                    </DashboardLayout>
+                } />
+                <Route path="/Reports" element={
+                    <DashboardLayout>
+                        <Reports />
+                    </DashboardLayout>
+                } />
+                <Route path="/Notifications" element={
+                    <DashboardLayout>
+                        <Notifications />
                     </DashboardLayout>
                 } />
                 <Route path="/Profiler/:profile" element={
