@@ -8,19 +8,18 @@ import {
 import { Button } from "../../components/ui/Button";
 import { toast } from "react-toastify";
 
-// Define customer type
+// Customer type
 interface Customer {
   id: string;
   name: string;
-  email: string;
-  orgNumber: string;
-  postCode: string;
-  address: string;
-  city: string;
 }
 
+// Invoice form data type
 interface InvoiceForm {
   customerId: string;
+  invoiceNumber: string;
+  amount: string;
+  status: "Paid" | "Pending" | "Overdue";
   dueDate: string;
   items: string;
 }
@@ -29,21 +28,24 @@ const CreateInvoice = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [formData, setFormData] = useState<InvoiceForm>({
     customerId: "",
+    invoiceNumber: "",
+    amount: "",
+    status: "Pending",
     dueDate: "",
     items: "",
   });
-
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/customers");
+        const response = await axios.get("/api/customers");
         if (Array.isArray(response.data)) {
           setCustomers(response.data);
         }
       } catch (err) {
         console.error("Error fetching customers:", err);
+        toast.error("Failed to load customers.");
       }
     };
 
@@ -64,11 +66,23 @@ const CreateInvoice = () => {
     e.preventDefault();
     setLoading(true);
 
+    if (!formData.customerId || !formData.invoiceNumber || !formData.amount) {
+      toast.warning("Please fill in all required fields.");
+      setLoading(false);
+      return;
+    }
+
     try {
-      await axios.post("http://localhost:5000/invoices", formData);
+      await axios.post("/api/invoices", {
+        ...formData,
+        amount: parseFloat(formData.amount),
+      });
       toast.success("✅ Invoice created successfully!");
       setFormData({
         customerId: "",
+        invoiceNumber: "",
+        amount: "",
+        status: "Pending",
         dueDate: "",
         items: "",
       });
@@ -101,6 +115,38 @@ const CreateInvoice = () => {
               {customer.name}
             </option>
           ))}
+        </Select>
+
+        {/* Invoice number */}
+        <Input
+          type="text"
+          name="invoiceNumber"
+          placeholder="Invoice Number"
+          value={formData.invoiceNumber}
+          onChange={handleChange}
+          required
+        />
+
+        {/* Amount */}
+        <Input
+          type="number"
+          name="amount"
+          placeholder="Amount"
+          value={formData.amount}
+          onChange={handleChange}
+          required
+        />
+
+        {/* Status */}
+        <Select
+          name="status"
+          value={formData.status}
+          onChange={handleChange}
+          required
+        >
+          <option value="Pending">Pending</option>
+          <option value="Paid">Paid</option>
+          <option value="Overdue">Overdue</option>
         </Select>
 
         {/* Due date */}

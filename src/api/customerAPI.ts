@@ -38,3 +38,9 @@ export const updateCustomer = async (
 export const deleteCustomer = async (id: string | number): Promise<void> => {
   await axios.delete(`/api/customers/${id}`);
 };
+
+// ✅ Get total number of customers (for dashboard use)
+export const getCustomersCount = async (): Promise<number> => {
+  const response = await axios.get("/api/customers/count");
+  return response.data.count; // Assuming API returns: { count: 42 }
+};

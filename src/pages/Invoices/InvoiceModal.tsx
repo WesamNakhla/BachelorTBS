@@ -10,7 +10,7 @@ import {
   Select,
 } from "../../styles/InvoiceStyles";
 import { Button } from "../../components/ui/Button";
-import { toast } from "react-toastify"; // ✅ Toast import
+import { toast } from "react-toastify";
 
 interface Customer {
   id: string;
@@ -30,6 +30,8 @@ const InvoiceModal = ({ onClose }: InvoiceModalProps) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
   const [invoiceData, setInvoiceData] = useState({
+    invoiceNumber: "",
+    amount: "",
     email: "",
     orgNumber: "",
     postCode: "",
@@ -43,18 +45,20 @@ const InvoiceModal = ({ onClose }: InvoiceModalProps) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await axios.get("http://localhost:5000/customers");
+      const response = await axios.get("/api/customers");
       if (Array.isArray(response.data)) {
         setCustomers(response.data);
       } else {
         setError("Invalid data format received from server.");
       }
-    } catch (err: any) {
+    } catch (err) {
       setError("Failed to load customers. Please try again.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
   }, []);
+
 
   useEffect(() => {
     fetchCustomers();
@@ -63,33 +67,39 @@ const InvoiceModal = ({ onClose }: InvoiceModalProps) => {
   const handleCustomerSelect = (customerId: string) => {
     const customer = customers.find((c) => c.id === customerId);
     if (customer) {
-      setInvoiceData({
+      setInvoiceData((prev) => ({
+        ...prev,
         email: customer.email,
         orgNumber: customer.orgNumber,
         postCode: customer.postCode,
         address: customer.address,
         city: customer.city,
-      });
+      }));
       setSelectedCustomer(customerId);
     }
   };
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInvoiceData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handleAddInvoice = async () => {
-    if (!selectedCustomer) {
-      toast.warning("Please select a customer first.");
+    if (!selectedCustomer || !invoiceData.invoiceNumber || !invoiceData.amount) {
+      toast.warning("Please fill in all required fields.");
       return;
     }
 
     try {
-      await axios.post("http://localhost:5000/invoices", {
+      await axios.post("/api/invoices", {
         customerId: selectedCustomer,
-        ...invoiceData,
+        invoiceNumber: invoiceData.invoiceNumber,
+        amount: parseFloat(invoiceData.amount),
       });
-      toast.success("✅ Invoice created successfully!");
+      toast.success("Invoice created successfully!");
       onClose();
-    } catch (err) {
-      console.error(err);
-      toast.error("❌ Failed to create invoice.");
+    } catch {
+      toast.error("Failed to create invoice.");
     }
   };
 
@@ -123,6 +133,21 @@ const InvoiceModal = ({ onClose }: InvoiceModalProps) => {
               ))}
             </Select>
           )}
+
+          <Input
+            type="text"
+            name="invoiceNumber"
+            placeholder="Invoice Number"
+            value={invoiceData.invoiceNumber}
+            onChange={handleChange}
+          />
+          <Input
+            type="number"
+            name="amount"
+            placeholder="Amount"
+            value={invoiceData.amount}
+            onChange={handleChange}
+          />
 
           <Input type="email" placeholder="Email" value={invoiceData.email} readOnly />
           <Input type="text" placeholder="Organization Number" value={invoiceData.orgNumber} readOnly />

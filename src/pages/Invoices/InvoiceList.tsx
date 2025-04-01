@@ -23,7 +23,7 @@ interface Invoice {
   invoiceNumber: string;
   customer: string;
   amount: number;
-  status: string;
+  status: "Paid" | "Pending" | "Overdue";
   date: string;
 }
 
@@ -33,24 +33,23 @@ const InvoiceList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch invoices from backend
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
     setError(null);
-
     try {
-      const response = await axios.get("http://localhost:5000/invoices");
-
+      const response = await axios.get("/api/invoices");
       if (Array.isArray(response.data)) {
         setInvoices(response.data);
       } else {
-        setInvoices([]);
-        setError("Invalid data format received from server.");
+        throw new Error("Invalid data format");
       }
-    } catch (error: unknown) {
-      setError("Failed to load invoices. Error: " + (error as Error).message);
+    } catch (err) {
+      console.error(err);
+      setError("Failed to load invoices.");
       setInvoices([]);
     } finally {
       setLoading(false);
@@ -61,21 +60,27 @@ const InvoiceList = () => {
     fetchInvoices();
   }, [fetchInvoices]);
 
+  // Handle invoice deletion
   const handleDelete = async (id: number) => {
+    const confirm = window.confirm("Are you sure you want to delete this invoice?");
+    if (!confirm) return;
+
     try {
-      await axios.delete(`http://localhost:5000/invoices/${id}`);
-      toast.success("✅ Invoice deleted successfully!");
-      fetchInvoices(); // Refresh list
+      await axios.delete(`/api/invoices/${id}`);
+      toast.success("Invoice deleted successfully!");
+      fetchInvoices();
     } catch (err) {
       console.error(err);
-      toast.error("❌ Failed to delete invoice.");
+      toast.error("Failed to delete invoice.");
     }
   };
 
+  // Filter invoices based on search
   const filteredInvoices = invoices.filter((invoice) =>
     invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination logic
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -92,10 +97,8 @@ const InvoiceList = () => {
     <InvoiceContainer>
       <h1>Invoices</h1>
 
-      {/* Error Message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Search Input */}
       <input
         type="text"
         placeholder="Search invoices..."
@@ -111,14 +114,18 @@ const InvoiceList = () => {
         }}
       />
 
-      {/* Action Buttons */}
-      <ActionButtons style={{ display: "flex", flexWrap: "wrap", gap: "12px", margin: "16px 0" }}>
-        <Button $variant="ghost" onClick={() => alert("Exporting to PDF...")}>Export</Button>
-        <Button $variant="ghost" onClick={() => alert("Importing data...")}>Import</Button>
-        <Button $variant="primary" onClick={() => setIsModalOpen(true)}>+ New Invoice</Button>
+      <ActionButtons style={{ margin: "16px 0", gap: "12px", flexWrap: "wrap" }}>
+        <Button $variant="ghost" onClick={() => alert("Exporting to PDF...")}>
+          Export
+        </Button>
+        <Button $variant="ghost" onClick={() => alert("Importing data...")}>
+          Import
+        </Button>
+        <Button $variant="primary" onClick={() => setIsModalOpen(true)}>
+          + New Invoice
+        </Button>
       </ActionButtons>
 
-      {/* Table */}
       {loading ? (
         <p>Loading invoices...</p>
       ) : (
@@ -134,7 +141,6 @@ const InvoiceList = () => {
                 <TableHeader>Actions</TableHeader>
               </TableRow>
             </TableHead>
-
             <TableBody>
               {paginatedInvoices.length > 0 ? (
                 paginatedInvoices.map((invoice) => (
@@ -144,36 +150,45 @@ const InvoiceList = () => {
                     <TableData>{invoice.date}</TableData>
                     <TableData className="hide-sm">${invoice.amount.toFixed(2)}</TableData>
                     <TableData className="hide-sm">
-                      <span style={{
-                        padding: "5px 12px",
-                        borderRadius: "20px",
-                        fontWeight: 500,
-                        fontSize: "13px",
-                        backgroundColor: invoice.status === "Paid" ? "#d1fae5" : "#fef9c3",
-                        color: invoice.status === "Paid" ? "#065f46" : "#92400e",
-                      }}>
+                      <span
+                        style={{
+                          padding: "5px 12px",
+                          borderRadius: "20px",
+                          fontWeight: 500,
+                          fontSize: "13px",
+                          backgroundColor:
+                            invoice.status === "Paid"
+                              ? "#d1fae5"
+                              : invoice.status === "Overdue"
+                              ? "#fee2e2"
+                              : "#fef9c3",
+                          color:
+                            invoice.status === "Paid"
+                              ? "#065f46"
+                              : invoice.status === "Overdue"
+                              ? "#991b1b"
+                              : "#92400e",
+                        }}
+                      >
                         {invoice.status}
                       </span>
                     </TableData>
                     <TableData>
-                      <div style={{ display: "flex", flexWrap: "wrap", gap: "6px" }}>
+                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
                         <Button
                           $variant="ghost"
-                          title="View"
                           onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}
                         >
                           👁
                         </Button>
                         <Button
                           $variant="ghost"
-                          title="Download"
                           onClick={() => alert(`Downloading invoice ${invoice.invoiceNumber}`)}
                         >
                           ⬇
                         </Button>
                         <Button
                           $variant="danger"
-                          title="Delete"
                           onClick={() => handleDelete(invoice.id)}
                         >
                           🗑
@@ -194,7 +209,6 @@ const InvoiceList = () => {
         </div>
       )}
 
-      {/* Pagination Controls */}
       <PaginationContainer>
         <RowsPerPage>
           <label htmlFor="rows">Rows per page:</label>
@@ -205,7 +219,6 @@ const InvoiceList = () => {
             <option value={50}>50</option>
           </select>
         </RowsPerPage>
-
         <PageButtons>
           {Array.from({ length: totalPages }, (_, i) => (
             <button
@@ -219,7 +232,6 @@ const InvoiceList = () => {
         </PageButtons>
       </PaginationContainer>
 
-      {/* Modal */}
       {isModalOpen && <InvoiceModal onClose={() => setIsModalOpen(false)} />}
     </InvoiceContainer>
   );

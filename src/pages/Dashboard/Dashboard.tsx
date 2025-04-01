@@ -6,6 +6,7 @@ import {
   StatsGrid,
   StatCard,
 } from "../../styles/DashboardStyles";
+import { getCustomersCount } from "../../api/customerAPI";
 import {
   UserTable,
   TableHead,
@@ -78,11 +79,16 @@ const Dashboard: React.FC = () => {
       try {
         const statsResponse = await axios.get("/api/dashboard/stats");
         setStats(statsResponse.data);
-
+  
         const invoicesResponse = await axios.get("/api/dashboard/recent-invoices");
         const invoices = Array.isArray(invoicesResponse.data) ? invoicesResponse.data : [];
         setRecentInvoices(invoices);
-
+  
+        // ✅ New: fetch customers count
+        const customerCount = await getCustomersCount();
+        setStats((prev) => ({ ...prev, totalCustomers: customerCount }));
+  
+        // Revenue chart
         const revenueByMonth: { [key: string]: number } = {};
         invoices.forEach((inv: Invoice) => {
           const month = new Date(inv.dateIssued).toLocaleString("default", { month: "short", year: "numeric" });
@@ -90,13 +96,15 @@ const Dashboard: React.FC = () => {
         });
         const chartData = Object.entries(revenueByMonth).map(([month, revenue]) => ({ month, revenue }));
         setMonthlyRevenue(chartData);
+  
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
     };
-
+  
     fetchDashboardData();
   }, []);
+  
 
   return (
     <DashboardContainer>
