@@ -8,19 +8,19 @@ import fs from "fs";
 import connectDB from "./config/db";
 
 
-// ✅ Load environment variables
+// Load environment variables
 dotenv.config();
 
-// ✅ Initialize Express app
+//  Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ✅ Middlewares
+//  Middlewares
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-// ✅ Enable CORS for frontend requests
+// Enable CORS for frontend requests
 const allowedOrigins = ["http://localhost:5173"];
 app.use(
   cors({
@@ -31,7 +31,7 @@ app.use(
   })
 );
 
-// ✅ Function to dynamically load route modules
+// Function to dynamically load route modules
 const loadRoutes = (routesPath: string) => {
   fs.readdirSync(routesPath).forEach((file) => {
     // Construct full path of the route file
@@ -47,43 +47,43 @@ const loadRoutes = (routesPath: string) => {
             // Construct the route path based on the file name
             const routePath = `/api/${path.basename(file, path.extname(file))}`;
             app.use(routePath, routeModule.default);
-            console.log(`✅ Route loaded: ${routePath}`);
+            console.log(` Route loaded: ${routePath}`);
           } else {
-            console.warn(`⚠️ No default export found in: ${fullPath}`);
+            console.warn(`No default export found in: ${fullPath}`);
           }
         })
         .catch((error) => {
-          console.error(`❌ Failed to load route at ${fullPath}:`, error);
+          console.error(` Failed to load route at ${fullPath}:`, error);
         });
     }
   });
 };
 
-// ✅ Load routes from the 'routes' directory
+// Load routes from the 'routes' directory
 loadRoutes(path.join(__dirname, "routes"));
 
-// ✅ Root API endpoint
+// Root API endpoint
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "✅ API is running" });
 });
 
-// ✅ Global error handler
+//  Global error handler
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
-  console.error("❌ Unhandled error:", err instanceof Error ? err.message : err);
+  console.error(" Unhandled error:", err instanceof Error ? err.message : err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// ✅ Start server after successful DB connection
+// Start server after successful DB connection
 const startServer = async () => {
   try {
     await connectDB();
-    console.log("✅ Connected to MongoDB");
+    console.log(" Connected to MongoDB");
 
     app.listen(PORT, () => {
-      console.log(`🚀 Server running on http://localhost:${PORT}`);
+      console.log(`Server running on http://localhost:${PORT}`);
     });
   } catch (err) {
-    console.error("❌ MongoDB connection failed:", err instanceof Error ? err.message : err);
+    console.error("MongoDB connection failed:", err instanceof Error ? err.message : err);
     process.exit(1);
   }
 };

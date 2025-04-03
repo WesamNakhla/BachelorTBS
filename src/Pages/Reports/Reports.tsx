@@ -47,7 +47,6 @@ const Reports = () => {
 
   return (
     <div>
-      <h1>Financial Reports</h1>
 
       {/* Show loading state */}
       {loading && <p>Loading data...</p>}

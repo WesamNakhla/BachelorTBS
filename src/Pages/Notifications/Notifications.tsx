@@ -59,7 +59,7 @@ const Notifications = () => {
 
   return (
     <NotificationContainer>
-      <h1>Notifications</h1>
+     
 
       {loading && <p>Loading notifications...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}

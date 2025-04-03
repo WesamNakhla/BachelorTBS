@@ -42,7 +42,6 @@ const SecuritySettings = () => {
 
   return (
     <SecurityContainer>
-      <h1>Security Settings</h1>
       <SecurityForm onSubmit={handleSubmit}>
         <label>
           Enable Two-Factor Authentication (2FA):

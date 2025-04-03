@@ -57,7 +57,6 @@ const UserManagement = () => {
 
   return (
     <UserContainer>
-      <h1>User Management</h1>
 
       {/* Display loading message */}
       {loading && <p>Loading users...</p>}

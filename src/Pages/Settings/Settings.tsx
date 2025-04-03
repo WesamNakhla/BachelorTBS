@@ -28,7 +28,6 @@ const Settings = () => {
 
   return (
     <SettingsContainer>
-      <h1>Settings</h1>
       <SettingsForm onSubmit={handleSubmit}>
         <label>
           Username:

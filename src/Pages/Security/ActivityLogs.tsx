@@ -43,7 +43,6 @@ const ActivityLogs = () => {
 
   return (
     <LogsContainer>
-      <h1>Activity Logs</h1>
 
       {/* Display loading message */}
       {loading && <p>Loading activity logs...</p>}

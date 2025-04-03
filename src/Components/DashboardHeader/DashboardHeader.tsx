@@ -11,6 +11,8 @@ const DashboardHeader = ()=>{
 
     useEffect(()=>{
         setPathName(location.pathname.slice(1));
+        
+        
     }, [location.pathname])
 
     return(

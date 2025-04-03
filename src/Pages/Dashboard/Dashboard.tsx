@@ -57,7 +57,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <DashboardContainer>
-      <h1>Dashboard</h1>
+     
 
       {/* Statistics Grid */}
       <StatsGrid>

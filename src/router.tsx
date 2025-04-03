@@ -59,7 +59,7 @@ const Router = ()=>{
                         <Faktura />
                     </DashboardLayout>
                 } />
-                <Route path="/Faktura" element={
+                <Route path="/Dashboard" element={
                     <DashboardLayout>
                         <Dashboard />
                     </DashboardLayout>
