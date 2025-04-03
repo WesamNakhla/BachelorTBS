@@ -25,8 +25,11 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: string;
+  role: "admin" | "editor" | "client" | "viewer" | "visitor";
 }
+
+// Replace this with real authenticated user role
+const currentUserRole: User["role"] = "admin";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -38,7 +41,14 @@ const UserManagement = () => {
 
   const navigate = useNavigate();
 
-  // Fetch all users
+  // Prevent unauthorized roles from accessing the page
+  useEffect(() => {
+    if (["viewer", "visitor"].includes(currentUserRole)) {
+      navigate("/"); // Redirect to homepage
+    }
+  }, []);
+
+  // Fetch users from backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -57,7 +67,7 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Search & filter logic
+  // Search and filter users
   useEffect(() => {
     const filtered = users.filter((user) => {
       const matchQuery =
@@ -69,7 +79,7 @@ const UserManagement = () => {
     setFilteredUsers(filtered);
   }, [searchQuery, roleFilter, users]);
 
-  // Delete user
+  // Delete a user by ID
   const handleDelete = async (userId: number) => {
     const confirm = window.confirm("Are you sure you want to delete this user?");
     if (!confirm) return;
@@ -90,12 +100,14 @@ const UserManagement = () => {
     <UserContainer>
       <TopBar>
         <h1>User Management</h1>
-        <AddButton onClick={() => alert("Add user functionality not implemented yet.")}>
-          + Add User
-        </AddButton>
+        {currentUserRole === "admin" && (
+          <AddButton onClick={() => navigate("/users/create")}>
+            + Add User
+          </AddButton>
+        )}
       </TopBar>
 
-      {/* Search and Filters */}
+      {/* Search and Role Filter */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
         <SearchInput
           placeholder="Search by name or email..."
@@ -106,14 +118,16 @@ const UserManagement = () => {
           <option value="">All Roles</option>
           <option value="admin">Admin</option>
           <option value="editor">Editor</option>
+          <option value="client">Client</option>
           <option value="viewer">Viewer</option>
+          <option value="visitor">Visitor</option>
         </FilterSelect>
       </div>
 
-      {/* Error message */}
+      {/* Error Message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* Table */}
+      {/* User Table */}
       {loading ? (
         <p>Loading users...</p>
       ) : filteredUsers.length > 0 ? (
@@ -136,15 +150,16 @@ const UserManagement = () => {
                 <TableData>{user.role}</TableData>
                 <TableData>
                   <ActionButtons>
-                    <ViewButton onClick={() => navigate(`/users/${user.id}`)}>
-                      View
-                    </ViewButton>
-                    <EditButton onClick={() => navigate(`/users/edit/${user.id}`)}>
-                      Edit
-                    </EditButton>
-                    <DeleteButton onClick={() => handleDelete(user.id)}>
-                      Delete
-                    </DeleteButton>
+                    {/* View button available for all */}
+                    <ViewButton onClick={() => navigate(`/users/${user.id}`)}>View</ViewButton>
+
+                    {/* Edit/Delete only for admin */}
+                    {currentUserRole === "admin" && (
+                      <>
+                        <EditButton onClick={() => navigate(`/users/edit/${user.id}`)}>Edit</EditButton>
+                        <DeleteButton onClick={() => handleDelete(user.id)}>Delete</DeleteButton>
+                      </>
+                    )}
                   </ActionButtons>
                 </TableData>
               </TableRow>

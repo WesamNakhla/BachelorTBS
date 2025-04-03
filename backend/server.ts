@@ -10,7 +10,7 @@ import fs from "fs";
 // Load environment variables from .env file
 dotenv.config();
 
-// Create Express app
+// Initialize Express app
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/bachelor-db";
@@ -29,7 +29,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-// Enable CORS for frontend requests
+// Enable CORS for frontend (adjust origin as needed)
 const allowedOrigins = ["http://localhost:5173"];
 app.use(
   cors({
@@ -40,45 +40,51 @@ app.use(
   })
 );
 
-// Dynamically load all routes from the "routes" folder
-const loadRoutes = (routesPath: string) => {
-  fs.readdirSync(routesPath).forEach((file) => {
+// Safe route loader with error isolation
+const loadRoutes = async (routesPath: string) => {
+  const routeFiles = fs.readdirSync(routesPath);
+
+  for (const file of routeFiles) {
     const fullPath = path.join(routesPath, file);
 
-    if (file.endsWith(".ts") || file.endsWith(".js")) {
-      import(fullPath)
-        .then((routeModule) => {
-          if (routeModule.default) {
-            const routePath = `/api/${path.basename(file, path.extname(file))}`;
-            app.use(routePath, routeModule.default);
-            console.log(`✅ Route loaded: ${routePath}`);
-          } else {
-            console.warn(`⚠️ No default export found in: ${fullPath}`);
-          }
-        })
-        .catch((error) => {
-          console.error(`❌ Failed to load route at ${fullPath}:`, error);
-        });
+    // Only .ts or .js files
+    if (!file.endsWith(".ts") && !file.endsWith(".js")) continue;
+
+    try {
+      const routeModule = await import(fullPath);
+      if (routeModule.default && typeof routeModule.default === "function") {
+        const routePath = `/api/${path.basename(file, path.extname(file))}`;
+        app.use(routePath, routeModule.default);
+        console.log(`✅ Route loaded: ${routePath}`);
+      } else {
+        console.warn(`⚠️ Skipped file (no default export): ${file}`);
+      }
+    } catch (err) {
+      console.error(`❌ Error loading route ${file}:`, err);
     }
-  });
+  }
 };
 
 // Load all routes from the "routes" directory
-loadRoutes(path.join(__dirname, "routes"));
+const routesDir = path.join(__dirname, "routes");
+if (fs.existsSync(routesDir)) {
+  loadRoutes(routesDir);
+} else {
+  console.warn("⚠️ No 'routes' directory found to load.");
+}
 
-// Root API test route
+// Health check route
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "✅ API is running" });
 });
 
 // Global error handler
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
-  console.error("❌ Unhandled error:", err instanceof Error ? err.message : err);
+  console.error("❌ Global Error:", err instanceof Error ? err.message : err);
   res.status(500).json({ error: "Internal Server Error" });
-  next(err);
 });
 
-// Start the server
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
 });

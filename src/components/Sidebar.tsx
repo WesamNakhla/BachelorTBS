@@ -18,7 +18,6 @@ import {
   Settings,
   Lock,
   Bell,
-  Shield,
   FileSignature,
   Menu,
   X,
@@ -29,13 +28,12 @@ const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
-  // Navigation links
+  // Navigation links (Roles link removed)
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: <Home /> },
     { to: "/invoices", label: "Fakturaer", icon: <FileText /> },
     { to: "/customers", label: "Kunder", icon: <Users /> },
     { to: "/users", label: "Users", icon: <Users /> },
-    { to: "/users/roles", label: "Roles", icon: <Shield /> },
     { to: "/security", label: "Security Settings", icon: <Lock /> },
     { to: "/security/logs", label: "Activity Logs", icon: <FileSignature /> },
     { to: "/reports", label: "Reports", icon: <FileText /> },

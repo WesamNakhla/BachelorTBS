@@ -14,8 +14,11 @@ interface User {
   id: number;
   name: string;
   email: string;
-  role: string;
+  role: "admin" | "employee" | "client" | "visitor";
 }
+
+// Simulated current user's role (should be dynamic from auth context in real app)
+const CURRENT_USER_ROLE: User["role"] = "admin"; // Change this for testing
 
 const EditUser = () => {
   const { id } = useParams();
@@ -26,7 +29,7 @@ const EditUser = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch the user data by ID
+  // Fetch user data by ID
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -46,10 +49,10 @@ const EditUser = () => {
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => prev ? { ...prev, [name]: value } : prev);
+    setFormData((prev) => (prev ? { ...prev, [name]: value } : prev));
   };
 
-  // Submit updated user info
+  // Handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
@@ -71,7 +74,7 @@ const EditUser = () => {
     }
   };
 
-  // Show loading state
+  // Loading state
   if (loading) {
     return (
       <UserContainer>
@@ -80,7 +83,7 @@ const EditUser = () => {
     );
   }
 
-  // Show error or empty state
+  // Error or no user
   if (error || !formData) {
     return (
       <UserContainer>
@@ -89,12 +92,14 @@ const EditUser = () => {
     );
   }
 
-  // Render the editable user form
   return (
     <UserContainer style={{ maxWidth: "600px", margin: "0 auto" }}>
       <h1>Edit User</h1>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "24px" }}>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "24px" }}
+      >
         <DetailRow>
           <strong>Name:</strong>
           <Input
@@ -119,20 +124,28 @@ const EditUser = () => {
 
         <DetailRow>
           <strong>Role:</strong>
-          <Select
-            name="role"
-            value={formData.role}
-            onChange={handleChange}
-            required
-          >
-            <option value="admin">Admin</option>
-            <option value="editor">Editor</option>
-            <option value="viewer">Viewer</option>
-          </Select>
+          {CURRENT_USER_ROLE === "admin" ? (
+            <Select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              required
+            >
+              <option value="admin">Admin</option>
+              <option value="employee">Employee</option>
+              <option value="client">Client</option>
+              <option value="visitor">Visitor</option>
+            </Select>
+          ) : (
+            <Input type="text" value={formData.role} readOnly />
+          )}
         </DetailRow>
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px", marginTop: "20px" }}>
-          <Button style={{ backgroundColor: "#ccc", color: "#333" }} onClick={() => navigate("/users")}>
+          <Button
+            style={{ backgroundColor: "#ccc", color: "#333" }}
+            onClick={() => navigate("/users")}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={saving}>
