@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableBody,
   TableData,
-} from "../../styles/SecurityStyles";
+} from "../../../styles/SecurityStyles";
 import axios from "axios";
 
 // Define the type for a log entry

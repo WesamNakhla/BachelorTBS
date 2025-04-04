@@ -1,69 +1,89 @@
+// src/styles/SecurityStyles.ts
 import styled from "styled-components";
 
-// Security Container
 export const SecurityContainer = styled.div`
-  padding: 20px;
+  padding: 24px;
+  max-width: 700px;
+  margin: 0 auto;
 `;
 
-// Security Form
 export const SecurityForm = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 15px;
-
-  label {
-    font-size: 16px;
-  }
+  gap: 16px;
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 `;
 
-// Input Fields
 export const Input = styled.input`
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
+  padding: 10px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  background-color: #fff;
   width: 100%;
 `;
 
-// Save Button
 export const SubmitButton = styled.button`
-  background: #6a11cb;
+  padding: 10px 16px;
+  font-size: 14px;
+  background-color: #3b82f6;
   color: white;
-  padding: 10px;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
+
+  &:hover {
+    background-color: #2563eb;
+  }
 `;
 
-// Logs Container
-export const LogsContainer = styled.div`
-  padding: 20px;
-`;
-
-// Activity Logs Table
-export const LogsTable = styled.table`
+// Optional table styles for logs
+export const Table = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
 `;
 
 export const TableHead = styled.thead`
-  background: #6a11cb;
-  color: white;
-`;
-
-export const TableRow = styled.tr`
-  &:nth-child(even) {
-    background: #f9f9f9;
-  }
-`;
-
-export const TableHeader = styled.th`
-  padding: 10px;
-  text-align: left;
+  background-color: #f3f4f6;
 `;
 
 export const TableBody = styled.tbody``;
 
+export const TableRow = styled.tr`
+  &:hover {
+    background-color: #f9fafb;
+  }
+`;
+
+export const TableHeader = styled.th`
+  padding: 14px;
+  font-size: 14px;
+  text-align: left;
+`;
+
 export const TableData = styled.td`
-  padding: 10px;
-  border-bottom: 1px solid #ddd;
+  padding: 14px;
+  font-size: 14px;
+  color: #4b5563;
+`;
+// Existing exports from SecurityStyles
+
+// Add LogsContainer export
+export const LogsContainer = styled.div`
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+`;
+
+// Add LogsTable export if missing
+export const LogsTable = styled.table`
+  /* Add your table styles here */
 `;

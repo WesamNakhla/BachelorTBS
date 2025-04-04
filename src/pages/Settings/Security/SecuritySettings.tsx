@@ -5,7 +5,7 @@ import {
   SecurityForm,
   Input,
   SubmitButton,
-} from "../../styles/SecurityStyles";
+} from "../../../styles/SecurityStyles";
 import axios from "axios";
 
 const SecuritySettings = () => {
@@ -14,7 +14,7 @@ const SecuritySettings = () => {
     accountLockThreshold: 5,
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSettings({ ...settings, [e.target.name]: e.target.value });
   };
 
@@ -25,17 +25,17 @@ const SecuritySettings = () => {
       });
       setSettings({ ...settings, enable2FA: response.data.enable2FA });
       alert("Two-Factor Authentication updated successfully!");
-    } catch (error) {
+    } catch {
       alert("Failed to update 2FA settings.");
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await axios.post("/api/security/update-settings", settings);
       alert("Security settings updated successfully!");
-    } catch (error) {
+    } catch {
       alert("Failed to update security settings.");
     }
   };

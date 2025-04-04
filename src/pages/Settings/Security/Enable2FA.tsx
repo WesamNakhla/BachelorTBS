@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import { SecurityContainer, SecurityForm, Input, SubmitButton } from "../../styles/SecurityStyles";
+import { SecurityContainer, SecurityForm, Input, SubmitButton } from "../../../styles/SecurityStyles";
 
 const Enable2FA = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -12,7 +12,7 @@ const Enable2FA = () => {
       await axios.post("/api/security/send-otp", { phoneNumber });
       setOtpSent(true);
       alert("OTP sent to your phone.");
-    } catch (error) {
+    } catch {
       alert("Failed to send OTP.");
     }
   };
@@ -21,7 +21,7 @@ const Enable2FA = () => {
     try {
       await axios.post("/api/security/verify-otp", { phoneNumber, otp });
       alert("Two-Factor Authentication enabled successfully!");
-    } catch (error) {
+    } catch {
       alert("Invalid OTP.");
     }
   };
