@@ -1,16 +1,58 @@
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import FormInput from "../../Components/FormInput/FormInput"; 
 import FormSelect from "../../Components/FormSelect/FormSelect";
 import { FcGoogle } from "react-icons/fc";
 import { Link } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import axiosInstances from "../../utils/Api/api";
+
+interface register{
+    firstName: string,
+    lastName: string,
+    email: string,
+    dateOfBirth: string,
+    password: string,
+    confirmPassword: string
+}
 const Register  = ()=>{
-    const [ input, setInput ] = useState<string>("");
-    const handleInput = (e: React.ChangeEvent<HTMLInputElement>)=>{
-        setInput(e.target.value);
+    const [ registerData, setRegisterData  ] = useState<register>({
+        firstName: "",
+        lastName: "",
+        email: "",
+        dateOfBirth: "",
+        password: "",
+        confirmPassword: ""
+    });
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
+        setRegisterData((prev: any)=>({
+            ...prev,
+            [e.target.name]: e.target.value
+        }));
+    }
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>)=>{
+        e.preventDefault();
+        console.log(registerData);
+        const data = {
+            firstName: registerData.firstName,
+            lastName: registerData.lastName,
+            email: registerData.email,
+            dateOfBirth: registerData.dateOfBirth,
+            password: registerData.password,
+        }
+        if(registerData.password === registerData.confirmPassword){
+            try{
+                let response = await axiosInstances.post("/register", data);
+                toast.success(response.data?.message);
+                window.location.href = "/login";
+            }catch(err:any){
+                toast.error(err.message);
+            }
+        }
     }
     return (
         <>
             <div className="flex w-[100%] h-auto">
+                <ToastContainer />
                 <div className="flex justify-center w-[20%] bg-[#112147]">
                     <h1 className="text-[#fff] font-bold">TBS</h1>
                 </div>
@@ -19,22 +61,24 @@ const Register  = ()=>{
                         <h3>KOM IGANG</h3>
                     </div>
                     <div className="flex flex-col justify-center items-center p-5">
-                        <form className="w-full">
+                        <form className="w-full" onSubmit={handleSubmit}>
                             <div className="flex justify-start my-5 font-sans font-semibold text-lg">Opprett bruker</div>
                             <div className="flex justify-evenly">
                                 <FormInput 
                                     type="text"
                                     label="Fornavn"
                                     placeholder="Fornavn"
-                                    onChange={handleInput}
-                                    value={input}
+                                    onChange={handleChange}
+                                    value={registerData.firstName}
+                                    name="firstName"
                                 />
                                  <FormInput 
                                     type="text"
                                     label="Etternavn"
                                     placeholder="Etternavn"
-                                    onChange={handleInput}
-                                    value={input}
+                                    onChange={handleChange}
+                                    value={registerData.lastName}
+                                    name="lastName"
                                 />
                             </div>
                             <div className="flex justify-evenly">
@@ -42,15 +86,17 @@ const Register  = ()=>{
                                     type="email"
                                     label="Email eller telefonnummer"
                                     placeholder="Email eller telefonnummer"
-                                    onChange={handleInput}
-                                    value={input}
+                                    onChange={handleChange}
+                                    value={registerData.email}
+                                    name="email"
                                 />
                                  <FormInput 
                                     type="date"
                                     label="Fødelsdato dd/mm/åååå"
                                     placeholder=""
-                                    onChange={handleInput}
-                                    value={input}
+                                    onChange={handleChange}
+                                    value={registerData.dateOfBirth}
+                                    name="dateOfBirth"
                                 />
                             </div>
                             <div className="flex justify-evenly">
@@ -58,15 +104,17 @@ const Register  = ()=>{
                                     type="password"
                                     label="Passord"
                                     placeholder=""
-                                    onChange={handleInput}
-                                    value={input}
+                                    onChange={handleChange}
+                                    value={registerData.password}
+                                    name="password"
                                 />
                                  <FormInput 
                                     type="password"
                                     label="Bekreft Passord"
                                     placeholder=""
-                                    onChange={handleInput}
-                                    value={input}
+                                    onChange={handleChange}
+                                    value={registerData.confirmPassword}
+                                    name="confirmPassword"
                                 />
                             </div>
                             <div className="flex flex-col">
