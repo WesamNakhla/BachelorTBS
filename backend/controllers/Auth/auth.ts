@@ -3,7 +3,7 @@ import User from "../../models/User";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
-
+require("dotenv").config();
 // Generate JWT Token
 const generateToken = (email: string, _id: string): string => {
   return jwt.sign({ 
@@ -78,7 +78,6 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     }
 
     const { email, password } = req.body;
-console.log(password);
     // Find user by email
     const user = await User.findOne({ email });
 
@@ -88,7 +87,6 @@ console.log(password);
       return;
     }
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log(isMatch);
     if(!isMatch){
       res.status(401).json({ message: "Invalid password" });
       return;
