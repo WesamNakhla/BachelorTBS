@@ -1,12 +1,15 @@
 import express, { Request, Response, NextFunction } from "express";
-import { loginUser, registerUser } from "../controllers/AuthController/auth";
+import { registerUser, loginUser } from "../controllers/Auth/auth";
 import { body } from "express-validator";
+
 
 const router = express.Router();
 
 // Validation middleware
 const validateUserRegistration = [
-  body("name").notEmpty().withMessage("Name is required"),
+  body("firstName").notEmpty().withMessage("first name is required"),
+  body("lastName").notEmpty().withMessage("last name  is required"),
+  body("dateOfBirth").notEmpty().withMessage("date of birth is required"),
   body("email").isEmail().withMessage("Valid email is required"),
   body("password").isLength({ min: 6 }).withMessage("Password must be at least 6 characters"),
 ];
@@ -17,22 +20,10 @@ const validateUserLogin = [
 ];
 
 // Register route
-router.post("/register", validateUserRegistration, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await registerUser(req, res, next);
-  } catch (error) {
-    next(error);
-  }
-});
+router.post("/register", validateUserRegistration, registerUser);
 
 // Login route
-router.post("/login", validateUserLogin, async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    await loginUser(req, res, next);
-  } catch (error) {
-    next(error);
-  }
-});
+router.post("/login", validateUserLogin, loginUser);
 
 // Test route
 router.get("/test", (req: Request, res: Response) => {

@@ -3,9 +3,8 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import path from "path";
-import fs from "fs";
 import connectDB from "./config/db";
+import AuthRoutes from "./routes/authRoutes";
 
 
 // Load environment variables
@@ -19,6 +18,7 @@ const PORT = process.env.PORT || 5000;
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
+app.use("/api/v1", AuthRoutes);
 
 // Enable CORS for frontend requests
 const allowedOrigins = ["http://localhost:5173"];
@@ -31,36 +31,6 @@ app.use(
   })
 );
 
-// Function to dynamically load route modules
-const loadRoutes = (routesPath: string) => {
-  fs.readdirSync(routesPath).forEach((file) => {
-    // Construct full path of the route file
-    const fullPath = path.join(routesPath, file);
-
-    // Check if the file is a TypeScript or JavaScript file
-    if (file.endsWith(".ts") || file.endsWith(".js")) {
-      // Import the route module
-      import(fullPath)
-        .then((routeModule) => {
-          // Use the default export if available
-          if (routeModule.default) {
-            // Construct the route path based on the file name
-            const routePath = `/api/${path.basename(file, path.extname(file))}`;
-            app.use(routePath, routeModule.default);
-            console.log(` Route loaded: ${routePath}`);
-          } else {
-            console.warn(`No default export found in: ${fullPath}`);
-          }
-        })
-        .catch((error) => {
-          console.error(` Failed to load route at ${fullPath}:`, error);
-        });
-    }
-  });
-};
-
-// Load routes from the 'routes' directory
-loadRoutes(path.join(__dirname, "routes"));
 
 // Root API endpoint
 app.get("/", (req: Request, res: Response) => {

@@ -4,7 +4,15 @@ import bcrypt from "bcryptjs";
 
 const UserSchema = new Schema(
   {
-    name: { 
+    firstName: { 
+      type: String,
+      required: true
+     },
+    lastName: { 
+      type: String,
+      required: true
+     },
+    dateOfBirth: { 
       type: String,
       required: true
      },
@@ -25,18 +33,8 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-// Password hashing middleware
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
 
-// Compare password method
-UserSchema.methods.matchPassword = async function (enteredPassword: string) {
-  return await bcrypt.compare(enteredPassword, this.password);
-};
+
 
 const User = mongoose.model("User", UserSchema);
 export default User;
