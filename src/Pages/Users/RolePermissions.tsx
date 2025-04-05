@@ -57,7 +57,6 @@ const RolePermissions = () => {
 
   return (
     <UserContainer>
-      <h1>Manage User Roles</h1>
 
       {/* Display loading message */}
       {loading && <p>Loading users...</p>}
