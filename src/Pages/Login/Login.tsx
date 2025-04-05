@@ -38,7 +38,7 @@ const Login = ()=>{
 
     return (
         <>
-            <div className="flex flex-col h-[1000px]">
+            <div className="flex flex-col min-h-screen">
                 <div className="flex items-center font-bold text-[#fff] w-[100%] h-[50px] p-10 text-lg bg-[#112147]">
                     <h3>TBS</h3>
                 </div>

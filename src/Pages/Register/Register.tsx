@@ -51,7 +51,7 @@ const Register  = ()=>{
     }
     return (
         <>
-            <div className="flex w-[100%] h-auto">
+            <div className="flex w-[100%] min-h-screen">
                 <ToastContainer />
                 <div className="flex justify-center w-[20%] bg-[#112147]">
                     <h1 className="text-[#fff] font-bold">TBS</h1>

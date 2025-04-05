@@ -8,7 +8,7 @@ const Contact = ()=>{
     }
 ;    return (
         <>
-            <div className="flex flex-col justify-center items-center bg-[#EFEBEB] py-16">
+            <div className="flex flex-col justify-center items-center bg-[#EFEBEB] py-16 min-h-screen">
                 <div className="flex items-center mb-5">
                     <div className="h-[21px] w-[116px] bg-[#E29C51] rounded-full"></div>
                     <p className="text-[#E29C51] font-lexend font-semibold text-3xl ml-3">Hvem er vi ? </p>
@@ -20,6 +20,7 @@ const Contact = ()=>{
                         placeholder="Navn"
                         onChange={handleInput}
                         value={input}
+                        name="navn"
                     />
                     <FormInput 
                         type="text"
@@ -27,6 +28,7 @@ const Contact = ()=>{
                         placeholder="etternavn"
                         onChange={handleInput}
                         value={input}
+                        name="etternavn"
                     />
                     <FormInput 
                         type="text"
@@ -34,6 +36,7 @@ const Contact = ()=>{
                         placeholder="epost"
                         onChange={handleInput}
                         value={input}
+                        name="epost"
                     />
                     <FormInput 
                         type="text"
@@ -41,6 +44,7 @@ const Contact = ()=>{
                         placeholder="melding"
                         onChange={handleInput}
                         value={input}
+                        name="melding"
                     />
                     <button type="button" className="cursor-pointer bg-[#2C2C2C] text-[#fff] w-full h-[50px] rounded-full">Submit</button>
                 </form>
