@@ -125,9 +125,6 @@ const Register  = ()=>{
                                 <button type="submit" className="cursor-pointer text-[#fff] bg-[#66B2FF] w-[300px] h-[50px] rounded-md">
                                     Opprett bruker 
                                 </button>
-                                <button type="button" className="flex items-center justify-center text-[#fff] cursor-pointer bg-[#212020] w-[300px] h-[50px] rounded-md">
-                                    <p className="mr-1"><FcGoogle /></p>Logg inn med google  
-                                </button>
                             </div>
                             
                         </form>
