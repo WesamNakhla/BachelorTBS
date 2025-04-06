@@ -1,198 +1,171 @@
 // src/styles/SettingsStyles.ts
 import styled from "styled-components";
 
-// Main container for all settings sections
+// Main container for the settings page with reduced outer margins and inner padding
 export const SettingsContainer = styled.div`
-  padding: 32px;
-  max-width: 1000px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
+  max-width: 920px;
+  margin: 20px auto;       /* Reduced margin to bring sidebar and page closer */
+  padding: 24px;           /* Reduced overall padding */
+  background: #ffffff;
+  border-radius: 20px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.15),
+              0 10px 10px rgba(0, 0, 0, 0.05);
+  font-family: 'Roboto', sans-serif;
 `;
 
-// Individual section block (e.g., Appearance, Security)
+// Section container for each settings group with reduced margin and padding
 export const SettingsSection = styled.div`
-  background-color: ${({ theme }) => theme.cardBg || "#fff"};
-  border-radius: 10px;
-  padding: 24px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: background-color 0.3s ease;
-`;
-
-// Section header
-export const SectionHeader = styled.h2`
-  font-size: 20px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.textPrimary || "#111827"};
-  margin-bottom: 16px;
-`;
-
-// Content inside each section
-export const SectionContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-`;
-
-// Regular input field
-export const Input = styled.input`
-  padding: 10px 14px;
-  font-size: 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  background-color: ${({ theme }) => theme.inputBg || "#fff"};
-  color: ${({ theme }) => theme.inputText || "#111827"};
-  width: 100%;
-`;
-
-// Save/submit button
-export const SubmitButton = styled.button`
-  background-color: ${({ theme }) => theme.success || "#10b981"};
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  font-size: 14px;
-  border-radius: 6px;
-  cursor: pointer;
+  margin-bottom: 20px;     /* Reduced spacing between sections */
+  padding: 20px;           /* Reduced inner padding */
+  background: #fdfdfd;
+  border-radius: 16px;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+              rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.successDark || "#059669"};
+    transform: translateY(-3px);
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 4px 12px 0px;
   }
 `;
 
-// Simple visual divider between sections
-export const Divider = styled.hr`
-  border: none;
-  border-top: 1px solid #e5e7eb;
-  margin: 16px 0;
-`;
-
-// Flex layout row for inputs/controls
-export const FlexRow = styled.div`
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-// Label for inputs or toggles
-export const Label = styled.label`
-  font-size: 14px;
-  font-weight: 500;
-  color: ${({ theme }) => theme.textSecondary || "#374151"};
-`;
-
-// Expandable section wrapper
-export const ExpandableBox = styled.div`
-  background-color: ${({ theme }) => theme.cardBg || "#fff"};
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  margin-top: 12px;
-  overflow: hidden;
-`;
-
-// Expand/collapse button
-export const ExpandButton = styled.button`
-  all: unset;
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  color: ${({ theme }) => theme.textPrimary || "#111827"};
+// Header for each section with reduced bottom padding/margin
+export const SectionHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: ${({ theme }) => theme.sectionHeaderBg || "#f3f4f6"};
-
-  &:hover {
-    background-color: ${({ theme }) => theme.hoverBg || "#e5e7eb"};
-  }
+  font-size: 1.7rem;
+  font-weight: 600;
+  color: #333333;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 8px;    /* Reduced padding-bottom */
+  margin-bottom: 16px;    /* Reduced margin-bottom */
 `;
 
-// Collapsible content area
-// Wrapper for custom toggle elements like checkboxes or switches
-export const ToggleWrapper = styled.div`
+// Content container for section items with a reduced gap
+export const SectionContent = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  height: 100%;
-  padding-top: 4px;
-
-  input[type="checkbox"] {
-    width: 40px;
-    height: 20px;
-    appearance: none;
-    background-color: #d1d5db;
-    border-radius: 999px;
-    position: relative;
-    transition: background-color 0.3s ease;
-    cursor: pointer;
-
-    &:checked {
-      background-color: #4f46e5;
-    }
-
-    &::before {
-      content: "";
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 16px;
-      height: 16px;
-      background-color: white;
-      border-radius: 50%;
-      transition: transform 0.3s ease;
-    }
-
-    &:checked::before {
-      transform: translateX(20px);
-    }
-  }
+  flex-direction: column;
+  gap: 15px;              /* Reduced gap between items */
 `;
 
-// Individual setting item inside a section
+// Individual setting item with reduced vertical padding
 export const SettingItem = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f1f1;
+  padding: 12px 0;        /* Reduced padding */
+  border-bottom: 1px solid #eeeeee;
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
-// Setting label (left text)
+// Label for each setting with slightly adjusted font-size
 export const SettingLabel = styled.div`
-  font-size: 14px;
+  font-size: 1.2rem;       /* Slightly reduced font size */
   font-weight: 500;
-  color: ${({ theme }) => theme.textPrimary || "#1f2937"};
+  color: #555555;
 `;
 
-// Description below label
+// Description for each setting with reduced top margin
 export const SettingDescription = styled.div`
-  font-size: 12px;
-  color: ${({ theme }) => theme.textSecondary || "#6b7280"};
-  margin-top: 4px;
+  font-size: 1rem;
+  color: #777777;
+  margin-top: 4px;        /* Reduced margin */
+  line-height: 1.6;
 `;
 
-// Right side action (e.g., switch or button)
+// Action container for buttons or toggles with a small gap
 export const SettingAction = styled.div`
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 8px;               /* Added gap between action elements */
 `;
-// ToggleButton used in ThemeToggle for switching themes
-export const ToggleButton = styled.button`
-  background-color: ${({ theme }) => theme.buttonBg || "#4f46e5"};
-  color: ${({ theme }) => theme.buttonText || "#ffffff"};
+
+// Styled button for actions with reduced padding
+export const StyledButton = styled.button`
+  padding: 10px 20px;      /* Reduced padding */
+  font-size: 1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   border: none;
-  padding: 10px 16px;
-  font-size: 14px;
-  border-radius: 6px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:hover {
-    background-color: ${({ theme }) => theme.buttonHover || "#4338ca"};
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+`;
+
+// Styled toggle switch with slightly reduced dimensions
+export const StyledToggle = styled.input`
+  width: 48px;           /* Reduced width */
+  height: 26px;          /* Reduced height */
+  appearance: none;
+  background: #dddddd;
+  border-radius: 26px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.3s ease;
+
+  &:checked {
+    background: #667eea;
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    background: #ffffff;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s ease;
+  }
+
+  &:checked:before {
+    transform: translateX(22px);  /* Adjusted for new width */
+  }
+`;
+
+// Expand button for collapsible sections remains similar
+export const ExpandButton = styled.button`
+  font-size: 1rem;
+  color: #667eea;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: #764ba2;
+  }
+`;
+
+// Expandable box for collapsible content with reduced padding and margin
+export const ExpandableBox = styled.div`
+  margin-top: 16px;       /* Reduced margin-top */
+  padding: 20px;          /* Reduced padding */
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+`;
+
+// Wrapper for toggle switches remains unchanged
+export const ToggleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `;
