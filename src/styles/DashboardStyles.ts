@@ -1,11 +1,18 @@
 import styled from "styled-components";
 
+// === TYPES ===
+interface SectionProps {
+  $gap?: string;
+  $wrap?: boolean;
+}
+
 // Main container for the Dashboard
 export const DashboardContainer = styled.div`
   padding: 2rem;
   min-height: 100vh;
-  background: linear-gradient(135deg, #e0f7fa, #ffffff);
+  background: ${({ theme }) => theme.background};
   font-family: 'Inter', sans-serif;
+  color: ${({ theme }) => theme.text};
 `;
 
 // Dashboard title
@@ -13,7 +20,7 @@ export const DashboardTitle = styled.h1`
   font-size: 2.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: #1f2937;
+  color: ${({ theme }) => theme.text};
 `;
 
 // Grid layout for statistics
@@ -25,7 +32,7 @@ export const StatsGrid = styled.div`
 
 // Individual stat card
 export const StatCard = styled.div`
-  background: #ffffff;
+  background: ${({ theme }) => theme.inputBackground};
   border-radius: 1.25rem;
   padding: 2rem;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.05);
@@ -40,23 +47,32 @@ export const StatCard = styled.div`
 
   h3 {
     font-size: 1rem;
-    color: #6b7280;
+    color: ${({ theme }) => theme.textSecondary};
     margin-bottom: 0.5rem;
   }
 
   p {
     font-size: 2rem;
     font-weight: 600;
-    color: #111827;
+    color: ${({ theme }) => theme.text};
   }
 `;
 
-// Section for recent invoices or tables
+// Section (with custom props)
+export const Section = styled.div<SectionProps>`
+  display: flex;
+  flex-direction: row;
+  gap: ${({ $gap }) => $gap || "16px"};
+  flex-wrap: ${({ $wrap }) => ($wrap ? "wrap" : "nowrap")};
+  margin-top: 4rem;
+`;
+
+// Recent invoices section wrapper
 export const RecentInvoices = styled.div`
   margin-top: 3rem;
 `;
 
-// Styled table wrapper
+// Table
 export const Table = styled.table`
   width: 100%;
   border-collapse: separate;
@@ -64,21 +80,21 @@ export const Table = styled.table`
 `;
 
 export const TableHead = styled.thead`
-  background-color: #f1f5f9;
+  background-color: ${({ theme }) => theme.inputBackground};
 `;
 
 export const TableBody = styled.tbody`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.inputBackground};
 `;
 
 export const TableRow = styled.tr`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.inputBackground};
   border-radius: 0.75rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   transition: background-color 0.2s ease-in-out;
 
   &:hover {
-    background-color: #f9fafb;
+    background-color: ${({ theme }) => theme.background};
   }
 `;
 
@@ -86,18 +102,46 @@ export const TableHeader = styled.th`
   padding: 1rem 1.25rem;
   text-align: left;
   font-size: 0.85rem;
-  color: #4b5563;
+  color: ${({ theme }) => theme.textSecondary};
   font-weight: 600;
 `;
 
 export const TableData = styled.td`
   padding: 1rem 1.25rem;
   font-size: 0.95rem;
-  color: #1f2937;
-  border-bottom: 1px solid #e5e7eb;
+  color: ${({ theme }) => theme.text};
+  border-bottom: 1px solid ${({ theme }) => theme.textSecondary}33;
 `;
 
-// General section block with separation
-export const Section = styled.div`
-  margin-top: 4rem;
+// Filters (input + select)
+export const FilterInput = styled.input`
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid ${({ theme }) => theme.textSecondary}55;
+  background-color: ${({ theme }) => theme.inputBackground};
+  color: ${({ theme }) => theme.text};
+  font-size: 0.95rem;
+  min-width: 180px;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.primary}33;
+  }
+`;
+
+export const FilterSelect = styled.select`
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid ${({ theme }) => theme.textSecondary}55;
+  background-color: ${({ theme }) => theme.inputBackground};
+  color: ${({ theme }) => theme.text};
+  font-size: 0.95rem;
+  min-width: 180px;
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.primary};
+    box-shadow: 0 0 0 2px ${({ theme }) => theme.primary}33;
+  }
 `;

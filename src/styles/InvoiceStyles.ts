@@ -3,7 +3,7 @@ import styled from "styled-components";
 /* ==== LAYOUT WRAPPERS ==== */
 export const InvoiceContainer = styled.div`
   padding: 24px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.inputBackground};
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   animation: fadeIn 0.3s ease-in-out;
@@ -34,22 +34,21 @@ export const InvoiceTable = styled.table`
 `;
 
 export const TableHead = styled.thead`
-  background: linear-gradient(90deg, #5a0ebc, #1e5bbf);
+  background: ${({ theme }) => theme.primary};
   color: #fff;
 `;
 
 export const TableRow = styled.tr`
   border-bottom: 1px solid #e2e6ea;
+  transition: background-color 0.2s;
 
   &:nth-child(even) {
-    background-color: #f8f9fa;
+    background-color: ${({ theme }) => theme.inputBackground};
   }
 
   &:hover {
-    background-color: #f1f3f5;
+    background-color: ${({ theme }) => theme.background};
   }
-
-  transition: background-color 0.2s;
 `;
 
 export const TableHeader = styled.th`
@@ -65,11 +64,68 @@ export const TableData = styled.td`
   padding: 14px 18px;
   font-size: 14px;
   border-bottom: 1px solid #e2e6ea;
-  color: #333;
+  color: ${({ theme }) => theme.text};
 `;
 
-/* ==== BUTTON BASE STYLE ==== */
-const baseButton = styled.button`
+/* ==== SEARCH INPUT ==== */
+export const SearchInput = styled.input`
+  width: 100%;
+  max-width: 300px;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 12px;
+  border: 1px solid ${({ theme }) => theme.textSecondary}55;
+  background-color: ${({ theme }) => theme.inputBackground};
+  color: ${({ theme }) => theme.text};
+
+  &:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.primary}33;
+  }
+
+  &::placeholder {
+    color: ${({ theme }) => theme.textSecondary};
+  }
+`;
+
+/* ==== STATUS BADGE ==== */
+export const StatusBadge = styled.span<{ status: "Paid" | "Pending" | "Overdue" }>`
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-weight: 500;
+  font-size: 13px;
+  background-color: ${({ status }) =>
+    status === "Paid"
+      ? "#d1fae5"
+      : status === "Overdue"
+      ? "#fee2e2"
+      : "#fef9c3"};
+  color: ${({ status }) =>
+    status === "Paid"
+      ? "#065f46"
+      : status === "Overdue"
+      ? "#991b1b"
+      : "#92400e"};
+`;
+
+/* ==== ACTION GROUP ==== */
+export const ActionGroup = styled.div`
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+`;
+
+/* ==== ACTION BUTTONS ==== */
+export const ActionButtons = styled.div`
+  display: flex;
+  gap: 12px;
+  margin: 16px 0;
+  flex-wrap: wrap;
+`;
+
+export const Button = styled.button`
   padding: 10px 16px;
   border-radius: 6px;
   border: none;
@@ -84,27 +140,46 @@ const baseButton = styled.button`
   }
 `;
 
-export const ExportButton = styled(baseButton)`
-  background-color: #5a0ebc;
+/* ==== PAGINATION ==== */
+export const PaginationContainer = styled.div`
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+`;
 
-  &:hover {
-    background-color: #4b0f9c;
+export const RowsPerPage = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  select {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
   }
 `;
 
-export const ImportButton = styled(baseButton)`
-  background-color: #1e5bbf;
+export const PageButtons = styled.div`
+  display: flex;
+  gap: 8px;
 
-  &:hover {
-    background-color: #164a96;
-  }
-`;
+  button {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    background: #f1f1f1;
+    cursor: pointer;
 
-export const AddInvoiceButton = styled(baseButton)`
-  background-color: #28a745;
+    &.active {
+      background-color: ${({ theme }) => theme.primary};
+      color: #fff;
+    }
 
-  &:hover {
-    background-color: #218838;
+    &:hover {
+      background-color: ${({ theme }) => theme.secondary}33;
+    }
   }
 `;
 
@@ -120,7 +195,7 @@ export const ModalOverlay = styled.div`
 `;
 
 export const ModalContainer = styled.div`
-  background: #fff;
+  background: ${({ theme }) => theme.inputBackground};
   padding: 24px;
   border-radius: 16px;
   width: 100%;
@@ -165,7 +240,6 @@ export const ModalContent = styled.div`
   gap: 12px;
 `;
 
-/* ==== CLOSE BUTTON ==== */
 export const CloseButton = styled.button`
   font-size: 20px;
   color: #aaa;
@@ -185,19 +259,19 @@ export const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: 15px;
-  color: #111827;
-  background-color: #f9fafb;
+  color: ${({ theme }) => theme.text};
+  background-color: ${({ theme }) => theme.inputBackground};
   transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
+    border-color: ${({ theme }) => theme.primary};
     background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.primary}33;
   }
 
   &::placeholder {
-    color: #9ca3af;
+    color: ${({ theme }) => theme.textSecondary};
   }
 `;
 
@@ -207,91 +281,26 @@ export const Select = styled.select`
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: 15px;
-  color: #111827;
-  background-color: #f9fafb;
+  color: ${({ theme }) => theme.text};
+  background-color: ${({ theme }) => theme.inputBackground};
   transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    background-color: #ffffff;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    border-color: ${({ theme }) => theme.primary};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.primary}33;
   }
 `;
 
-/* ==== PAGINATION ==== */
-export const PaginationContainer = styled.div`
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-`;
-
-export const RowsPerPage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  select {
-    padding: 6px 10px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-`;
-
-export const PageButtons = styled.div`
-  display: flex;
-  gap: 8px;
-
-  button {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    background: #f1f1f1;
-    cursor: pointer;
-
-    &.active {
-      background-color: #007bff;
-      color: #fff;
-    }
-
-    &:hover {
-      background-color: #e2e6ea;
-    }
-  }
-`;
-
-/* ==== ACTION BUTTON GROUP ==== */
-export const ActionButtons = styled.div`
-  display: flex;
-  gap: 12px;
-  margin: 16px 0;
-  flex-wrap: wrap;
-`;
-export const Button = styled.button`
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: scale(1.08);
-  }
-`;
+/* ==== INVOICE INFO VIEW ==== */
 export const InvoiceInfo = styled.div`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.inputBackground};
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   margin-top: 20px;
 `;
 
-// Row for individual detail (label + value)
 export const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -300,12 +309,12 @@ export const DetailRow = styled.div`
   padding: 12px 0;
 
   span {
-    color: #374151;
+    color: ${({ theme }) => theme.textSecondary};
     font-weight: 500;
   }
 
   strong {
-    color: #111827;
+    color: ${({ theme }) => theme.text};
     font-weight: 600;
     min-width: 120px;
   }

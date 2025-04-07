@@ -1,12 +1,14 @@
-import { useState, useEffect } from "react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   DashboardContainer,
   StatsGrid,
   StatCard,
+  Section,
+  FilterInput,
+  FilterSelect,
 } from "../../styles/DashboardStyles";
-import { getCustomersCount } from "../../api/customerAPI";
 import {
   UserTable,
   TableHead,
@@ -16,7 +18,7 @@ import {
   TableData,
 } from "../../styles/UserStyles";
 import { Button } from "../../components/ui/Button";
-import axios from "axios";
+import { getCustomersCount } from "../../api/customerAPI";
 import {
   BarChart,
   Bar,
@@ -56,7 +58,9 @@ const Dashboard: React.FC = () => {
   });
 
   const [recentInvoices, setRecentInvoices] = useState<Invoice[]>([]);
-  const [monthlyRevenue, setMonthlyRevenue] = useState<{ month: string; revenue: number }[]>([]);
+  const [monthlyRevenue, setMonthlyRevenue] = useState<
+    { month: string; revenue: number }[]
+  >([]);
 
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
@@ -79,54 +83,80 @@ const Dashboard: React.FC = () => {
       try {
         const statsResponse = await axios.get("/api/dashboard/stats");
         setStats(statsResponse.data);
-  
+
         const invoicesResponse = await axios.get("/api/dashboard/recent-invoices");
-        const invoices = Array.isArray(invoicesResponse.data) ? invoicesResponse.data : [];
+        const invoices = Array.isArray(invoicesResponse.data)
+          ? invoicesResponse.data
+          : [];
         setRecentInvoices(invoices);
-  
-        // ✅ New: fetch customers count
+
         const customerCount = await getCustomersCount();
         setStats((prev) => ({ ...prev, totalCustomers: customerCount }));
-  
-        // Revenue chart
+
         const revenueByMonth: { [key: string]: number } = {};
         invoices.forEach((inv: Invoice) => {
-          const month = new Date(inv.dateIssued).toLocaleString("default", { month: "short", year: "numeric" });
+          const month = new Date(inv.dateIssued).toLocaleString("default", {
+            month: "short",
+            year: "numeric",
+          });
           revenueByMonth[month] = (revenueByMonth[month] || 0) + inv.amount;
         });
-        const chartData = Object.entries(revenueByMonth).map(([month, revenue]) => ({ month, revenue }));
+
+        const chartData = Object.entries(revenueByMonth).map(
+          ([month, revenue]) => ({ month, revenue })
+        );
         setMonthlyRevenue(chartData);
-  
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
     };
-  
+
     fetchDashboardData();
   }, []);
-  
 
   return (
     <DashboardContainer>
       <h1>Dashboard</h1>
 
-      <div style={{ display: "flex", gap: "12px", margin: "20px 0", flexWrap: "wrap" }}>
-        <Button $variant="primary" onClick={() => navigate("/invoices/create")}>+ New Invoice</Button>
-        <Button $variant="secondary" onClick={() => navigate("/customers/create")}>+ Add Customer</Button>
-        <Button $variant="danger" onClick={() => alert("Exporting report... (to be implemented)")}>Export Report</Button>
-      </div>
+      <Section style={{ gap: "12px", flexWrap: "wrap" }}>
+        <Button $variant="primary" onClick={() => navigate("/invoices/create")}>
+          + New Invoice
+        </Button>
+        <Button $variant="secondary" onClick={() => navigate("/customers/create")}>
+          + Add Customer
+        </Button>
+        <Button $variant="danger" onClick={() => alert("Exporting report...")}>
+          Export Report
+        </Button>
+      </Section>
 
-      <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "30px" }}>
-        <input type="date" onChange={(e) => setStartDate(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
-        <input type="date" onChange={(e) => setEndDate(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
-        <input type="text" placeholder="Filter by customer" onChange={(e) => setCustomerFilter(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }} />
-        <select onChange={(e) => setStatusFilter(e.target.value)} style={{ padding: "8px", borderRadius: "6px", border: "1px solid #ccc" }}>
+      <Section $gap="12px" $wrap>
+        <FilterInput
+          type="date"
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+        />
+        <FilterInput
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+        />
+        <FilterInput
+          type="text"
+          placeholder="Filter by customer"
+          value={customerFilter}
+          onChange={(e) => setCustomerFilter(e.target.value)}
+        />
+        <FilterSelect
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        >
           <option value="">All Statuses</option>
           <option value="Paid">Paid</option>
           <option value="Pending">Pending</option>
           <option value="Overdue">Overdue</option>
-        </select>
-      </div>
+        </FilterSelect>
+      </Section>
 
       <StatsGrid>
         <StatCard>
@@ -143,7 +173,7 @@ const Dashboard: React.FC = () => {
         </StatCard>
       </StatsGrid>
 
-      <div style={{ marginTop: "40px" }}>
+      <Section>
         <h2>Monthly Revenue</h2>
         {monthlyRevenue.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
@@ -158,15 +188,15 @@ const Dashboard: React.FC = () => {
         ) : (
           <p>No data to display chart.</p>
         )}
-      </div>
+      </Section>
 
-      <div style={{ marginTop: "40px" }}>
+      <Section>
         <h2>Invoice Status Distribution</h2>
         {recentInvoices.length > 0 ? (
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={['Paid', 'Pending', 'Overdue'].map((status) => ({
+                data={["Paid", "Pending", "Overdue"].map((status) => ({
                   name: status,
                   value: recentInvoices.filter((inv) => inv.status === status).length,
                 }))}
@@ -175,8 +205,11 @@ const Dashboard: React.FC = () => {
                 outerRadius={100}
                 label
               >
-                {['Paid', 'Pending', 'Overdue'].map((status, index) => (
-                  <Cell key={`cell-${index}`} fill={STATUS_COLORS[status as Invoice['status']]} />
+                {["Paid", "Pending", "Overdue"].map((status, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={STATUS_COLORS[status as Invoice["status"]]}
+                  />
                 ))}
               </Pie>
               <Legend />
@@ -185,11 +218,11 @@ const Dashboard: React.FC = () => {
         ) : (
           <p>No data to display chart.</p>
         )}
-      </div>
+      </Section>
 
-      <div style={{ marginTop: "40px" }}>
+      <Section>
         <h2>Overdue Invoices</h2>
-        {filteredInvoices.filter(inv => inv.status === "Overdue").length > 0 ? (
+        {filteredInvoices.filter((inv) => inv.status === "Overdue").length > 0 ? (
           <UserTable>
             <TableHead>
               <TableRow>
@@ -200,22 +233,24 @@ const Dashboard: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredInvoices.filter(inv => inv.status === "Overdue").map((inv) => (
-                <TableRow key={inv.id}>
-                  <TableData>{inv.invoiceNumber}</TableData>
-                  <TableData>{inv.customer}</TableData>
-                  <TableData>${inv.amount.toFixed(2)}</TableData>
-                  <TableData>{new Date(inv.dateIssued).toLocaleDateString()}</TableData>
-                </TableRow>
-              ))}
+              {filteredInvoices
+                .filter((inv) => inv.status === "Overdue")
+                .map((inv) => (
+                  <TableRow key={inv.id}>
+                    <TableData>{inv.invoiceNumber}</TableData>
+                    <TableData>{inv.customer}</TableData>
+                    <TableData>${inv.amount.toFixed(2)}</TableData>
+                    <TableData>{new Date(inv.dateIssued).toLocaleDateString()}</TableData>
+                  </TableRow>
+                ))}
             </TableBody>
           </UserTable>
         ) : (
           <p>No overdue invoices at the moment.</p>
         )}
-      </div>
+      </Section>
 
-      <div style={{ marginTop: "40px" }}>
+      <Section>
         <h2>Top Customers by Revenue</h2>
         {filteredInvoices.length > 0 ? (
           <UserTable>
@@ -245,20 +280,22 @@ const Dashboard: React.FC = () => {
         ) : (
           <p>No customer data available.</p>
         )}
-      </div>
+      </Section>
 
-      <div style={{ marginTop: "40px" }}>
+      <Section>
         <h2>Average Invoice Amount</h2>
         {filteredInvoices.length > 0 ? (
           <p style={{ fontSize: "18px", fontWeight: "bold" }}>
-            ${(
-              filteredInvoices.reduce((sum, inv) => sum + inv.amount, 0) / filteredInvoices.length
+            $
+            {(
+              filteredInvoices.reduce((sum, inv) => sum + inv.amount, 0) /
+              filteredInvoices.length
             ).toFixed(2)}
           </p>
         ) : (
           <p>No data to calculate average.</p>
         )}
-      </div>
+      </Section>
     </DashboardContainer>
   );
 };

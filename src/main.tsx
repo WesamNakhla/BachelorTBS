@@ -1,20 +1,27 @@
+// File: src/main.tsx
+
 import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./styles/App.css";
 
+import { ThemeProviderWrapper } from "./context/ThemeContext";
+import { GlobalStyles } from "./styles/GlobalStyles"; // Import global styles for theme support
+
 // Get the root element from index.html
 const rootElement = document.getElementById("root");
 
 if (rootElement) {
-  // Create a React root and render the App component
   const root = ReactDOM.createRoot(rootElement);
+
   root.render(
     <React.StrictMode>
-      <App />
+      <ThemeProviderWrapper>
+        <GlobalStyles /> {/* Apply global styles (background, text color, etc.) */}
+        <App />
+      </ThemeProviderWrapper>
     </React.StrictMode>
   );
 } else {
-  // Log an error if the root element is not found
-  console.error("Root element not found! Ensure you have a <div id='root'> in index.html");
+  console.error("Root element not found! Please ensure <div id='root'> exists in index.html.");
 }

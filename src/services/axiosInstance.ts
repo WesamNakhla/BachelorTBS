@@ -3,8 +3,8 @@ import axios from 'axios';
 
 // Create a pre-configured Axios instance to be reused across the app
 const axiosInstance = axios.create({
-  // Base URL for all API requests (replace with your backend URL)
-  baseURL: 'https://api.example.com/',
+  // Base URL for all API requests (points to local development server)
+  baseURL: 'http://localhost:5000/api',
 
   // Set default headers for all requests
   headers: {

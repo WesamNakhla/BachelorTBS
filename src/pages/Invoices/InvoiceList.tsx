@@ -12,6 +12,9 @@ import {
   PaginationContainer,
   RowsPerPage,
   PageButtons,
+  SearchInput,
+  StatusBadge,
+  ActionGroup,
 } from "../../styles/InvoiceStyles";
 import InvoiceModal from "./InvoiceModal";
 import { Button } from "../../components/ui/Button";
@@ -99,22 +102,14 @@ const InvoiceList = () => {
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      <input
+      <SearchInput
         type="text"
         placeholder="Search invoices..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        style={{
-          width: "100%",
-          maxWidth: "300px",
-          padding: "10px",
-          marginBottom: "12px",
-          borderRadius: "8px",
-          border: "1px solid #d1d5db",
-        }}
       />
 
-      <ActionButtons style={{ margin: "16px 0", gap: "12px", flexWrap: "wrap" }}>
+      <ActionButtons>
         <Button $variant="ghost" onClick={() => alert("Exporting to PDF...")}>
           Export
         </Button>
@@ -150,31 +145,10 @@ const InvoiceList = () => {
                     <TableData>{invoice.date}</TableData>
                     <TableData className="hide-sm">${invoice.amount.toFixed(2)}</TableData>
                     <TableData className="hide-sm">
-                      <span
-                        style={{
-                          padding: "5px 12px",
-                          borderRadius: "20px",
-                          fontWeight: 500,
-                          fontSize: "13px",
-                          backgroundColor:
-                            invoice.status === "Paid"
-                              ? "#d1fae5"
-                              : invoice.status === "Overdue"
-                              ? "#fee2e2"
-                              : "#fef9c3",
-                          color:
-                            invoice.status === "Paid"
-                              ? "#065f46"
-                              : invoice.status === "Overdue"
-                              ? "#991b1b"
-                              : "#92400e",
-                        }}
-                      >
-                        {invoice.status}
-                      </span>
+                      <StatusBadge status={invoice.status}>{invoice.status}</StatusBadge>
                     </TableData>
                     <TableData>
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      <ActionGroup>
                         <Button
                           $variant="ghost"
                           onClick={() => alert(`Viewing invoice ${invoice.invoiceNumber}`)}
@@ -193,7 +167,7 @@ const InvoiceList = () => {
                         >
                           🗑
                         </Button>
-                      </div>
+                      </ActionGroup>
                     </TableData>
                   </TableRow>
                 ))

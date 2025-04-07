@@ -1,4 +1,5 @@
-// src/pages/Settings.tsx
+// File: src/pages/Settings.tsx
+
 import React, { useState } from "react";
 import {
   SettingsContainer,
@@ -15,27 +16,19 @@ import {
   SettingAction,
   ToggleWrapper,
 } from "../../styles/SettingsStyles";
-// Removed ThemeToggle in favor of our custom implementation
+import { useTheme } from "../../context/ThemeContext"; // ✅ استخدام سياق الثيم
 
 const Settings = () => {
-  // State variables for toggling sections and settings
   const [isSecurityExpanded, setIsSecurityExpanded] = useState(true);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [isAutoUpdateEnabled, setIsAutoUpdateEnabled] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Function to toggle the visibility of the security section
+  // ✅ الحصول على حالة الثيم ودالة التبديل من السياق
+  const { isDark, toggleTheme } = useTheme();
+
+  // Toggle security section visibility
   const toggleSecuritySettings = () => {
     setIsSecurityExpanded((prev) => !prev);
-  };
-
-  // Function to toggle dark mode by adding/removing a CSS class on the document body
-  const toggleDarkMode = () => {
-    setIsDarkMode((prev) => {
-      const newValue = !prev;
-      document.body.classList.toggle("dark-mode", newValue);
-      return newValue;
-    });
   };
 
   return (
@@ -63,8 +56,8 @@ const Settings = () => {
               <ToggleWrapper>
                 <StyledToggle
                   type="checkbox"
-                  checked={isDarkMode}
-                  onChange={toggleDarkMode}
+                  checked={isDark}
+                  onChange={toggleTheme}
                 />
               </ToggleWrapper>
             </SettingAction>

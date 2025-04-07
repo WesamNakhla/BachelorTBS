@@ -1,17 +1,22 @@
+// src/theme/GlobalStyles.ts
 import { createGlobalStyle } from "styled-components";
 
-const GlobalStyles = createGlobalStyle`
-  * {
+export const GlobalStyles = createGlobalStyle`
+  body {
+    background-color: ${({ theme }) => theme.background};
+    color: ${({ theme }) => theme.text};
+    font-family: 'Inter', sans-serif;
     margin: 0;
     padding: 0;
+    transition: all 0.25s linear;
+  }
+
+  *, *::before, *::after {
     box-sizing: border-box;
   }
 
-  body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 `;
-
-export default GlobalStyles;
