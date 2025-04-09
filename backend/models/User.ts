@@ -1,28 +1,83 @@
-import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
-const UserSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    role: { type: String, default: "user" },
-  },
-  { timestamps: true }
-);
+// Define the User interface for TypeScript
+export interface IUser {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+}
 
-// Password hashing middleware
-UserSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
+// Mock database for storing users (replace with your actual database logic)
+const users: IUser[] = [];
+
+// Export the mock database or logic as default
+export { users };
+
+/**
+ * Hash the user's password before saving it to the database.
+ * @param user - The user object
+ */
+export async function hashPassword(user: IUser): Promise<IUser> {
   const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
-  next();
-});
+  user.password = await bcrypt.hash(user.password, salt);
+  return user;
+}
 
-// Compare password method
-UserSchema.methods.matchPassword = async function (enteredPassword: string) {
-  return await bcrypt.compare(enteredPassword, this.password);
+/**
+ * Compare the entered password with the hashed password.
+ * @param enteredPassword - The password entered by the user
+ * @param storedPassword - The hashed password stored in the database
+ * @returns A boolean indicating whether the passwords match
+ */
+export async function matchPassword(
+  enteredPassword: string,
+  storedPassword: string
+): Promise<boolean> {
+  return await bcrypt.compare(enteredPassword, storedPassword);
+}
+
+/**
+ * Add a new user to the mock database.
+ * @param user - The user object to add
+ */
+export function addUser(user: IUser): void {
+  users.push(user);
+}
+
+/**
+ * Get all users from the mock database.
+ * @returns An array of users
+ */
+export function getUsers(): IUser[] {
+  return users;
+}
+
+/**
+ * Swagger schema definition for the User model.
+ * This will be used in the Swagger documentation.
+ */
+export const swaggerUserSchema = {
+  type: "object",
+  required: ["name", "email", "password"],
+  properties: {
+    name: {
+      type: "string",
+      description: "The name of the user",
+    },
+    email: {
+      type: "string",
+      format: "email",
+      description: "The email address of the user",
+    },
+    password: {
+      type: "string",
+      format: "password",
+      description: "The user's password",
+    },
+    role: {
+      type: "string",
+      description: "The role of the user (default: 'user')",
+    },
+  },
 };
-
-const User = mongoose.model("User", UserSchema);
-export default User;

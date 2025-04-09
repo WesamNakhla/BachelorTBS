@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/User";
+import { users } from "../models/User"; // Import 'users' mock database
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
@@ -14,7 +14,6 @@ const generateToken = (id: string): string => {
 // Register user
 export const registerUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
-    // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -23,7 +22,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     const { name, email, password } = req.body;
 
     // Check if user already exists
-    const userExists = await User.findOne({ email });
+    const userExists = users.find((user) => user.email === email);
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
@@ -33,18 +32,19 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
-    const user = await User.create({ name, email, password: hashedPassword });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid user data" });
-    }
+    const newUser = {
+      name,
+      email,
+      password: hashedPassword,
+      role: "user",
+    };
+    users.push(newUser);
 
     // Send response
     return res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      token: generateToken(user._id.toString()),
+      name: newUser.name,
+      email: newUser.email,
+      token: generateToken(newUser.email),
     });
   } catch (error) {
     next(error);
@@ -54,7 +54,6 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
 // Login user
 export const loginUser = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
   try {
-    // Validate request body
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -63,7 +62,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     const { email, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = users.find((user) => user.email === email);
 
     // Check password
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -72,10 +71,9 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
     // Send response
     return res.json({
-      _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id.toString()),
+      token: generateToken(user.email),
     });
   } catch (error) {
     next(error);

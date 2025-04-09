@@ -3,33 +3,25 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import mongoose from "mongoose";
 import path from "path";
 import fs from "fs";
 
-// Load environment variables from .env file
+// Swagger imports
+import { swaggerUi, swaggerSpec } from "./docs/swagger"; // ✅ Make sure this file exists
+
+// Load environment variables from .env
 dotenv.config();
 
-// Initialize Express app
+// Initialize Express application
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://localhost:27017/bachelor-db";
 
-// Connect to MongoDB using Mongoose
-mongoose
-  .connect(MONGO_URI)
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch((err) => {
-    console.error("❌ MongoDB connection failed:", err);
-    process.exit(1);
-  });
-
-// Middleware
+// Middleware setup
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-// Enable CORS for frontend (adjust origin as needed)
+// CORS configuration (adjust origins if needed)
 const allowedOrigins = ["http://localhost:5173"];
 app.use(
   cors({
@@ -40,14 +32,18 @@ app.use(
   })
 );
 
-// Safe route loader with error isolation
+// Swagger documentation route
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+console.log("📚 Swagger UI available at /api-docs");
+
+// Dynamically load route files from backend/routes
 const loadRoutes = async (routesPath: string) => {
   const routeFiles = fs.readdirSync(routesPath);
 
   for (const file of routeFiles) {
     const fullPath = path.join(routesPath, file);
 
-    // Only .ts or .js files
+    // Only load TypeScript or JavaScript files
     if (!file.endsWith(".ts") && !file.endsWith(".js")) continue;
 
     try {
@@ -65,26 +61,27 @@ const loadRoutes = async (routesPath: string) => {
   }
 };
 
-// Load all routes from the "routes" directory
+// Load routes from backend/routes directory
 const routesDir = path.join(__dirname, "routes");
 if (fs.existsSync(routesDir)) {
   loadRoutes(routesDir);
 } else {
-  console.warn("⚠️ No 'routes' directory found to load.");
+  console.warn("⚠️ 'routes' directory not found.");
 }
 
-// Health check route
+// Health check endpoint
 app.get("/", (req: Request, res: Response) => {
   res.status(200).json({ message: "✅ API is running" });
 });
 
-// Global error handler
-app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+// Global error handler middleware
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: unknown, req: Request, res: Response, _next: NextFunction) => {
   console.error("❌ Global Error:", err instanceof Error ? err.message : err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// Start server
+// Start the Express server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server is running at http://localhost:${PORT}`);
 });

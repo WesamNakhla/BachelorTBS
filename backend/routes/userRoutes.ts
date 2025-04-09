@@ -1,73 +1,87 @@
-import express from "express";
-import type { Request, Response, NextFunction } from "express";
-import User from "../models/userModel";
+import { Router, Request, Response } from "express";
 
-const router = express.Router();
+const router = Router();
 
-// Get all users
-router.get("/", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    next(error);
-  }
+/**
+ * @swagger
+ * tags:
+ *   name: Users
+ *   description: API endpoints for managing users
+ */
+
+/**
+ * @swagger
+ * /api/user:
+ *   get:
+ *     summary: Get all users
+ *     tags: [Users]
+ *     responses:
+ *       200:
+ *         description: Successfully fetched users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ */
+router.get("/", (req: Request, res: Response): void => {
+  // Placeholder response (replace with DB logic later)
+  res.status(200).json([
+    { id: "1", name: "Alice", email: "alice@example.com" },
+    { id: "2", name: "Bob", email: "bob@example.com" },
+  ]);
 });
 
-// Get a user by ID
-router.get("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) {
-      res.status(404).json({ message: "User not found." });
-      return;
-    }
-    res.status(200).json(user);
-  } catch (error) {
-    console.error("Error fetching user by ID:", error);
-    next(error);
+/**
+ * @swagger
+ * /api/user:
+ *   post:
+ *     summary: Create a new user
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - name
+ *               - email
+ *             properties:
+ *               name:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: User created successfully
+ *       400:
+ *         description: Invalid request data
+ */
+router.post("/", (req: Request, res: Response): void => {
+  const { name, email } = req.body;
+
+  if (!name || !email) {
+    res.status(400).json({ error: "Name and email are required." });
+    return;
   }
-});
 
-// Update a user by ID
-router.put("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const { name, email, role } = req.body;
+  // Simulate new user creation (replace with DB logic)
+  const newUser = {
+    id: Date.now().toString(),
+    name,
+    email,
+  };
 
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { name, email, role },
-      { new: true, runValidators: true }
-    );
-
-    if (!updatedUser) {
-      res.status(404).json({ message: "User not found." });
-      return;
-    }
-
-    res.status(200).json(updatedUser);
-  } catch (error) {
-    console.error("Error updating user:", error);
-    next(error);
-  }
-});
-
-// Delete a user by ID
-router.delete("/:id", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
-
-    if (!deletedUser) {
-      res.status(404).json({ message: "User not found." });
-      return;
-    }
-
-    res.status(204).end(); // No Content
-  } catch (error) {
-    console.error("Error deleting user:", error);
-    next(error);
-  }
+  res.status(201).json(newUser);
 });
 
 export default router;
