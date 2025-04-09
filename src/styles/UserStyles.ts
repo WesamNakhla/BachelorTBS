@@ -1,31 +1,34 @@
-// Removed duplicate import
+// src/styles/UserStyles.ts
+import styled from "styled-components";
 
-// Container for all user-related pages
+/* ==== MAIN CONTAINER ==== */
 export const UserContainer = styled.div`
   padding: 24px;
   width: 100%;
+  background-color: ${({ theme }) => theme.background};
+  color: ${({ theme }) => theme.text};
 `;
 
-// Table styles
+/* ==== TABLE STYLES ==== */
 export const UserTable = styled.table`
   width: 100%;
   border-collapse: collapse;
   margin-top: 16px;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.cardBackground};
   border-radius: 10px;
   overflow: hidden;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
 `;
 
 export const TableHead = styled.thead`
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.headerBackground || "#f3f4f6"};
 `;
 
 export const TableRow = styled.tr`
   border-bottom: 1px solid #e5e7eb;
 
   &:hover {
-    background-color: #f3f4f6;
+    background-color: ${({ theme }) => theme.hoverBackground || "#f3f4f6"};
   }
 `;
 
@@ -34,7 +37,7 @@ export const TableHeader = styled.th`
   padding: 14px 18px;
   font-weight: 600;
   font-size: 14px;
-  color: #374151;
+  color: ${({ theme }) => theme.text};
 `;
 
 export const TableBody = styled.tbody``;
@@ -42,11 +45,11 @@ export const TableBody = styled.tbody``;
 export const TableData = styled.td`
   padding: 14px 18px;
   font-size: 14px;
-  color: #4b5563;
+  color: ${({ theme }) => theme.subText || "#4b5563"};
   vertical-align: middle;
 `;
 
-// Top bar with title and add button
+/* ==== HEADER BAR ==== */
 export const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -56,7 +59,7 @@ export const TopBar = styled.div`
   gap: 12px;
 `;
 
-// Search input style
+/* ==== SEARCH & FILTER ==== */
 export const SearchInput = styled.input`
   padding: 10px 14px;
   border: 1px solid #d1d5db;
@@ -64,42 +67,54 @@ export const SearchInput = styled.input`
   font-size: 14px;
   flex: 1;
   min-width: 250px;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.inputBackground || "#ffffff"};
+  color: ${({ theme }) => theme.text};
 `;
 
-// Filter dropdown
 export const FilterSelect = styled.select`
   padding: 10px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.inputBackground || "#ffffff"};
+  color: ${({ theme }) => theme.text};
 `;
 
-// Add button
+/* ==== ADD BUTTON ==== */
+
 export const AddButton = styled.button`
-  background-color: #3b82f6;
-  color: white;
-  padding: 10px 18px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 600;
   border: none;
   border-radius: 8px;
-  font-weight: 600;
-  font-size: 14px;
+  background-color: ${({ theme }) => theme.primary || "#3b82f6"};
+  color: #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  transition: all 0.25s ease;
 
   &:hover {
-    background-color: #2563eb;
+    background-color: ${({ theme }) => theme.primaryDark || "#2563eb"};
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.15);
+  }
+
+  &:disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    box-shadow: none;
+    cursor: not-allowed;
   }
 `;
 
-// Action buttons container
+/* ==== ACTION BUTTONS ==== */
 export const ActionButtons = styled.div`
   display: flex;
   gap: 8px;
   flex-wrap: wrap;
 `;
 
-// View button
 export const ViewButton = styled.button`
   background-color: #e0f2fe;
   color: #0369a1;
@@ -114,7 +129,6 @@ export const ViewButton = styled.button`
   }
 `;
 
-// Edit button
 export const EditButton = styled.button`
   background-color: #fef9c3;
   color: #92400e;
@@ -129,7 +143,6 @@ export const EditButton = styled.button`
   }
 `;
 
-// Delete button
 export const DeleteButton = styled.button`
   background-color: #fee2e2;
   color: #991b1b;
@@ -144,7 +157,7 @@ export const DeleteButton = styled.button`
   }
 `;
 
-// Detail row for user details page
+/* ==== USER DETAIL ROW ==== */
 export const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -156,16 +169,22 @@ export const DetailRow = styled.div`
     color: #374151;
     font-weight: 500;
   }
+
+  strong {
+    color: #111827;
+    font-weight: 600;
+    min-width: 120px;
+  }
 `;
 
-import styled from "styled-components";
-
+/* ==== FORM ELEMENTS (if reused) ==== */
 export const Input = styled.input`
   padding: 10px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #fff;
+  background-color: ${({ theme }) => theme.inputBackground || "#fff"};
+  color: ${({ theme }) => theme.text};
   width: 100%;
 `;
 
@@ -174,6 +193,7 @@ export const Select = styled.select`
   border: 1px solid #d1d5db;
   border-radius: 8px;
   font-size: 14px;
-  background-color: #fff;
+  background-color: ${({ theme }) => theme.inputBackground || "#fff"};
+  color: ${({ theme }) => theme.text};
   width: 100%;
 `;

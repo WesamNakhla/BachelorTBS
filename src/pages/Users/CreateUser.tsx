@@ -1,23 +1,29 @@
+// src/pages/Users/CreateUser.tsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import {
-  UserContainer,
-  DetailRow,
-} from "../../styles/UserStyles";
-import { Input, Select } from "../../styles/InvoiceStyles";
-import { Button } from "../../components/ui/Button";
+import { DetailRow } from "@/styles/UserStyles";
+import { Input, Select } from "@/styles/InvoiceStyles";
+import { Button } from "@/components/ui/Button";
 import { toast } from "react-toastify";
+import type { User } from "../types/User";
 
-// Define the CreateUser form fields
+// Props passed from UserModal
+interface CreateUserProps {
+  onCancel?: () => void;
+  onSuccess?: (user: User) => void;
+}
+
+// Local form state type
 interface CreateUserForm {
   name: string;
   email: string;
   password: string;
-  role: string;
+  role: User["role"];
 }
 
-const CreateUser = () => {
+const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<CreateUserForm>({
@@ -29,8 +35,10 @@ const CreateUser = () => {
 
   const [loading, setLoading] = useState(false);
 
-  // Handle input changes
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  // Handle input field changes
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
@@ -41,9 +49,14 @@ const CreateUser = () => {
     setLoading(true);
 
     try {
-      await axios.post("/api/users", formData);
+      const response = await axios.post("/api/users", formData);
+
       toast.success("User created successfully!");
-      navigate("/users");
+      if (onSuccess) {
+        onSuccess(response.data); // notify parent component
+      } else {
+        navigate("/users");
+      }
     } catch (error) {
       console.error("Error creating user:", error);
       toast.error("Failed to create user.");
@@ -53,10 +66,12 @@ const CreateUser = () => {
   };
 
   return (
-    <UserContainer style={{ maxWidth: "600px", margin: "0 auto" }}>
-      <h1>Create New User</h1>
-
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px", marginTop: "24px" }}>
+    <div style={{ maxWidth: "600px", width: "100%" }}>
+      <h2 style={{ marginBottom: "24px" }}>Create New User</h2>
+      <form
+        onSubmit={handleSubmit}
+        style={{ display: "flex", flexDirection: "column", gap: "20px" }}
+      >
         <DetailRow>
           <strong>Name:</strong>
           <Input
@@ -92,7 +107,12 @@ const CreateUser = () => {
 
         <DetailRow>
           <strong>Role:</strong>
-          <Select name="role" value={formData.role} onChange={handleChange} required>
+          <Select
+            name="role"
+            value={formData.role}
+            onChange={handleChange}
+            required
+          >
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
             <option value="client">Client</option>
@@ -100,8 +120,14 @@ const CreateUser = () => {
           </Select>
         </DetailRow>
 
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
-          <Button style={{ backgroundColor: "#ccc", color: "#333" }} onClick={() => navigate("/users")}>
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}
+        >
+          <Button
+            type="button"
+            style={{ backgroundColor: "#ccc", color: "#333" }}
+            onClick={onCancel ? onCancel : () => navigate("/users")}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>
@@ -109,7 +135,7 @@ const CreateUser = () => {
           </Button>
         </div>
       </form>
-    </UserContainer>
+    </div>
   );
 };
 

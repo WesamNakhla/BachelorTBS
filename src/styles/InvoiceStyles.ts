@@ -1,23 +1,95 @@
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+/* ==== ANIMATIONS ==== */
+const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+const slideIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+`;
+
+/* ==== MODAL ==== */
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1001;
+`;
+
+export const ModalContent = styled.div`
+  background-color: ${({ theme }) => theme.cardBackground || "#fff"};
+  color: ${({ theme }) => theme.text};
+  padding: 32px;
+  border-radius: 20px;
+  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  width: 90%;
+  animation: ${slideIn} 0.3s ease;
+
+  @media (max-width: 768px) {
+    width: 95%;
+    padding: 24px;
+  }
+`;
+
+export const CloseButton = styled.button`
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  color: ${({ theme }) => theme.text};
+  font-size: 22px;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover {
+    color: ${({ theme }) => theme.primary};
+  }
+`;
+
+/* ==== MODAL CONTAINER (if used separately) ==== */
+export const ModalContainer = styled.div`
+  background: #fff;
+  padding: 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  animation: ${slideIn} 0.3s ease;
+
+  @media (max-width: 600px) {
+    width: 90%;
+    padding: 16px;
+  }
+`;
 
 /* ==== LAYOUT WRAPPERS ==== */
 export const InvoiceContainer = styled.div`
   padding: 24px;
-  background: #ffffff;
+  background: ${({ theme }) => theme.cardBackground || "#ffffff"};
   border-radius: 16px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.3s ease-in-out;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
+  animation: ${fadeIn} 0.3s ease-in-out;
 
   @media (max-width: 768px) {
     padding: 16px;
@@ -65,117 +137,7 @@ export const TableData = styled.td`
   padding: 14px 18px;
   font-size: 14px;
   border-bottom: 1px solid #e2e6ea;
-  color: #333;
-`;
-
-/* ==== BUTTON BASE STYLE ==== */
-const baseButton = styled.button`
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: scale(1.08);
-  }
-`;
-
-export const ExportButton = styled(baseButton)`
-  background-color: #5a0ebc;
-
-  &:hover {
-    background-color: #4b0f9c;
-  }
-`;
-
-export const ImportButton = styled(baseButton)`
-  background-color: #1e5bbf;
-
-  &:hover {
-    background-color: #164a96;
-  }
-`;
-
-export const AddInvoiceButton = styled(baseButton)`
-  background-color: #28a745;
-
-  &:hover {
-    background-color: #218838;
-  }
-`;
-
-/* ==== MODAL ==== */
-export const ModalOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1001;
-`;
-
-export const ModalContainer = styled.div`
-  background: #fff;
-  padding: 24px;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 520px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  animation: slideIn 0.3s ease;
-
-  @keyframes slideIn {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-
-  @media (max-width: 600px) {
-    width: 90%;
-    padding: 16px;
-  }
-`;
-
-export const ModalHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 12px;
-  margin-bottom: 16px;
-
-  h3 {
-    font-size: 18px;
-    font-weight: 600;
-  }
-`;
-
-export const ModalContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-`;
-
-/* ==== CLOSE BUTTON ==== */
-export const CloseButton = styled.button`
-  font-size: 20px;
-  color: #aaa;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-
-  &:hover {
-    color: #000;
-  }
+  color: ${({ theme }) => theme.text || "#333"};
 `;
 
 /* ==== FORM ELEMENTS ==== */
@@ -216,6 +178,46 @@ export const Select = styled.select`
     border-color: #3b82f6;
     background-color: #ffffff;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+`;
+
+/* ==== BUTTON BASE STYLE ==== */
+const baseButton = styled.button`
+  padding: 10px 16px;
+  border-radius: 6px;
+  border: none;
+  font-size: 14px;
+  font-weight: 500;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    transform: scale(1.08);
+  }
+`;
+
+export const ExportButton = styled(baseButton)`
+  background-color: #5a0ebc;
+
+  &:hover {
+    background-color: #4b0f9c;
+  }
+`;
+
+export const ImportButton = styled(baseButton)`
+  background-color: #1e5bbf;
+
+  &:hover {
+    background-color: #164a96;
+  }
+`;
+
+export const AddInvoiceButton = styled(baseButton)`
+  background-color: #28a745;
+
+  &:hover {
+    background-color: #218838;
   }
 `;
 
@@ -269,6 +271,7 @@ export const ActionButtons = styled.div`
   margin: 16px 0;
   flex-wrap: wrap;
 `;
+
 export const Button = styled.button`
   padding: 10px 16px;
   border-radius: 6px;
@@ -283,6 +286,8 @@ export const Button = styled.button`
     transform: scale(1.08);
   }
 `;
+
+/* ==== INVOICE DETAILS BOX ==== */
 export const InvoiceInfo = styled.div`
   background-color: #ffffff;
   padding: 24px;
@@ -291,7 +296,7 @@ export const InvoiceInfo = styled.div`
   margin-top: 20px;
 `;
 
-// Row for individual detail (label + value)
+/* ==== DETAIL ROW (LABEL + VALUE) ==== */
 export const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;

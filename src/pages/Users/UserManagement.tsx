@@ -19,16 +19,9 @@ import {
 } from "../../styles/UserStyles";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import UserModal from "./UserModal"; // Ensure UserModal.tsx exists in the same directory
+import type { User } from "../types/User"; // ✅ unified User interface
 
-// User interface
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: "admin" | "editor" | "client" | "viewer" | "visitor";
-}
-
-// Replace this with real authenticated user role
 const currentUserRole: User["role"] = "admin";
 
 const UserManagement = () => {
@@ -38,17 +31,18 @@ const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
-  // Prevent unauthorized roles from accessing the page
+  // Redirect unauthorized roles
   useEffect(() => {
     if (["viewer", "visitor"].includes(currentUserRole)) {
-      navigate("/"); // Redirect to homepage
+      navigate("/");
     }
-  }, []);
+  }, [navigate]);
 
-  // Fetch users from backend
+  // Fetch users from the backend
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -67,7 +61,7 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Search and filter users
+  // Filter and search users
   useEffect(() => {
     const filtered = users.filter((user) => {
       const matchQuery =
@@ -76,13 +70,14 @@ const UserManagement = () => {
       const matchRole = roleFilter ? user.role === roleFilter : true;
       return matchQuery && matchRole;
     });
+
     setFilteredUsers(filtered);
   }, [searchQuery, roleFilter, users]);
 
-  // Delete a user by ID
+  // Handle user deletion
   const handleDelete = async (userId: number) => {
-    const confirm = window.confirm("Are you sure you want to delete this user?");
-    if (!confirm) return;
+    const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+    if (!confirmDelete) return;
 
     try {
       await axios.delete(`/api/users/${userId}`);
@@ -101,13 +96,12 @@ const UserManagement = () => {
       <TopBar>
         <h1>User Management</h1>
         {currentUserRole === "admin" && (
-          <AddButton onClick={() => navigate("/users/create")}>
+          <AddButton onClick={() => setIsModalOpen(true)}>
             + Add User
           </AddButton>
         )}
       </TopBar>
 
-      {/* Search and Role Filter */}
       <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginBottom: "16px" }}>
         <SearchInput
           placeholder="Search by name or email..."
@@ -124,10 +118,8 @@ const UserManagement = () => {
         </FilterSelect>
       </div>
 
-      {/* Error Message */}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {/* User Table */}
       {loading ? (
         <p>Loading users...</p>
       ) : filteredUsers.length > 0 ? (
@@ -150,10 +142,7 @@ const UserManagement = () => {
                 <TableData>{user.role}</TableData>
                 <TableData>
                   <ActionButtons>
-                    {/* View button available for all */}
                     <ViewButton onClick={() => navigate(`/users/${user.id}`)}>View</ViewButton>
-
-                    {/* Edit/Delete only for admin */}
                     {currentUserRole === "admin" && (
                       <>
                         <EditButton onClick={() => navigate(`/users/edit/${user.id}`)}>Edit</EditButton>
@@ -168,6 +157,18 @@ const UserManagement = () => {
         </UserTable>
       ) : (
         <p>No users found.</p>
+      )}
+
+      {isModalOpen && (
+        <UserModal
+          onClose={() => setIsModalOpen(false)}
+          onUserCreated={(newUser) => {
+            const updatedList = [...users, newUser];
+            setUsers(updatedList);
+            setFilteredUsers(updatedList);
+            toast.success("User created successfully.");
+          }}
+        />
       )}
     </UserContainer>
   );
