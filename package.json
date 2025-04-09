@@ -2,7 +2,7 @@
   "name": "tbsbachelor-team",
   "version": "0.0.0",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "scripts": {
     "mock": "json-server --watch db.json --port 3001",
     "dev": "vite",
@@ -35,8 +35,6 @@
     "react-toastify": "^11.0.5",
     "recharts": "^2.15.1",
     "styled-components": "^6.1.16",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
     "xlsx": "^0.18.5",
     "yup": "^1.6.1",
     "zustand": "^5.0.3"
