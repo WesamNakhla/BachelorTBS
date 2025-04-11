@@ -1,28 +1,61 @@
 {
   "compilerOptions": {
+    // Set the JavaScript language version for the output
     "target": "es6",
+
+    // Set the module system used in the project
     "module": "commonjs",
+
+    // Use Node-style module resolution
     "moduleResolution": "node",
+
+    // Enable strict type-checking options
     "strict": true,
+
+    // Allow default imports from modules with no default export
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
+
+    // Skip type checking of all declaration files (*.d.ts)
     "skipLibCheck": true,
+
+    // Use the modern JSX transform with React 17+
     "jsx": "react-jsx",
+
+    // Ensure consistent casing in imports
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./",
+
+    // Base directory to resolve non-relative module names
+    "baseUrl": "src", // Required for path aliases to work properly
+
+    // Custom path aliases for simplified imports
     "paths": {
-      "@/*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@styles/*": ["src/styles/*"],
-      "@pages/*": ["src/pages/*"],
-      "@hooks/*": ["src/hooks/*"],
-      "@context/*": ["src/context/*"],
-      "@utils/*": ["src/utils/*"]
+      "@/*": ["*"],
+      "@components/*": ["components/*"],
+      "@styles/*": ["styles/*"],
+      "@pages/*": ["pages/*"],
+      "@hooks/*": ["hooks/*"],
+      "@context/*": ["context/*"],
+      "@utils/*": ["utils/*"]
     },
+
+    // Where to find type declaration packages
     "typeRoots": ["./node_modules/@types", "./backend/types"],
+
+    // Output directory for compiled JavaScript files
     "outDir": "./dist",
+
+    // Root directory of the TypeScript project
     "rootDir": "./"
   },
-  "include": ["backend/**/*.ts"],
-  "exclude": ["node_modules"]
+
+  // Files to include in the TypeScript compiler
+  "include": [
+    "backend/**/*.ts",   // Include all backend TypeScript files
+    "src/**/*.tsx",      // Include all React JSX files
+    "src/**/*.ts"        // Include all frontend TypeScript files
+  ],
+
+  // Folders to exclude from the compiler
+  "exclude": ["node_modules"] // Exclude dependencies
 }
