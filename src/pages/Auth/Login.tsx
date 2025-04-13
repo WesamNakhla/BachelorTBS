@@ -1,5 +1,7 @@
+// src/pages/Auth/Login.tsx
+
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
@@ -8,7 +10,8 @@ import {
   LoginTitle,
   Form,
   Input,
-  SubmitButton
+  SubmitButton,
+  ForgotPasswordLink // ✅ Styled link
 } from "../../styles/LoginStyles";
 
 const Login: React.FC = () => {
@@ -38,12 +41,11 @@ const Login: React.FC = () => {
 
     setLoading(true);
 
-    // Temporary local login check
     setTimeout(() => {
       if (username === "admin" && password === "admin") {
-        login(); // Set auth status to true
+        login(); // ✅ simulate auth success
         toast.success("Login successful!");
-        navigate("/Sidebar"); // Redirect to the dashboard or sidebar page
+        navigate("/dashboard");
       } else {
         toast.error("Invalid username or password.");
       }
@@ -54,6 +56,7 @@ const Login: React.FC = () => {
   return (
     <LoginWrapper>
       <LoginTitle>Logg inn</LoginTitle>
+
       <Form onSubmit={handleSubmit}>
         <Input
           type="text"
@@ -69,6 +72,9 @@ const Login: React.FC = () => {
           onChange={(e) => handleChange("password", e.target.value)}
           required
         />
+
+        {/* ✅ Link to reset password */}
+        <ForgotPasswordLink to="/auth/forgot-password">Forgot your password?</ForgotPasswordLink>
         <SubmitButton type="submit" disabled={loading}>
           {loading ? "Logger inn..." : "Logg inn"}
         </SubmitButton>

@@ -1,39 +1,41 @@
-// src/styles/LoginStyles.ts
-import styled from "styled-components";
-import { Link as RouterLink } from "react-router-dom";
+// src/styles/ResetPasswordStyles.ts
 
-// Wrapper for the entire login area
-export const LoginWrapper = styled.div`
+import styled from "styled-components";
+
+// Wrapper for the reset password page
+export const ResetWrapper = styled.div`
   max-width: 400px;
   margin: 5rem auto;
-  padding: 2rem;
+  padding: 2.5rem;
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
 `;
 
-// Title of the login form
-export const LoginTitle = styled.h2`
+// Page title
+export const ResetTitle = styled.h2`
   text-align: center;
-  margin-bottom: 1.5rem;
-  font-size: 1.8rem;
+  margin-bottom: 1.8rem;
+  font-size: 1.9rem;
+  font-weight: bold;
   color: #333;
 `;
 
-// Login form container
+// Form container
 export const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.2rem;
 `;
 
-// Styled input fields
+// Styled input field
 export const Input = styled.input`
-  padding: 0.75rem;
+  padding: 0.75rem 1rem;
   font-size: 1rem;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 
   &:focus {
     border-color: #667eea;
@@ -41,9 +43,9 @@ export const Input = styled.input`
   }
 `;
 
-// Styled submit button
+// Submit button
 export const SubmitButton = styled.button`
-   padding: 0.75rem;
+  padding: 0.75rem;
   background: linear-gradient(to right, #667eea, #764ba2);
   color: white;
   font-size: 1rem;
@@ -65,22 +67,19 @@ export const SubmitButton = styled.button`
   }
 `;
 
-// Forgot password link (React Router Link)
-export const ForgotPasswordLink = styled(RouterLink)`
-  text-align: right;
+// Link to return to login
+export const BackLink = styled.button`
+  margin-top: 0.5rem;
+  text-align: center;
   font-size: 0.9rem;
   color: #667eea;
-  text-decoration: none;
-  margin-top: -0.5rem;
-  margin-bottom: 0.5rem;
-  display: block;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-decoration: underline;
+  transition: color 0.3s ease;
 
   &:hover {
-    text-decoration: underline;
-  }
-
-  &:focus {
-    outline: 2px dashed #667eea;
-    outline-offset: 3px;
+    color: #5a67d8;
   }
 `;
