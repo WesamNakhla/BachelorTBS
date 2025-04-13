@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
@@ -79,9 +79,9 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 // Global error handler
-app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
-  console.error("❌ Global Error:", err instanceof Error ? err.message : err);
-  res.status(500).json({ error: "Internal Server Error" });
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((req, res, next) => {
+  res.send("Hello");
 });
 
 // Start server

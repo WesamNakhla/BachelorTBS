@@ -2,8 +2,8 @@ import React, { createContext, useState, ReactNode } from "react";
 
 interface AuthContextType {
   user: { id: string; name: string; email: string } | null;
-  login: () => void;
-  logout: () => void;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
   loading: boolean;
 }
 
@@ -13,8 +13,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [user, setUser] = useState<AuthContextType["user"]>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  const login = () => setUser({ id: "1", name: "User", email: "user@example.com" });
-  const logout = () => setUser(null);
+  const login = async () => {
+    setLoading(true);
+    setTimeout(() => {
+      setUser({ id: "1", name: "User", email: "user@example.com" });
+      setLoading(false);
+    }, 1000); // Simulate a network request
+  };
+
+  const logout = async () => {
+    setLoading(true);
+    setTimeout(() => {
+      setUser(null);
+      setLoading(false);
+    }, 1000); // Simulate a network request
+  };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
