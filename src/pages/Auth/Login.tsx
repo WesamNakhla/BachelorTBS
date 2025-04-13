@@ -1,10 +1,8 @@
-// src/pages/Auth/Login.tsx
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 
-// Styled components for login form
 import {
   LoginWrapper,
   LoginTitle,
@@ -15,71 +13,58 @@ import {
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
 
-  // Form state for email and password
   const [form, setForm] = useState({
-    email: "",
+    username: "",
     password: ""
   });
 
   const [loading, setLoading] = useState(false);
 
-  // Handle form input changes
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  // Handle login form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!form.email || !form.password) {
-      toast.error("Please enter both email and password.");
+    const { username, password } = form;
+
+    if (!username || !password) {
+      toast.error("Please fill in both fields.");
       return;
     }
 
-    try {
-      setLoading(true);
+    setLoading(true);
 
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(form)
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        toast.success("Logged in successfully.");
-        navigate("/dashboard");
+    // Temporary local login check
+    setTimeout(() => {
+      if (username === "admin" && password === "admin") {
+        login(); // Set auth status to true
+        toast.success("Login successful!");
+        navigate("/Sidebar"); // Redirect to the dashboard or sidebar page
       } else {
-        toast.error(data.message || "Invalid credentials.");
+        toast.error("Invalid username or password.");
       }
-    } catch (error) {
-        toast.error("Server error. Please try again later.");
-        console.error(error); // ✅ Marks it as used
-      } finally {
       setLoading(false);
-    }
+    }, 1000);
   };
 
   return (
     <LoginWrapper>
       <LoginTitle>Logg inn</LoginTitle>
-
       <Form onSubmit={handleSubmit}>
         <Input
-          type="email"
-          placeholder="E-post"
-          value={form.email}
-          onChange={(e) => handleChange("email", e.target.value)}
+          type="text"
+          placeholder="Username"
+          value={form.username}
+          onChange={(e) => handleChange("username", e.target.value)}
           required
         />
         <Input
           type="password"
-          placeholder="Passord"
+          placeholder="Password"
           value={form.password}
           onChange={(e) => handleChange("password", e.target.value)}
           required

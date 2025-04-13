@@ -1,37 +1,34 @@
-import React, { createContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
+// Define types for AuthContext
 interface AuthContextType {
-  user: { id: string; name: string; email: string } | null;
-  login: () => Promise<void>;
-  logout: () => Promise<void>;
-  loading: boolean;
+  isAuthenticated: boolean;
+  login: () => void;
+  logout: () => void;
 }
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+// Create the context
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<AuthContextType["user"]>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+// AuthProvider component to wrap the application
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const login = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      setUser({ id: "1", name: "User", email: "user@example.com" });
-      setLoading(false);
-    }, 1000); // Simulate a network request
-  };
-
-  const logout = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      setUser(null);
-      setLoading(false);
-    }, 1000); // Simulate a network request
-  };
+  const login = () => setIsAuthenticated(true);
+  const logout = () => setIsAuthenticated(false);
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Custom hook to use the AuthContext
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
 };
