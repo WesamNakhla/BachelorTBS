@@ -5,8 +5,8 @@ import bcrypt from "bcryptjs";
 import { validationResult } from "express-validator";
 
 // Generate JWT Token
-const generateToken = (id: string): string => {
-  return jwt.sign({ id }, process.env.JWT_SECRET as string, {
+const generateToken = (id: string, role: string): string => {
+  return jwt.sign({ id: id, role: role }, process.env.JWT_SECRET as string, {
     expiresIn: "30d",
   });
 };
@@ -20,7 +20,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
@@ -33,7 +33,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
-    const user = await User.create({ name, email, password: hashedPassword });
+    const user = await User.create({ name, email, password: hashedPassword, role });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid user data" });
@@ -44,7 +44,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id.toString()),
+      role: user.role,
     });
   } catch (error) {
     next(error);
@@ -75,7 +75,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       _id: user._id,
       name: user.name,
       email: user.email,
-      token: generateToken(user._id.toString()),
+      token: generateToken(user._id.toString(), user.role),
     });
   } catch (error) {
     next(error);
