@@ -1,3 +1,4 @@
+// src/components/Sidebar.tsx
 import React, { useState } from "react";
 import {
   SidebarContainer,
@@ -27,13 +28,12 @@ const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
 
-  // Navigation links (Security Settings removed and merged into Settings)
+  // Navigation links (Kunder removed, Inventory added)
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: <Home /> },
     { to: "/invoices", label: "Fakturaer", icon: <FileText /> },
-    { to: "/customers", label: "Kunder", icon: <Users /> },
+    { to: "/inventory", label: "Inventory", icon: <FileText /> }, // New Inventory section
     { to: "/users", label: "Users", icon: <Users /> },
-    // { to: "/settings/security", label: "Security Settings", icon: <Lock /> }, // Removed
     { to: "/settings/security/logs", label: "Activity Logs", icon: <FileSignature /> },
     { to: "/reports", label: "Reports", icon: <FileText /> },
     { to: "/notifications", label: "Notifications", icon: <Bell /> },

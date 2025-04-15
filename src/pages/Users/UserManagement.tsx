@@ -1,3 +1,4 @@
+// src/pages/Users/UserManagement.tsx
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -113,6 +114,7 @@ const UserManagement = () => {
           <option value="admin">Admin</option>
           <option value="editor">Editor</option>
           <option value="client">Client</option>
+          <option value="customer">Customer</option> {/* ✅ New role added */}
           <option value="viewer">Viewer</option>
           <option value="visitor">Visitor</option>
         </FilterSelect>

@@ -116,6 +116,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
             <option value="client">Client</option>
+            <option value="customer">Customer</option> {/* ✅ New role added */}
             <option value="viewer">Visitor</option>
           </Select>
         </DetailRow>
