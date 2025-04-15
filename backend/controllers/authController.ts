@@ -63,7 +63,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
 
     const { username, password } = req.body;
 
-    // Find user by email
+    // Find user by usename
     const user = await User.findOne({ username });
 
     // Check password
