@@ -12,7 +12,7 @@ const validateUserRegistration = [
 ];
 
 const validateUserLogin = [
-  body("email").isEmail().withMessage("Valid email is required"),
+  body("username").notEmpty().withMessage("Enter your username"),
   body("password").notEmpty().withMessage("Password is required"),
 ];
 

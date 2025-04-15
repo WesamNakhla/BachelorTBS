@@ -20,7 +20,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { name, email, password, role } = req.body;
+    const { name, email, password, role, username } = req.body;
 
     // Check if user already exists
     const userExists = await User.findOne({ email });
@@ -33,7 +33,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
     const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create new user
-    const user = await User.create({ name, email, password: hashedPassword, role });
+    const user = await User.create({ name, email, password: hashedPassword, role, username });
 
     if (!user) {
       return res.status(400).json({ message: "Invalid user data" });
@@ -45,6 +45,7 @@ export const registerUser = async (req: Request, res: Response, next: NextFuncti
       name: user.name,
       email: user.email,
       role: user.role,
+      username: user.username
     });
   } catch (error) {
     next(error);
@@ -60,10 +61,10 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     // Find user by email
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ username });
 
     // Check password
     if (!user || !(await bcrypt.compare(password, user.password))) {
@@ -75,6 +76,7 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
       _id: user._id,
       name: user.name,
       email: user.email,
+      username: username,
       token: generateToken(user._id.toString(), user.role),
     });
   } catch (error) {

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useNavigate, } from "react-router-dom";
 import { toast } from "react-toastify";
-import { useAuth } from "../../context/AuthContext";
+import axiosInstance from "@/utils/api";
 
 import {
   LoginWrapper,
@@ -16,7 +16,6 @@ import {
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
 
   const [form, setForm] = useState({
     username: "",
@@ -31,6 +30,7 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    try{
 
     const { username, password } = form;
 
@@ -40,17 +40,22 @@ const Login: React.FC = () => {
     }
 
     setLoading(true);
-
-    setTimeout(() => {
-      if (username === "admin" && password === "admin") {
-        login(); // ✅ simulate auth success
-        toast.success("Login successful!");
-        navigate("/dashboard");
-      } else {
-        toast.error("Invalid username or password.");
-      }
+    if (username === "admin" && password === "admin") {
+      let response = await axiosInstance.post("/login", { username, password });
+      toast.success("Login successful!");
+      navigate("/dashboard");
+      return response;
+    } else {
+      toast.error("Invalid username or password.");
+    }
       setLoading(false);
-    }, 1000);
+    }catch(err: any){
+      console.log(err);
+        toast.error(err.message);
+        setLoading(false);
+    }
+
+
   };
 
   return (
