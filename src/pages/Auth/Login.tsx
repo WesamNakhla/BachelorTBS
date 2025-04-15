@@ -40,15 +40,12 @@ const Login: React.FC = () => {
     }
 
     setLoading(true);
-    if (username === "admin" && password === "admin") {
       let response = await axiosInstance.post("/login", { username, password });
       toast.success("Login successful!");
+      setLoading(false);
       navigate("/dashboard");
       return response;
-    } else {
-      toast.error("Invalid username or password.");
-    }
-      setLoading(false);
+      
     }catch(err: any){
       console.log(err);
         toast.error(err.message);
