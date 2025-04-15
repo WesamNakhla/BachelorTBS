@@ -1,12 +1,17 @@
+// src/App.tsx
+
 import React, { useEffect, useState } from "react";
-import { BrowserRouter as Router, useLocation } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  useLocation,
+} from "react-router-dom";
 import Sidebar from "./components/Sidebar";
 import AppRoutes from "./routes/AppRoutes";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 
-// Layout handler component that hides sidebar on public pages
+// ✅ Layout component to manage sidebar visibility
 const LayoutWrapper: React.FC = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
   const location = useLocation();
@@ -20,18 +25,19 @@ const LayoutWrapper: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isPublicRoute = ["/", "/auth/login"].includes(location.pathname);
+  const isPublicRoute = ["/", "/auth/login", "/auth/forgot-password", "/auth/reset-password"].includes(location.pathname);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* Show sidebar only after login */}
+      {/* ✅ Show sidebar only if logged in and not on public routes */}
       {isAuthenticated && !isPublicRoute && <Sidebar />}
 
       <div
         style={{
           flex: 1,
           padding: "20px",
-          marginLeft: isAuthenticated && !isPublicRoute && isDesktop ? "250px" : "0px",
+          marginLeft:
+            isAuthenticated && !isPublicRoute && isDesktop ? "250px" : "0px",
           transition: "margin-left 0.3s ease",
         }}
       >
@@ -41,6 +47,7 @@ const LayoutWrapper: React.FC = () => {
   );
 };
 
+// ✅ Wrap the app in AuthProvider and Router
 const App: React.FC = () => {
   return (
     <AuthProvider>

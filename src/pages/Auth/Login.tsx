@@ -1,7 +1,7 @@
 // src/pages/Auth/Login.tsx
 
 import React, { useState } from "react";
-import { useNavigate, } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
 
@@ -11,7 +11,7 @@ import {
   Form,
   Input,
   SubmitButton,
-  ForgotPasswordLink // ✅ Styled link
+  ForgotPasswordLink,
 } from "../../styles/LoginStyles";
 
 const Login: React.FC = () => {
@@ -20,7 +20,7 @@ const Login: React.FC = () => {
 
   const [form, setForm] = useState({
     username: "",
-    password: ""
+    password: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -31,7 +31,6 @@ const Login: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const { username, password } = form;
 
     if (!username || !password) {
@@ -42,13 +41,36 @@ const Login: React.FC = () => {
     setLoading(true);
 
     setTimeout(() => {
-      if (username === "admin" && password === "admin") {
-        login(); // ✅ simulate auth success
+      // ✅ Simulated credentials for testing (can be deleted later)
+      const validCredentials: { [key: string]: { password: string; role: "admin" | "employee" | "customer" } } = {
+        admin: { password: "admin123", role: "admin" },
+        employee: { password: "employee123", role: "employee" },
+        customer: { password: "customer123", role: "customer" },
+      };
+
+      const userData = validCredentials[username];
+
+      if (userData && userData.password === password) {
+        // Set user info in context
+        login({
+          id: "1",
+          name: username,
+          email: `${username}@example.com`,
+          role: userData.role,
+        });
+
         toast.success("Login successful!");
-        navigate("/dashboard");
+
+        // Redirect user based on role
+        if (userData.role === "customer") {
+          navigate("/invoices");
+        } else {
+          navigate("/dashboard");
+        }
       } else {
         toast.error("Invalid username or password.");
       }
+
       setLoading(false);
     }, 1000);
   };
@@ -73,8 +95,10 @@ const Login: React.FC = () => {
           required
         />
 
-        {/* ✅ Link to reset password */}
-        <ForgotPasswordLink to="/auth/forgot-password">Forgot your password?</ForgotPasswordLink>
+        <ForgotPasswordLink to="/auth/forgot-password">
+          Forgot your password?
+        </ForgotPasswordLink>
+
         <SubmitButton type="submit" disabled={loading}>
           {loading ? "Logger inn..." : "Logg inn"}
         </SubmitButton>

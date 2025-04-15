@@ -7,14 +7,13 @@ import { Routes, Route } from "react-router-dom";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login";
 import ForgotPassword from "../pages/Auth/ForgotPassword";
-import ResetPassword from "../pages/Auth/ResetPassword"; // ✅ Import added
+import ResetPassword from "../pages/Auth/ResetPassword";
 import NotFound from "../pages/NotFound/NotFound";
 
-// Private dashboard pages
+// Private pages
 import Dashboard from "../pages/Dashboard/Dashboard";
 import InvoiceList from "../pages/Invoices/InvoiceList";
-// import CustomerList from "../pages/Customers/CustomerList"; ❌ Removed
-import InventoryList from "../pages/Inventory/InventoryList"; // ✅ New import
+import InventoryList from "../pages/Inventory/InventoryList";
 import UserManagement from "../pages/Users/UserManagement";
 import CreateUser from "../pages/Users/CreateUser";
 import Reports from "../pages/Reports/Reports";
@@ -26,6 +25,9 @@ import SecuritySettings from "../pages/Settings/Security/SecuritySettings";
 import Enable2FA from "../pages/Settings/Security/Enable2FA";
 import ActivityLogs from "../pages/Settings/Security/ActivityLogs";
 
+// Protected Route
+import ProtectedRoute from "../components/ui/ProtectedRoute";
+
 const AppRoutes: React.FC = () => {
   return (
     <Routes>
@@ -35,20 +37,28 @@ const AppRoutes: React.FC = () => {
       <Route path="/auth/forgot-password" element={<ForgotPassword />} />
       <Route path="/auth/reset-password" element={<ResetPassword />} />
 
-      {/* Private dashboard routes */}
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/invoices" element={<InvoiceList />} />
-      <Route path="/inventory" element={<InventoryList />} /> {/* ✅ New route */}
-      <Route path="/users" element={<UserManagement />} />
-      <Route path="/users/create" element={<CreateUser />} />
-      <Route path="/reports" element={<Reports />} />
-      <Route path="/notifications" element={<Notifications />} />
-      <Route path="/settings" element={<Settings />} />
+      {/* Protected: Admin + Employee */}
+      <Route element={<ProtectedRoute allowedRoles={["admin", "employee"]} />}>
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/inventory" element={<InventoryList />} />
+        <Route path="/reports" element={<Reports />} />
+        <Route path="/notifications" element={<Notifications />} />
+      </Route>
 
-      {/* Security pages */}
-      <Route path="/settings/security" element={<SecuritySettings />} />
-      <Route path="/settings/security/enable-2fa" element={<Enable2FA />} />
-      <Route path="/settings/security/logs" element={<ActivityLogs />} />
+      {/* Protected: Admin only */}
+      <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+        <Route path="/users" element={<UserManagement />} />
+        <Route path="/users/create" element={<CreateUser />} />
+        <Route path="/settings" element={<Settings />} />
+        <Route path="/settings/security" element={<SecuritySettings />} />
+        <Route path="/settings/security/enable-2fa" element={<Enable2FA />} />
+        <Route path="/settings/security/logs" element={<ActivityLogs />} />
+      </Route>
+
+      {/* Protected: Customer only */}
+      <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
+        <Route path="/invoices" element={<InvoiceList />} />
+      </Route>
 
       {/* 404 fallback */}
       <Route path="*" element={<NotFound />} />

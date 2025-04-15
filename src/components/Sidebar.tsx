@@ -10,6 +10,11 @@ import {
   NavItem,
   NavLinkStyled,
   IconWrapper,
+  UserInfoSection,
+  UserName,
+  UserRole,
+  AvatarCircle,
+  UserMeta,
 } from "../styles/SidebarStyles";
 
 import {
@@ -21,18 +26,27 @@ import {
   FileSignature,
   Menu,
   X,
+  LogOut,
 } from "lucide-react";
-import { useLocation } from "react-router-dom";
+
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout, user } = useAuth();
 
-  // Navigation links (Kunder removed, Inventory added)
+  const handleLogout = () => {
+    logout();
+    navigate("/auth/login");
+  };
+
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: <Home /> },
     { to: "/invoices", label: "Fakturaer", icon: <FileText /> },
-    { to: "/inventory", label: "Inventory", icon: <FileText /> }, // New Inventory section
+    { to: "/inventory", label: "Inventory", icon: <FileText /> },
     { to: "/users", label: "Users", icon: <Users /> },
     { to: "/settings/security/logs", label: "Activity Logs", icon: <FileSignature /> },
     { to: "/reports", label: "Reports", icon: <FileText /> },
@@ -42,12 +56,12 @@ const Sidebar: React.FC = () => {
 
   return (
     <>
-      {/* Mobile Sidebar Toggle Button */}
+      {/* Mobile toggle button */}
       <HamburgerButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
         {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </HamburgerButton>
 
-      {/* Sidebar for desktop */}
+      {/* Desktop sidebar */}
       <SidebarContainer>
         <Logo>TBS</Logo>
         <Nav>
@@ -59,10 +73,44 @@ const Sidebar: React.FC = () => {
               </NavLinkStyled>
             </NavItem>
           ))}
+
+          {/* Logout as a separate button */}
+          <NavItem>
+            <button
+              onClick={handleLogout}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#374151",
+                width: "100%",
+                fontSize: "1rem",
+              }}
+            >
+              <IconWrapper><LogOut /></IconWrapper>
+              Logout
+            </button>
+          </NavItem>
         </Nav>
+
+        {/* User info (desktop) */}
+        {user && (
+          <UserInfoSection>
+            <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
+            <UserMeta>
+              <UserName>{user.name}</UserName>
+              <UserRole>{user.role.toUpperCase()}</UserRole>
+            </UserMeta>
+          </UserInfoSection>
+        )}
       </SidebarContainer>
 
-      {/* Sidebar for mobile */}
+      {/* Mobile sidebar */}
       <MobileSidebar $isOpen={isSidebarOpen}>
         <Logo>TBS</Logo>
         <Nav>
@@ -74,10 +122,46 @@ const Sidebar: React.FC = () => {
               </NavLinkStyled>
             </NavItem>
           ))}
+
+          {/* Logout for mobile */}
+          <NavItem>
+            <button
+              onClick={() => {
+                handleLogout();
+                setIsSidebarOpen(false);
+              }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "12px",
+                padding: "10px 12px",
+                borderRadius: "8px",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                color: "#374151",
+                width: "100%",
+                fontSize: "1rem",
+              }}
+            >
+              <IconWrapper><LogOut /></IconWrapper>
+              Logout
+            </button>
+          </NavItem>
         </Nav>
+
+        {/* User info (mobile) */}
+        {user && (
+          <UserInfoSection>
+            <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
+            <UserMeta>
+              <UserName>{user.name}</UserName>
+              <UserRole>{user.role.toUpperCase()}</UserRole>
+            </UserMeta>
+          </UserInfoSection>
+        )}
       </MobileSidebar>
 
-      {/* Background overlay for mobile */}
       {isSidebarOpen && <MobileOverlay onClick={() => setIsSidebarOpen(false)} />}
     </>
   );

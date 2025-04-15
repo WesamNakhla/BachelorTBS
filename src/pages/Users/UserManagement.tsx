@@ -1,4 +1,5 @@
 // src/pages/Users/UserManagement.tsx
+
 import { useEffect, useState } from "react";
 import axios from "axios";
 import {
@@ -20,10 +21,11 @@ import {
 } from "../../styles/UserStyles";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import UserModal from "./UserModal"; // Ensure UserModal.tsx exists in the same directory
-import type { User } from "../types/User"; // ✅ unified User interface
+import UserModal from "./UserModal";
+import type { User } from "../types/User"; // Removed unused UserRole import
 
-const currentUserRole: User["role"] = "admin";
+// ✅ Simulated current user role (use real auth in production)
+const currentUserRole: string = "admin";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
@@ -36,14 +38,14 @@ const UserManagement = () => {
 
   const navigate = useNavigate();
 
-  // Redirect unauthorized roles
+  // ✅ Block access for customer role
   useEffect(() => {
-    if (["viewer", "visitor"].includes(currentUserRole)) {
+    if (currentUserRole === "customer") {
       navigate("/");
     }
   }, [navigate]);
 
-  // Fetch users from the backend
+  // ✅ Fetch users from API
   useEffect(() => {
     const fetchUsers = async () => {
       try {
@@ -62,7 +64,7 @@ const UserManagement = () => {
     fetchUsers();
   }, []);
 
-  // Filter and search users
+  // ✅ Filter logic for search and role
   useEffect(() => {
     const filtered = users.filter((user) => {
       const matchQuery =
@@ -75,7 +77,7 @@ const UserManagement = () => {
     setFilteredUsers(filtered);
   }, [searchQuery, roleFilter, users]);
 
-  // Handle user deletion
+  // ✅ Delete user handler
   const handleDelete = async (userId: number) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this user?");
     if (!confirmDelete) return;
@@ -97,9 +99,7 @@ const UserManagement = () => {
       <TopBar>
         <h1>User Management</h1>
         {currentUserRole === "admin" && (
-          <AddButton onClick={() => setIsModalOpen(true)}>
-            + Add User
-          </AddButton>
+          <AddButton onClick={() => setIsModalOpen(true)}>+ Add User</AddButton>
         )}
       </TopBar>
 
@@ -112,11 +112,8 @@ const UserManagement = () => {
         <FilterSelect value={roleFilter} onChange={(e) => setRoleFilter(e.target.value)}>
           <option value="">All Roles</option>
           <option value="admin">Admin</option>
-          <option value="editor">Editor</option>
-          <option value="client">Client</option>
-          <option value="customer">Customer</option> {/* ✅ New role added */}
-          <option value="viewer">Viewer</option>
-          <option value="visitor">Visitor</option>
+          <option value="employee">Employee</option>
+          <option value="customer">Customer</option>
         </FilterSelect>
       </div>
 

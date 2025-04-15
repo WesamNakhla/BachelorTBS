@@ -20,7 +20,7 @@ interface CreateUserForm {
   name: string;
   email: string;
   password: string;
-  role: User["role"];
+  role: "admin" | "employee" | "customer";
 }
 
 const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
@@ -30,7 +30,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
     name: "",
     email: "",
     password: "",
-    role: "viewer",
+    role: "employee", // default role
   });
 
   const [loading, setLoading] = useState(false);
@@ -53,7 +53,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
 
       toast.success("User created successfully!");
       if (onSuccess) {
-        onSuccess(response.data); // notify parent component
+        onSuccess(response.data);
       } else {
         navigate("/users");
       }
@@ -115,9 +115,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
           >
             <option value="admin">Admin</option>
             <option value="employee">Employee</option>
-            <option value="client">Client</option>
-            <option value="customer">Customer</option> {/* ✅ New role added */}
-            <option value="viewer">Visitor</option>
+            <option value="customer">Customer</option>
           </Select>
         </DetailRow>
 
