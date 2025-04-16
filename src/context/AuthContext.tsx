@@ -13,7 +13,7 @@ export interface AuthUser {
   id: string;
   name: string;
   email: string;
-  role: "admin" | "employee" | "customer"; // "customer" added
+  role: "admin" | "employee" | "customer"; // Support 3 roles
 }
 
 // ✅ Context shape
@@ -27,12 +27,12 @@ interface AuthContextType {
 // ✅ Create context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// ✅ AuthProvider wraps the app and provides context
+// ✅ Provider that wraps the app and shares auth state
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // ✅ Load saved session from localStorage
+  // ✅ Load session from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem("authUser");
     if (storedUser) {
@@ -40,20 +40,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         const parsedUser: AuthUser = JSON.parse(storedUser);
         setUser(parsedUser);
         setIsAuthenticated(true);
-      } catch {
+      } catch (error) {
+        console.error("Failed to parse stored user:", error);
         localStorage.removeItem("authUser");
       }
     }
   }, []);
 
-  // ✅ Login function
+  // ✅ Login function saves to context and localStorage
   const login = (userData: AuthUser) => {
     setUser(userData);
     setIsAuthenticated(true);
     localStorage.setItem("authUser", JSON.stringify(userData));
   };
 
-  // ✅ Logout function
+  // ✅ Logout function clears everything
   const logout = () => {
     setUser(null);
     setIsAuthenticated(false);
@@ -67,7 +68,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// ✅ Custom hook to use the auth context
+// ✅ Custom hook to consume auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

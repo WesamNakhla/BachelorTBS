@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
+import { fakeUsers } from "../data/fakeUsers"; // ✅ External test users
 
 import {
   LoginWrapper,
@@ -41,17 +42,9 @@ const Login: React.FC = () => {
     setLoading(true);
 
     setTimeout(() => {
-      // ✅ Simulated credentials for testing (can be deleted later)
-      const validCredentials: { [key: string]: { password: string; role: "admin" | "employee" | "customer" } } = {
-        admin: { password: "admin123", role: "admin" },
-        employee: { password: "employee123", role: "employee" },
-        customer: { password: "customer123", role: "customer" },
-      };
-
-      const userData = validCredentials[username];
+      const userData = fakeUsers[username];
 
       if (userData && userData.password === password) {
-        // Set user info in context
         login({
           id: "1",
           name: username,

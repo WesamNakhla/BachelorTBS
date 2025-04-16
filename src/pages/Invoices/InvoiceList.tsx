@@ -1,3 +1,5 @@
+// src/pages/Invoices/InvoiceList.tsx
+
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
@@ -16,8 +18,8 @@ import {
 import InvoiceModal from "./InvoiceModal";
 import { Button } from "../../components/ui/Button";
 import { toast } from "react-toastify";
+import { useAuth } from "../../context/AuthContext";
 
-// Invoice type definition
 interface Invoice {
   id: number;
   invoiceNumber: string;
@@ -28,6 +30,7 @@ interface Invoice {
 }
 
 const InvoiceList = () => {
+  const { user } = useAuth();
   const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -36,7 +39,6 @@ const InvoiceList = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch invoices from backend
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -60,7 +62,6 @@ const InvoiceList = () => {
     fetchInvoices();
   }, [fetchInvoices]);
 
-  // Handle invoice deletion
   const handleDelete = async (id: number) => {
     const confirm = window.confirm("Are you sure you want to delete this invoice?");
     if (!confirm) return;
@@ -75,12 +76,13 @@ const InvoiceList = () => {
     }
   };
 
-  // Filter invoices based on search
-  const filteredInvoices = invoices.filter((invoice) =>
-    invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredInvoices = invoices.filter((invoice) => {
+    const matchesQuery = invoice.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase());
+    const isVisibleToCustomer =
+      user?.role === "customer" ? invoice.customer === user.name : true;
+    return matchesQuery && isVisibleToCustomer;
+  });
 
-  // Pagination logic
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
   const indexOfLast = currentPage * itemsPerPage;
   const indexOfFirst = indexOfLast - itemsPerPage;
@@ -114,17 +116,19 @@ const InvoiceList = () => {
         }}
       />
 
-      <ActionButtons style={{ margin: "16px 0", gap: "12px", flexWrap: "wrap" }}>
-        <Button $variant="ghost" onClick={() => alert("Exporting to PDF...")}>
-          Export
-        </Button>
-        <Button $variant="ghost" onClick={() => alert("Importing data...")}>
-          Import
-        </Button>
-        <Button $variant="primary" onClick={() => setIsModalOpen(true)}>
-          + New Invoice
-        </Button>
-      </ActionButtons>
+      {user?.role !== "customer" && (
+        <ActionButtons style={{ margin: "16px 0", gap: "12px", flexWrap: "wrap" }}>
+          <Button $variant="ghost" onClick={() => alert("Exporting to PDF...")}>
+            Export
+          </Button>
+          <Button $variant="ghost" onClick={() => alert("Importing data...")}>
+            Import
+          </Button>
+          <Button $variant="primary" onClick={() => setIsModalOpen(true)}>
+            + New Invoice
+          </Button>
+        </ActionButtons>
+      )}
 
       {loading ? (
         <p>Loading invoices...</p>
@@ -187,12 +191,14 @@ const InvoiceList = () => {
                         >
                           ⬇
                         </Button>
-                        <Button
-                          $variant="danger"
-                          onClick={() => handleDelete(invoice.id)}
-                        >
-                          🗑
-                        </Button>
+                        {user?.role !== "customer" && (
+                          <Button
+                            $variant="danger"
+                            onClick={() => handleDelete(invoice.id)}
+                          >
+                            🗑
+                          </Button>
+                        )}
                       </div>
                     </TableData>
                   </TableRow>
@@ -232,7 +238,9 @@ const InvoiceList = () => {
         </PageButtons>
       </PaginationContainer>
 
-      {isModalOpen && <InvoiceModal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && user?.role !== "customer" && (
+        <InvoiceModal onClose={() => setIsModalOpen(false)} />
+      )}
     </InvoiceContainer>
   );
 };

@@ -38,34 +38,42 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
 
+  // ❌ Don't render sidebar at all for customers
+  if (user?.role === "customer") return null;
+
   const handleLogout = () => {
     logout();
     navigate("/auth/login");
   };
 
+  // ✅ Define routes with role access
   const navLinks = [
-    { to: "/dashboard", label: "Dashboard", icon: <Home /> },
-    { to: "/invoices", label: "Fakturaer", icon: <FileText /> },
-    { to: "/inventory", label: "Inventory", icon: <FileText /> },
-    { to: "/users", label: "Users", icon: <Users /> },
-    { to: "/settings/security/logs", label: "Activity Logs", icon: <FileSignature /> },
-    { to: "/reports", label: "Reports", icon: <FileText /> },
-    { to: "/notifications", label: "Notifications", icon: <Bell /> },
-    { to: "/settings", label: "Settings", icon: <Settings /> },
+    { to: "/dashboard", label: "Dashboard", icon: <Home />, roles: ["admin", "employee"] },
+    { to: "/inventory", label: "Inventory", icon: <FileText />, roles: ["admin", "employee"] },
+    { to: "/users", label: "Users", icon: <Users />, roles: ["admin"] },
+    { to: "/settings/security/logs", label: "Activity Logs", icon: <FileSignature />, roles: ["admin"] },
+    { to: "/reports", label: "Reports", icon: <FileText />, roles: ["admin", "employee"] },
+    { to: "/notifications", label: "Notifications", icon: <Bell />, roles: ["admin", "employee"] },
+    { to: "/settings", label: "Settings", icon: <Settings />, roles: ["admin"] },
   ];
+
+  // ✅ Filter links by user role
+  const visibleLinks = user
+    ? navLinks.filter((link) => link.roles.includes(user.role))
+    : [];
 
   return (
     <>
-      {/* Mobile toggle button */}
+      {/* ✅ Hamburger for mobile */}
       <HamburgerButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
         {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </HamburgerButton>
 
-      {/* Desktop sidebar */}
+      {/* ✅ Desktop Sidebar */}
       <SidebarContainer>
         <Logo>TBS</Logo>
         <Nav>
-          {navLinks.map((link) => (
+          {visibleLinks.map((link) => (
             <NavItem key={link.to} className={location.pathname === link.to ? "active" : ""}>
               <NavLinkStyled to={link.to}>
                 <IconWrapper>{link.icon}</IconWrapper>
@@ -73,8 +81,6 @@ const Sidebar: React.FC = () => {
               </NavLinkStyled>
             </NavItem>
           ))}
-
-          {/* Logout as a separate button */}
           <NavItem>
             <button
               onClick={handleLogout}
@@ -98,7 +104,6 @@ const Sidebar: React.FC = () => {
           </NavItem>
         </Nav>
 
-        {/* User info (desktop) */}
         {user && (
           <UserInfoSection>
             <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
@@ -110,11 +115,11 @@ const Sidebar: React.FC = () => {
         )}
       </SidebarContainer>
 
-      {/* Mobile sidebar */}
+      {/* ✅ Mobile Sidebar */}
       <MobileSidebar $isOpen={isSidebarOpen}>
         <Logo>TBS</Logo>
         <Nav>
-          {navLinks.map((link) => (
+          {visibleLinks.map((link) => (
             <NavItem key={link.to} className={location.pathname === link.to ? "active" : ""}>
               <NavLinkStyled to={link.to} onClick={() => setIsSidebarOpen(false)}>
                 <IconWrapper>{link.icon}</IconWrapper>
@@ -122,8 +127,6 @@ const Sidebar: React.FC = () => {
               </NavLinkStyled>
             </NavItem>
           ))}
-
-          {/* Logout for mobile */}
           <NavItem>
             <button
               onClick={() => {
@@ -150,7 +153,6 @@ const Sidebar: React.FC = () => {
           </NavItem>
         </Nav>
 
-        {/* User info (mobile) */}
         {user && (
           <UserInfoSection>
             <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
