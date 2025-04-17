@@ -1,3 +1,5 @@
+// src/pages/Invoices/InvoiceDetails.tsx
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -5,43 +7,50 @@ import {
   InvoiceContainer,
   InvoiceInfo,
   DetailRow,
-} from "../../styles/InvoiceStyles";
-import { Button } from "../../components/ui/Button";
+} from "@/styles/InvoiceStyles";
+import { Button } from "@/components/ui/Button";
+import { useAuth } from "@/context/AuthContext";
 
-// Extended invoice type
 interface Invoice {
   id: number;
   invoiceNumber: string;
+  company: string;
   customer: {
     name: string;
     email: string;
     address: string;
-    city: string;
     postCode: string;
+    city: string;
   };
-  amount: number;
+  products: string;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+  total: number;
+  tax: number;
+  grandTotal: number;
   status: "Paid" | "Pending" | "Overdue";
-  dateIssued: string;
+  date: string;
   dueDate?: string;
-  items?: string;
 }
 
 const InvoiceDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+
   const [invoice, setInvoice] = useState<Invoice | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchInvoice = async () => {
-      setLoading(true);
       try {
         const response = await axios.get(`/api/invoices/${id}`);
         setInvoice(response.data);
-      } catch (err: unknown) {
+      } catch (err) {
         console.error("Error fetching invoice:", err);
-        setError("Failed to fetch invoice details. Please try again.");
+        setError("Kunne ikke hente fakturadetaljer.");
       } finally {
         setLoading(false);
       }
@@ -50,11 +59,21 @@ const InvoiceDetails = () => {
     fetchInvoice();
   }, [id]);
 
+  if (!user) {
+    return (
+      <InvoiceContainer>
+        <p style={{ textAlign: "center", color: "red" }}>
+          Du har ikke tilgang til denne siden. Vennligst logg inn.
+        </p>
+      </InvoiceContainer>
+    );
+  }
+
   if (loading) {
     return (
       <InvoiceContainer>
         <p style={{ textAlign: "center", padding: "20px", fontSize: "16px" }}>
-          Loading invoice details...
+          Laster fakturadetaljer...
         </p>
       </InvoiceContainer>
     );
@@ -71,69 +90,101 @@ const InvoiceDetails = () => {
   if (!invoice) {
     return (
       <InvoiceContainer>
-        <p style={{ textAlign: "center" }}>No invoice data found.</p>
+        <p style={{ textAlign: "center" }}>Ingen fakturadata funnet.</p>
       </InvoiceContainer>
     );
   }
 
   return (
-    <InvoiceContainer style={{ maxWidth: "700px", margin: "0 auto" }}>
-      <h1>Invoice Details</h1>
+    <InvoiceContainer style={{ maxWidth: "750px", margin: "0 auto" }}>
+      <h1 style={{ textAlign: "center", marginBottom: "24px" }}>FAKTURA</h1>
 
-      <InvoiceInfo style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      <InvoiceInfo style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
         <DetailRow>
-          <strong>Invoice #:</strong> <span>{invoice.invoiceNumber}</span>
+          <strong>Fakturanummer:</strong> <span>{invoice.invoiceNumber}</span>
         </DetailRow>
         <DetailRow>
-          <strong>Customer:</strong> <span>{invoice.customer.name}</span>
+          <strong>Firma:</strong> <span>{invoice.company}</span>
         </DetailRow>
         <DetailRow>
-          <strong>Email:</strong> <span>{invoice.customer.email}</span>
+          <strong>Kunde:</strong> <span>{invoice.customer.name}</span>
         </DetailRow>
         <DetailRow>
-          <strong>Address:</strong>{" "}
-          <span>{invoice.customer.address}, {invoice.customer.postCode}, {invoice.customer.city}</span>
+          <strong>E-post:</strong> <span>{invoice.customer.email}</span>
         </DetailRow>
         <DetailRow>
-          <strong>Amount:</strong> <span>${invoice.amount.toFixed(2)}</span>
+          <strong>Adresse:</strong>{" "}
+          <span>
+            {invoice.customer.address}, {invoice.customer.postCode}, {invoice.customer.city}
+          </span>
         </DetailRow>
         <DetailRow>
-          <strong>Status:</strong>{" "}
+          <strong>Dato:</strong>{" "}
+          <span>{new Date(invoice.date).toLocaleDateString("no-NO")}</span>
+        </DetailRow>
+        {invoice.dueDate && (
+          <DetailRow>
+            <strong>Forfallsdato:</strong>{" "}
+            <span>{new Date(invoice.dueDate).toLocaleDateString("no-NO")}</span>
+          </DetailRow>
+        )}
+        <DetailRow>
+          <strong>Status:</strong>
           <span
             style={{
               padding: "4px 10px",
               borderRadius: "16px",
-              backgroundColor: invoice.status === "Paid" ? "#d1fae5" :
-                               invoice.status === "Overdue" ? "#fee2e2" : "#fef9c3",
-              color: invoice.status === "Paid" ? "#065f46" :
-                     invoice.status === "Overdue" ? "#991b1b" : "#92400e",
+              backgroundColor:
+                invoice.status === "Paid" ? "#d1fae5" :
+                invoice.status === "Overdue" ? "#fee2e2" : "#fef9c3",
+              color:
+                invoice.status === "Paid" ? "#065f46" :
+                invoice.status === "Overdue" ? "#991b1b" : "#92400e",
               fontSize: "13px",
               fontWeight: 500,
             }}
           >
-            {invoice.status}
+            {invoice.status === "Paid" ? "Betalt" : invoice.status}
           </span>
         </DetailRow>
-        <DetailRow>
-          <strong>Date Issued:</strong>{" "}
-          <span>{new Date(invoice.dateIssued).toLocaleDateString()}</span>
-        </DetailRow>
-        {invoice.dueDate && (
-          <DetailRow>
-            <strong>Due Date:</strong>{" "}
-            <span>{new Date(invoice.dueDate).toLocaleDateString()}</span>
-          </DetailRow>
-        )}
-        {invoice.items && (
-          <DetailRow style={{ flexDirection: "column", alignItems: "flex-start" }}>
-            <strong>Description:</strong>
-            <p style={{ margin: 0, paddingTop: "6px" }}>{invoice.items}</p>
-          </DetailRow>
-        )}
       </InvoiceInfo>
 
+      <div style={{ marginTop: "30px" }}>
+        <h3 style={{ marginBottom: "16px" }}>Produkt(er)</h3>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
+          <thead style={{ background: "#f3f4f6" }}>
+            <tr>
+              <th style={{ padding: "10px", textAlign: "left" }}>Produkt</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Antall</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Enhet</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Pris/stk</th>
+              <th style={{ padding: "10px", textAlign: "left" }}>Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style={{ borderTop: "1px solid #e5e7eb" }}>
+              <td style={{ padding: "10px" }}>{invoice.products}</td>
+              <td style={{ padding: "10px" }}>{invoice.quantity}</td>
+              <td style={{ padding: "10px" }}>{invoice.unit}</td>
+              <td style={{ padding: "10px" }}>{invoice.unitPrice.toFixed(2)} kr</td>
+              <td style={{ padding: "10px" }}>{invoice.total.toFixed(2)} kr</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div style={{ marginTop: "24px", textAlign: "right" }}>
+          <p>
+            <strong>MVA (25%):</strong> {((invoice.total * invoice.tax) / 100).toFixed(2)} kr
+          </p>
+          <p>
+            <strong>Å betale (inkl. MVA):</strong>{" "}
+            {invoice.grandTotal.toFixed(2)} kr
+          </p>
+        </div>
+      </div>
+
       <div style={{ marginTop: "30px", textAlign: "center" }}>
-        <Button onClick={() => navigate("/invoices")}>← Back to Invoices</Button>
+        <Button onClick={() => navigate("/invoices")}>← Tilbake til fakturaer</Button>
       </div>
     </InvoiceContainer>
   );

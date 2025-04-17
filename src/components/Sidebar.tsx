@@ -1,11 +1,11 @@
 // src/components/Sidebar.tsx
+
 import React, { useState } from "react";
 import {
   SidebarContainer,
   MobileSidebar,
   HamburgerButton,
   MobileOverlay,
-  Logo,
   Nav,
   NavItem,
   NavLinkStyled,
@@ -27,10 +27,40 @@ import {
   Menu,
   X,
   LogOut,
+  File,
 } from "lucide-react";
 
+import { motion } from "framer-motion";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+
+// ✅ Animated Logo with fish icon beside "TBS"
+const AnimatedLogo: React.FC = () => {
+  return (
+    <motion.div
+      animate={{ x: [0, 6, -6, 0] }}
+      transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        margin: "0 auto 32px auto",
+        fontWeight: 900,
+        fontSize: "22px",
+        textTransform: "uppercase",
+        background: "linear-gradient(90deg, #00bcd4, #6a11cb)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        gap: "10px",
+      }}
+    >
+      <span role="img" aria-label="fish" style={{ fontSize: "22px" }}>
+        🐟
+      </span>
+      TBS
+    </motion.div>
+  );
+};
 
 const Sidebar: React.FC = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -38,40 +68,36 @@ const Sidebar: React.FC = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
 
-  // ❌ Don't render sidebar at all for customers
-  if (user?.role === "customer") return null;
+  if (!user) return null;
 
   const handleLogout = () => {
     logout();
     navigate("/auth/login");
   };
 
-  // ✅ Define routes with role access
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: <Home />, roles: ["admin", "employee"] },
+    { to: "/invoices", label: "Invoices", icon: <File />, roles: ["admin", "employee", "customer"] },
     { to: "/inventory", label: "Inventory", icon: <FileText />, roles: ["admin", "employee"] },
     { to: "/users", label: "Users", icon: <Users />, roles: ["admin"] },
     { to: "/settings/security/logs", label: "Activity Logs", icon: <FileSignature />, roles: ["admin"] },
-    { to: "/reports", label: "Reports", icon: <FileText />, roles: ["admin", "employee"] },
+    { to: "/reports", label: "Reports", icon: <Settings />, roles: ["admin", "employee"] },
     { to: "/notifications", label: "Notifications", icon: <Bell />, roles: ["admin", "employee"] },
     { to: "/settings", label: "Settings", icon: <Settings />, roles: ["admin"] },
   ];
 
-  // ✅ Filter links by user role
-  const visibleLinks = user
-    ? navLinks.filter((link) => link.roles.includes(user.role))
-    : [];
+  const visibleLinks = navLinks.filter((link) => link.roles.includes(user.role));
 
   return (
     <>
-      {/* ✅ Hamburger for mobile */}
+      {/* Mobile Toggle Button */}
       <HamburgerButton onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
         {isSidebarOpen ? <X size={24} /> : <Menu size={24} />}
       </HamburgerButton>
 
-      {/* ✅ Desktop Sidebar */}
+      {/* Desktop Sidebar */}
       <SidebarContainer>
-        <Logo>TBS</Logo>
+        <AnimatedLogo />
         <Nav>
           {visibleLinks.map((link) => (
             <NavItem key={link.to} className={location.pathname === link.to ? "active" : ""}>
@@ -103,21 +129,18 @@ const Sidebar: React.FC = () => {
             </button>
           </NavItem>
         </Nav>
-
-        {user && (
-          <UserInfoSection>
-            <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
-            <UserMeta>
-              <UserName>{user.name}</UserName>
-              <UserRole>{user.role.toUpperCase()}</UserRole>
-            </UserMeta>
-          </UserInfoSection>
-        )}
+        <UserInfoSection>
+          <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
+          <UserMeta>
+            <UserName>{user.name}</UserName>
+            <UserRole>{user.role.toUpperCase()}</UserRole>
+          </UserMeta>
+        </UserInfoSection>
       </SidebarContainer>
 
-      {/* ✅ Mobile Sidebar */}
+      {/* Mobile Sidebar */}
       <MobileSidebar $isOpen={isSidebarOpen}>
-        <Logo>TBS</Logo>
+        <AnimatedLogo />
         <Nav>
           {visibleLinks.map((link) => (
             <NavItem key={link.to} className={location.pathname === link.to ? "active" : ""}>
@@ -152,16 +175,13 @@ const Sidebar: React.FC = () => {
             </button>
           </NavItem>
         </Nav>
-
-        {user && (
-          <UserInfoSection>
-            <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
-            <UserMeta>
-              <UserName>{user.name}</UserName>
-              <UserRole>{user.role.toUpperCase()}</UserRole>
-            </UserMeta>
-          </UserInfoSection>
-        )}
+        <UserInfoSection>
+          <AvatarCircle>{user.name.charAt(0).toUpperCase()}</AvatarCircle>
+          <UserMeta>
+            <UserName>{user.name}</UserName>
+            <UserRole>{user.role.toUpperCase()}</UserRole>
+          </UserMeta>
+        </UserInfoSection>
       </MobileSidebar>
 
       {isSidebarOpen && <MobileOverlay onClick={() => setIsSidebarOpen(false)} />}

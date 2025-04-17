@@ -1,3 +1,4 @@
+// src/styles/InvoiceStyles.ts
 import styled, { keyframes } from "styled-components";
 
 /* ==== ANIMATIONS ==== */
@@ -67,7 +68,6 @@ export const CloseButton = styled.button`
   }
 `;
 
-/* ==== MODAL CONTAINER (if used separately) ==== */
 export const ModalContainer = styled.div`
   background: #fff;
   padding: 24px;
@@ -83,7 +83,7 @@ export const ModalContainer = styled.div`
   }
 `;
 
-/* ==== LAYOUT WRAPPERS ==== */
+/* ==== LAYOUT ==== */
 export const InvoiceContainer = styled.div`
   padding: 24px;
   background: ${({ theme }) => theme.cardBackground || "#ffffff"};
@@ -96,7 +96,7 @@ export const InvoiceContainer = styled.div`
   }
 `;
 
-/* ==== TABLE STYLES ==== */
+/* ==== TABLE ==== */
 export const InvoiceTable = styled.table`
   width: 100%;
   margin-top: 24px;
@@ -181,7 +181,7 @@ export const Select = styled.select`
   }
 `;
 
-/* ==== BUTTON BASE STYLE ==== */
+/* ==== BUTTON BASE ==== */
 const baseButton = styled.button`
   padding: 10px 16px;
   border-radius: 6px;
@@ -264,27 +264,12 @@ export const PageButtons = styled.div`
   }
 `;
 
-/* ==== ACTION BUTTON GROUP ==== */
+/* ==== ACTION BUTTONS ==== */
 export const ActionButtons = styled.div`
   display: flex;
   gap: 12px;
   margin: 16px 0;
   flex-wrap: wrap;
-`;
-
-export const Button = styled.button`
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: scale(1.08);
-  }
 `;
 
 /* ==== INVOICE DETAILS BOX ==== */

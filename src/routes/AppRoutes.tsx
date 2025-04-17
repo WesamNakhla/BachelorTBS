@@ -45,6 +45,11 @@ const AppRoutes: React.FC = () => {
         <Route path="/notifications" element={<Notifications />} />
       </Route>
 
+      {/* Protected: Admin + Employee + Customer */}
+      <Route element={<ProtectedRoute allowedRoles={["admin", "employee", "customer"]} />}>
+        <Route path="/invoices" element={<InvoiceList />} />
+      </Route>
+
       {/* Protected: Admin only */}
       <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
         <Route path="/users" element={<UserManagement />} />
@@ -53,11 +58,6 @@ const AppRoutes: React.FC = () => {
         <Route path="/settings/security" element={<SecuritySettings />} />
         <Route path="/settings/security/enable-2fa" element={<Enable2FA />} />
         <Route path="/settings/security/logs" element={<ActivityLogs />} />
-      </Route>
-
-      {/* Protected: Customer only */}
-      <Route element={<ProtectedRoute allowedRoles={["customer"]} />}>
-        <Route path="/invoices" element={<InvoiceList />} />
       </Route>
 
       {/* 404 fallback */}

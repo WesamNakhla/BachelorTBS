@@ -1,28 +1,27 @@
-// src/styles/SidebarStyles.ts
-
 import styled from "styled-components";
 import { NavLink } from "react-router-dom";
 
-// Sidebar container (desktop view)
+// Sidebar container (desktop)
 export const SidebarContainer = styled.div`
   width: 250px;
   height: 100vh;
-  background-color: #fff;
+  background-color: #ffffff;
   position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
-  padding: 24px 16px 80px;
+  padding: 24px 16px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.08);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   @media (max-width: 768px) {
     display: none;
   }
 `;
 
-// Sidebar container (mobile view)
+// Sidebar for mobile view
 export const MobileSidebar = styled.div<{ $isOpen?: boolean }>`
   width: 240px;
   height: 100vh;
@@ -30,7 +29,7 @@ export const MobileSidebar = styled.div<{ $isOpen?: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
-  padding: 24px 16px 80px;
+  padding: 24px 16px;
   box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
   z-index: 1100;
   transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
@@ -39,12 +38,13 @@ export const MobileSidebar = styled.div<{ $isOpen?: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
   @media (min-width: 769px) {
     display: none;
   }
 `;
 
-// Hamburger toggle button (mobile only)
+// Hamburger button (for mobile)
 export const HamburgerButton = styled.button`
   position: fixed;
   top: 20px;
@@ -53,13 +53,13 @@ export const HamburgerButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
-  display: none;
-  @media (max-width: 768px) {
-    display: block;
+
+  @media (min-width: 769px) {
+    display: none;
   }
 `;
 
-// Background overlay for mobile sidebar
+// Background overlay for mobile
 export const MobileOverlay = styled.div`
   @media (max-width: 768px) {
     position: fixed;
@@ -69,23 +69,92 @@ export const MobileOverlay = styled.div`
   }
 `;
 
-// Logo (top of the sidebar)
-export const Logo = styled.h2`
-  font-size: 22px;
-  font-weight: 700;
-  text-align: center;
-  color: #6a11cb;
+// Logo wrapper (fish + text)
+export const Logo = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   margin-bottom: 32px;
+  position: relative;
+
+  .fish {
+    font-size: 26px;
+    animation: swim 2.4s infinite ease-in-out;
+    margin-bottom: 4px;
+  }
+
+  .text {
+    font-size: 22px;
+    font-weight: 900;
+    text-transform: uppercase;
+    background: linear-gradient(90deg, #00bcd4, #6a11cb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .bubble {
+    position: absolute;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: bubbleUp 4s infinite ease-in;
+  }
+
+  .bubble:nth-child(2) {
+    left: 12%;
+    width: 6px;
+    height: 6px;
+    animation-delay: 0.8s;
+  }
+
+  .bubble:nth-child(3) {
+    left: 50%;
+    width: 9px;
+    height: 9px;
+    animation-delay: 1.6s;
+  }
+
+  .bubble:nth-child(4) {
+    left: 78%;
+    width: 5px;
+    height: 5px;
+    animation-delay: 2.2s;
+  }
+
+  @keyframes swim {
+    0%, 100% {
+      transform: translateX(0px) rotate(0deg);
+    }
+    50% {
+      transform: translateX(6px) rotate(5deg);
+    }
+  }
+
+  @keyframes bubbleUp {
+    0% {
+      bottom: 0;
+      opacity: 0;
+      transform: translateY(0) scale(1);
+    }
+    50% {
+      opacity: 0.5;
+    }
+    100% {
+      bottom: 100%;
+      opacity: 0;
+      transform: translateY(-12px) scale(1.2);
+    }
+  }
 `;
 
-// Navigation wrapper
+// Navigation container
 export const Nav = styled.nav`
   display: flex;
   flex-direction: column;
   gap: 8px;
 `;
 
-// Navigation item wrapper
+// Individual nav item
 export const NavItem = styled.div`
   &.active a {
     background-color: #ede9fe;
@@ -94,7 +163,7 @@ export const NavItem = styled.div`
   }
 `;
 
-// Styled NavLink
+// Custom NavLink
 export const NavLinkStyled = styled(NavLink)`
   display: flex;
   align-items: center;
@@ -111,61 +180,30 @@ export const NavLinkStyled = styled(NavLink)`
   }
 `;
 
-// Icon container next to text in nav links
+// Icon wrapper beside nav text
 export const IconWrapper = styled.span`
   display: flex;
   align-items: center;
   justify-content: center;
 `;
 
-// ===============================
-// ✅ User info section at bottom
-// ===============================
-
-// Container for user info (bottom of sidebar)
+// User info section at the bottom
 export const UserInfoSection = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 12px;
+  padding: 16px 12px;
   border-top: 1px solid #e5e7eb;
   background-color: #f9fafb;
+  margin-top: auto;
 `;
 
-// Avatar (circular image)
-export const UserAvatar = styled.img`
-  width: 38px;
-  height: 38px;
-  border-radius: 50%;
-  object-fit: cover;
-`;
-
-// Container for name and role
-export const UserInfoText = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-`;
-
-// User name
-export const UserName = styled.div`
-  font-size: 14px;
-  font-weight: 600;
-  color: #111827;
-`;
-
-// User role
-export const UserRole = styled.div`
-  font-size: 13px;
-  font-weight: 500;
-  color: #6b7280;
-  text-transform: uppercase;
-`;
+// Avatar with user initial
 export const AvatarCircle = styled.div`
   width: 38px;
   height: 38px;
   background-color: #6a11cb;
-  color: #fff;
+  color: white;
   border-radius: 50%;
   font-size: 16px;
   font-weight: bold;
@@ -173,9 +211,23 @@ export const AvatarCircle = styled.div`
   align-items: center;
   justify-content: center;
 `;
-// ✅ Wrapper for name + role text next to avatar
+
+// Username and role
 export const UserMeta = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: center;
+`;
+
+export const UserName = styled.div`
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+`;
+
+export const UserRole = styled.div`
+  font-size: 13px;
+  font-weight: 500;
+  color: #6b7280;
+  text-transform: uppercase;
 `;

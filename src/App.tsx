@@ -11,7 +11,7 @@ import { ToastContainer } from "react-toastify";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import "react-toastify/dist/ReactToastify.css";
 
-// ✅ Layout component to manage sidebar visibility
+// ✅ Layout wrapper: handles sidebar visibility + padding
 const LayoutWrapper: React.FC = () => {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
   const location = useLocation();
@@ -25,11 +25,17 @@ const LayoutWrapper: React.FC = () => {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const isPublicRoute = ["/", "/auth/login", "/auth/forgot-password", "/auth/reset-password"].includes(location.pathname);
+  // ✅ These are considered "public" routes with no sidebar
+  const isPublicRoute = [
+    "/",
+    "/auth/login",
+    "/auth/forgot-password",
+    "/auth/reset-password",
+  ].includes(location.pathname);
 
   return (
     <div style={{ display: "flex", minHeight: "100vh" }}>
-      {/* ✅ Show sidebar only if logged in and not on public routes */}
+      {/* ✅ Sidebar appears only when authenticated & not on public routes */}
       {isAuthenticated && !isPublicRoute && <Sidebar />}
 
       <div
@@ -41,13 +47,14 @@ const LayoutWrapper: React.FC = () => {
           transition: "margin-left 0.3s ease",
         }}
       >
+        {/* ✅ Main route rendering here */}
         <AppRoutes />
       </div>
     </div>
   );
 };
 
-// ✅ Wrap the app in AuthProvider and Router
+// ✅ Main App with Auth + Routing
 const App: React.FC = () => {
   return (
     <AuthProvider>

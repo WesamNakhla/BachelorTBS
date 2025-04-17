@@ -1,3 +1,4 @@
+// src/pages/Invoices/InvoiceModal.tsx
 import { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import {
@@ -5,8 +6,8 @@ import {
   ModalContent,
   Input,
   Select,
-  Button,
 } from "@/styles/InvoiceStyles";
+import { Button } from "@/components/ui/Button";
 
 interface Customer {
   id: string;
@@ -25,9 +26,18 @@ interface InvoiceModalProps {
 const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose }) => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [invoiceData, setInvoiceData] = useState({
     invoiceNumber: "",
-    amount: "",
+    products: "",
+    quantity: 1,
+    unit: "stk",
+    unitPrice: 0,
+    total: 0,
+    tax: 0,
+    grandTotal: 0,
     email: "",
     orgNumber: "",
     postCode: "",
@@ -35,23 +45,14 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose }) => {
     city: "",
   });
 
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  // Fetch customers from API
+  // Load customers
   const fetchCustomers = useCallback(async () => {
-    setLoading(true);
-    setError(null);
     try {
-      const response = await axios.get("/api/customers");
-      if (Array.isArray(response.data)) {
-        setCustomers(response.data);
-      } else {
-        setError("Invalid data format received from server.");
-      }
+      const res = await axios.get("/api/customers");
+      setCustomers(res.data || []);
     } catch (err) {
-      setError("Failed to load customers. Please try again.");
       console.error(err);
+      setError("Failed to load customers.");
     } finally {
       setLoading(false);
     }
@@ -61,9 +62,8 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose }) => {
     fetchCustomers();
   }, [fetchCustomers]);
 
-  // Handle customer selection
-  const handleCustomerSelect = (customerId: string) => {
-    const customer = customers.find((c) => c.id === customerId);
+  const handleCustomerSelect = (id: string) => {
+    const customer = customers.find((c) => c.id === id);
     if (customer) {
       setInvoiceData((prev) => ({
         ...prev,
@@ -73,50 +73,63 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose }) => {
         address: customer.address,
         city: customer.city,
       }));
-      setSelectedCustomer(customerId);
+      setSelectedCustomer(id);
     }
   };
 
-  // Handle input field change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Update and calculate totals dynamically
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
-    setInvoiceData((prev) => ({ ...prev, [name]: value }));
+    const parsedValue = name === "quantity" || name === "unitPrice" ? Number(value) : value;
+
+    setInvoiceData((prev) => {
+      const updated = {
+        ...prev,
+        [name]: parsedValue,
+      };
+
+      const total = Number(updated.quantity) * Number(updated.unitPrice);
+      const tax = +(total * 0.25).toFixed(2); // MVA = 25%
+      const grandTotal = +(total + tax).toFixed(2);
+
+      return {
+        ...updated,
+        total,
+        tax,
+        grandTotal,
+      };
+    });
   };
 
-  // Submit new invoice
   const handleAddInvoice = async () => {
-    if (!selectedCustomer || !invoiceData.invoiceNumber || !invoiceData.amount) {
-      alert("Please fill in all required fields.");
+    if (!selectedCustomer || !invoiceData.invoiceNumber) {
+      alert("Please complete all required fields.");
       return;
     }
 
     try {
       await axios.post("/api/invoices", {
         customerId: selectedCustomer,
-        invoiceNumber: invoiceData.invoiceNumber,
-        amount: parseFloat(invoiceData.amount),
+        ...invoiceData,
       });
 
       alert("Invoice created successfully!");
       onClose();
-    } catch (error) {
-      console.error("Failed to create invoice:", error);
+    } catch (err) {
+      console.error("Failed to save invoice", err);
       alert("Failed to create invoice.");
     }
   };
 
   return (
     <ModalOverlay>
-      <ModalContent style={{ maxWidth: "600px" }}>
-        <h2 style={{ marginBottom: "20px" }}>Create New Invoice</h2>
+      <ModalContent style={{ maxWidth: "680px" }}>
+        <h2 style={{ marginBottom: "20px" }}>Create Invoice</h2>
 
         {error && (
-          <div style={{ color: "red", marginBottom: "12px" }}>
-            {error}{" "}
-            <Button onClick={fetchCustomers} style={{ backgroundColor: "#999", color: "#fff", marginLeft: "8px" }}>
-              Retry
-            </Button>
-          </div>
+          <div style={{ color: "red", marginBottom: "12px" }}>{error}</div>
         )}
 
         {loading ? (
@@ -132,36 +145,29 @@ const InvoiceModal: React.FC<InvoiceModalProps> = ({ onClose }) => {
           </Select>
         )}
 
-        <Input
-          type="text"
-          name="invoiceNumber"
-          placeholder="Invoice Number"
-          value={invoiceData.invoiceNumber}
-          onChange={handleChange}
-        />
+        <Input name="invoiceNumber" placeholder="Invoice Number" value={invoiceData.invoiceNumber} onChange={handleChange} />
+        <Input name="products" placeholder="Products" value={invoiceData.products} onChange={handleChange} />
+        <Input name="quantity" type="number" placeholder="Quantity" value={invoiceData.quantity} onChange={handleChange} />
+        <Input name="unit" placeholder="Unit (e.g. stk, m²)" value={invoiceData.unit} onChange={handleChange} />
+        <Input name="unitPrice" type="number" placeholder="Unit Price (kr)" value={invoiceData.unitPrice} onChange={handleChange} />
 
-        <Input
-          type="number"
-          name="amount"
-          placeholder="Amount"
-          value={invoiceData.amount}
-          onChange={handleChange}
-        />
+        {/* Calculated values */}
+        <Input value={`Total: ${invoiceData.total.toFixed(2)} kr`} readOnly />
+        <Input value={`MVA (25%): ${invoiceData.tax.toFixed(2)} kr`} readOnly />
+        <Input value={`Grand Total: ${invoiceData.grandTotal.toFixed(2)} kr`} readOnly />
 
-        <Input type="email" placeholder="Email" value={invoiceData.email} readOnly />
-        <Input type="text" placeholder="Organization Number" value={invoiceData.orgNumber} readOnly />
-        <Input type="text" placeholder="Post Code" value={invoiceData.postCode} readOnly />
-        <Input type="text" placeholder="Address" value={invoiceData.address} readOnly />
-        <Input type="text" placeholder="City" value={invoiceData.city} readOnly />
+        {/* Readonly customer details */}
+        <Input value={invoiceData.email} readOnly />
+        <Input value={invoiceData.orgNumber} readOnly />
+        <Input value={invoiceData.postCode} readOnly />
+        <Input value={invoiceData.address} readOnly />
+        <Input value={invoiceData.city} readOnly />
 
         <div style={{ display: "flex", justifyContent: "flex-end", gap: "10px", marginTop: "24px" }}>
-          <Button
-            style={{ backgroundColor: "#ccc", color: "#333" }}
-            onClick={onClose}
-          >
+          <Button onClick={onClose} style={{ backgroundColor: "#ccc", color: "#000" }}>
             Cancel
           </Button>
-          <Button onClick={handleAddInvoice}>Add Invoice</Button>
+          <Button onClick={handleAddInvoice}>Save Invoice</Button>
         </div>
       </ModalContent>
     </ModalOverlay>
