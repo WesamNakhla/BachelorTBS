@@ -47,7 +47,14 @@ const InvoiceDetails = () => {
     const fetchInvoice = async () => {
       try {
         const response = await axios.get(`/api/invoices/${id}`);
-        setInvoice(response.data);
+        const data = response.data;
+
+        // ✅ Check customer access
+        if (user?.role === "customer" && data.customer?.name !== user.name) {
+          setError("Du har ikke tilgang til denne fakturaen.");
+        } else {
+          setInvoice(data);
+        }
       } catch (err) {
         console.error("Error fetching invoice:", err);
         setError("Kunne ikke hente fakturadetaljer.");
@@ -57,7 +64,7 @@ const InvoiceDetails = () => {
     };
 
     fetchInvoice();
-  }, [id]);
+  }, [id, user]);
 
   if (!user) {
     return (
@@ -83,6 +90,9 @@ const InvoiceDetails = () => {
     return (
       <InvoiceContainer>
         <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+        <div style={{ textAlign: "center", marginTop: "16px" }}>
+          <Button onClick={() => navigate("/invoices")}>← Tilbake</Button>
+        </div>
       </InvoiceContainer>
     );
   }
@@ -174,7 +184,7 @@ const InvoiceDetails = () => {
 
         <div style={{ marginTop: "24px", textAlign: "right" }}>
           <p>
-            <strong>MVA (25%):</strong> {((invoice.total * invoice.tax) / 100).toFixed(2)} kr
+            <strong>MVA ({invoice.tax}%):</strong> {((invoice.total * invoice.tax) / 100).toFixed(2)} kr
           </p>
           <p>
             <strong>Å betale (inkl. MVA):</strong>{" "}

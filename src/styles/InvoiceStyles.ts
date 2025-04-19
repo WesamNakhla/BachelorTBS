@@ -1,7 +1,7 @@
 // src/styles/InvoiceStyles.ts
 import styled, { keyframes } from "styled-components";
 
-/* ==== ANIMATIONS ==== */
+/* ========== ANIMATIONS ========== */
 const fadeIn = keyframes`
   from {
     opacity: 0;
@@ -24,7 +24,7 @@ const slideIn = keyframes`
   }
 `;
 
-/* ==== MODAL ==== */
+/* ========== MODAL ========== */
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
@@ -41,7 +41,7 @@ export const ModalContent = styled.div`
   color: ${({ theme }) => theme.text};
   padding: 32px;
   border-radius: 20px;
-  box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
   max-width: 600px;
   width: 90%;
   animation: ${slideIn} 0.3s ease;
@@ -61,7 +61,6 @@ export const CloseButton = styled.button`
   color: ${({ theme }) => theme.text};
   font-size: 22px;
   cursor: pointer;
-  transition: color 0.2s;
 
   &:hover {
     color: ${({ theme }) => theme.primary};
@@ -83,7 +82,7 @@ export const ModalContainer = styled.div`
   }
 `;
 
-/* ==== LAYOUT ==== */
+/* ========== MAIN CONTAINER ========== */
 export const InvoiceContainer = styled.div`
   padding: 24px;
   background: ${({ theme }) => theme.cardBackground || "#ffffff"};
@@ -96,13 +95,13 @@ export const InvoiceContainer = styled.div`
   }
 `;
 
-/* ==== TABLE ==== */
+/* ========== TABLE ========== */
 export const InvoiceTable = styled.table`
   width: 100%;
   margin-top: 24px;
   border-collapse: collapse;
-  overflow: hidden;
   border-radius: 8px;
+  overflow: hidden;
 `;
 
 export const TableHead = styled.thead`
@@ -140,7 +139,7 @@ export const TableData = styled.td`
   color: ${({ theme }) => theme.text || "#333"};
 `;
 
-/* ==== FORM ELEMENTS ==== */
+/* ========== FORM ELEMENTS ========== */
 export const Input = styled.input`
   width: 100%;
   padding: 12px 16px;
@@ -149,7 +148,6 @@ export const Input = styled.input`
   font-size: 15px;
   color: #111827;
   background-color: #f9fafb;
-  transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:focus {
     outline: none;
@@ -171,7 +169,6 @@ export const Select = styled.select`
   font-size: 15px;
   color: #111827;
   background-color: #f9fafb;
-  transition: border 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:focus {
     outline: none;
@@ -181,7 +178,7 @@ export const Select = styled.select`
   }
 `;
 
-/* ==== BUTTON BASE ==== */
+/* ========== BUTTONS ========== */
 const baseButton = styled.button`
   padding: 10px 16px;
   border-radius: 6px;
@@ -221,7 +218,7 @@ export const AddInvoiceButton = styled(baseButton)`
   }
 `;
 
-/* ==== PAGINATION ==== */
+/* ========== PAGINATION ========== */
 export const PaginationContainer = styled.div`
   margin-top: 20px;
   display: flex;
@@ -264,15 +261,16 @@ export const PageButtons = styled.div`
   }
 `;
 
-/* ==== ACTION BUTTONS ==== */
+/* ========== ACTION BUTTONS ========== */
 export const ActionButtons = styled.div`
   display: flex;
   gap: 12px;
   margin: 16px 0;
   flex-wrap: wrap;
+  align-items: center;
 `;
 
-/* ==== INVOICE DETAILS BOX ==== */
+/* ========== INVOICE DETAIL BOX ========== */
 export const InvoiceInfo = styled.div`
   background-color: #ffffff;
   padding: 24px;
@@ -281,7 +279,7 @@ export const InvoiceInfo = styled.div`
   margin-top: 20px;
 `;
 
-/* ==== DETAIL ROW (LABEL + VALUE) ==== */
+/* ========== ROW INSIDE DETAIL BOX ========== */
 export const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;

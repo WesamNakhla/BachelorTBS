@@ -1,4 +1,3 @@
-// src/pages/Settings.tsx
 import React, { useState } from "react";
 import {
   SettingsContainer,
@@ -15,21 +14,25 @@ import {
   SettingAction,
   ToggleWrapper,
 } from "../../styles/SettingsStyles";
-// Removed ThemeToggle in favor of our custom implementation
+
+// ✅ Import components
+import LoginSessions from "./Security/LoginSessions";
+import ActivityLogs from "./Security/ActivityLogs";
 
 const Settings = () => {
-  // State variables for toggling sections and settings
   const [isSecurityExpanded, setIsSecurityExpanded] = useState(true);
   const [isNotificationsEnabled, setIsNotificationsEnabled] = useState(true);
   const [isAutoUpdateEnabled, setIsAutoUpdateEnabled] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
 
-  // Function to toggle the visibility of the security section
+  // ✅ Local toggles for sub-sections
+  const [showSessions, setShowSessions] = useState(false);
+  const [showLogs, setShowLogs] = useState(false);
+
   const toggleSecuritySettings = () => {
     setIsSecurityExpanded((prev) => !prev);
   };
 
-  // Function to toggle dark mode by adding/removing a CSS class on the document body
   const toggleDarkMode = () => {
     setIsDarkMode((prev) => {
       const newValue = !prev;
@@ -95,15 +98,21 @@ const Settings = () => {
                   <StyledButton>Enable</StyledButton>
                 </SettingAction>
               </SettingItem>
+
               <SettingItem>
                 <SettingLabel>Activity Logs</SettingLabel>
                 <SettingDescription>
                   View all recent login activity on your account.
                 </SettingDescription>
                 <SettingAction>
-                  <StyledButton>View Logs</StyledButton>
+                  <StyledButton onClick={() => setShowLogs(!showLogs)}>
+                    {showLogs ? "Hide" : "View Logs"}
+                  </StyledButton>
                 </SettingAction>
               </SettingItem>
+
+              {showLogs && <ActivityLogs />}
+
               <SettingItem>
                 <SettingLabel>Change Password</SettingLabel>
                 <SettingDescription>
@@ -113,15 +122,20 @@ const Settings = () => {
                   <StyledButton>Update</StyledButton>
                 </SettingAction>
               </SettingItem>
+
               <SettingItem>
                 <SettingLabel>Login Sessions</SettingLabel>
                 <SettingDescription>
                   View and manage active login sessions for this account.
                 </SettingDescription>
                 <SettingAction>
-                  <StyledButton>Manage</StyledButton>
+                  <StyledButton onClick={() => setShowSessions(!showSessions)}>
+                    {showSessions ? "Hide" : "Manage"}
+                  </StyledButton>
                 </SettingAction>
               </SettingItem>
+
+              {showSessions && <LoginSessions />}
             </SectionContent>
           </ExpandableBox>
         )}
@@ -153,6 +167,7 @@ const Settings = () => {
               </ToggleWrapper>
             </SettingAction>
           </SettingItem>
+
           <SettingItem>
             <SettingLabel>Auto Update</SettingLabel>
             <SettingDescription>

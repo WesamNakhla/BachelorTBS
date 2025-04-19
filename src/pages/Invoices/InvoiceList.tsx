@@ -1,12 +1,11 @@
 // src/pages/Invoices/InvoiceList.tsx
 
 import { useState, useEffect, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
-
 import {
   InvoiceContainer,
   InvoiceTable,
@@ -52,7 +51,7 @@ const InvoiceList = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null); // ✅ Removed unused variable warning
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
@@ -63,8 +62,8 @@ const InvoiceList = () => {
       } else {
         throw new Error("Invalid response format");
       }
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setError("Failed to load invoices.");
       toast.error("Failed to load invoices from server.");
     } finally {
@@ -89,103 +88,87 @@ const InvoiceList = () => {
   });
 
   const exportFilteredToPDF = () => {
-    try {
-      const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text("Filtered Invoices", 14, 20);
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text("Filtered Invoices", 14, 20);
 
-      const tableData = filteredByDate.map((inv) => [
-        inv.invoiceNumber,
-        inv.customer,
-        format(new Date(inv.date), "yyyy-MM-dd"),
-        `${inv.total.toFixed(2)} kr`,
-        `${inv.tax}%`,
-        `${inv.grandTotal.toFixed(2)} kr`,
-      ]);
+    const tableData = filteredByDate.map((inv) => [
+      inv.invoiceNumber,
+      inv.customer,
+      format(new Date(inv.date), "yyyy-MM-dd"),
+      `${inv.total.toFixed(2)} kr`,
+      `${inv.tax}%`,
+      `${inv.grandTotal.toFixed(2)} kr`,
+    ]);
 
-      const total = filteredByDate.reduce((sum, inv) => sum + inv.total, 0);
-      const grand = filteredByDate.reduce((sum, inv) => sum + inv.grandTotal, 0);
+    const total = filteredByDate.reduce((sum, inv) => sum + inv.total, 0);
+    const grand = filteredByDate.reduce((sum, inv) => sum + inv.grandTotal, 0);
+    tableData.push(["", "", "Totals", `${total.toFixed(2)} kr`, "", `${grand.toFixed(2)} kr`]);
 
-      tableData.push(["", "", "Totals", `${total.toFixed(2)} kr`, "", `${grand.toFixed(2)} kr`]);
+    autoTable(doc, {
+      startY: 30,
+      head: [["Invoice #", "Customer", "Date", "Total", "Tax", "Grand Total"]],
+      body: tableData,
+    });
 
-      autoTable(doc, {
-        startY: 30,
-        head: [["Invoice #", "Customer", "Date", "Total", "Tax", "Grand Total"]],
-        body: tableData,
-      });
-
-      doc.save("filtered_invoices.pdf");
-      toast.success("PDF generated from filtered invoices!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to export filtered invoices.");
-    }
+    doc.save("filtered_invoices.pdf");
+    toast.success("PDF generated!");
   };
 
   const exportAllToPDF = () => {
-    try {
-      const doc = new jsPDF();
-      doc.text("All Invoices", 14, 20);
-      const tableData = filteredInvoices.map((inv) => [
-        inv.invoiceNumber,
-        inv.company,
-        inv.customer,
-        inv.products,
-        inv.quantity,
-        inv.unit,
-        `${inv.unitPrice.toFixed(2)} kr`,
-        `${inv.total.toFixed(2)} kr`,
-        `${inv.tax}%`,
-        `${inv.grandTotal.toFixed(2)} kr`,
-        inv.status,
-        inv.dueDate,
-        inv.date,
-      ]);
+    const doc = new jsPDF();
+    doc.text("All Invoices", 14, 20);
+    const tableData = filteredInvoices.map((inv) => [
+      inv.invoiceNumber,
+      inv.company,
+      inv.customer,
+      inv.products,
+      inv.quantity,
+      inv.unit,
+      `${inv.unitPrice.toFixed(2)} kr`,
+      `${inv.total.toFixed(2)} kr`,
+      `${inv.tax}%`,
+      `${inv.grandTotal.toFixed(2)} kr`,
+      inv.status,
+      inv.dueDate,
+      inv.date,
+    ]);
 
-      autoTable(doc, {
-        startY: 30,
-        head: [["Invoice #", "Company", "Customer", "Products", "Qty", "Unit", "Unit Price", "Total", "Tax", "Grand Total", "Status", "Due", "Date"]],
-        body: tableData,
-      });
+    autoTable(doc, {
+      startY: 30,
+      head: [["Invoice #", "Company", "Customer", "Products", "Qty", "Unit", "Unit Price", "Total", "Tax", "Grand Total", "Status", "Due", "Date"]],
+      body: tableData,
+    });
 
-      doc.save("all_invoices.pdf");
-      toast.success("All invoices exported as PDF!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to export invoices.");
-    }
+    doc.save("all_invoices.pdf");
+    toast.success("All invoices exported!");
   };
 
   const exportSingleInvoiceToPDF = (invoice: Invoice) => {
-    try {
-      const doc = new jsPDF();
-      doc.setFontSize(14);
-      doc.text(`Invoice: ${invoice.invoiceNumber}`, 14, 20);
+    const doc = new jsPDF();
+    doc.setFontSize(14);
+    doc.text(`Invoice: ${invoice.invoiceNumber}`, 14, 20);
 
-      autoTable(doc, {
-        startY: 30,
-        body: [
-          ["Company", invoice.company],
-          ["Customer", invoice.customer],
-          ["Products", invoice.products],
-          ["Quantity", invoice.quantity.toString()],
-          ["Unit", invoice.unit],
-          ["Unit Price", `${invoice.unitPrice.toFixed(2)} kr`],
-          ["Total", `${invoice.total.toFixed(2)} kr`],
-          ["Tax", `${invoice.tax}%`],
-          ["Grand Total", `${invoice.grandTotal.toFixed(2)} kr`],
-          ["Status", invoice.status],
-          ["Date", invoice.date],
-          ["Due Date", invoice.dueDate],
-        ],
-        theme: "grid",
-      });
+    autoTable(doc, {
+      startY: 30,
+      body: [
+        ["Company", invoice.company],
+        ["Customer", invoice.customer],
+        ["Products", invoice.products],
+        ["Quantity", invoice.quantity.toString()],
+        ["Unit", invoice.unit],
+        ["Unit Price", `${invoice.unitPrice.toFixed(2)} kr`],
+        ["Total", `${invoice.total.toFixed(2)} kr`],
+        ["Tax", `${invoice.tax}%`],
+        ["Grand Total", `${invoice.grandTotal.toFixed(2)} kr`],
+        ["Status", invoice.status],
+        ["Date", invoice.date],
+        ["Due Date", invoice.dueDate],
+      ],
+      theme: "grid",
+    });
 
-      doc.save(`invoice_${invoice.invoiceNumber}.pdf`);
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to export invoice.");
-    }
+    doc.save(`invoice_${invoice.invoiceNumber}.pdf`);
   };
 
   const printInvoice = (invoice: Invoice) => {
@@ -229,21 +212,20 @@ const InvoiceList = () => {
     <InvoiceContainer>
       <h1>Invoices</h1>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {/* ✅ Add New Invoice Button */}
+      {user?.role !== "customer" && (
+        <div style={{ marginBottom: "20px" }}>
+          <Button $variant="primary" onClick={() => navigate("/invoices/create")}>
+            + New Invoice
+          </Button>
+        </div>
+      )}
 
       <input
         type="text"
         placeholder="Search invoices..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        style={{
-          width: "100%",
-          maxWidth: "300px",
-          padding: "10px",
-          marginBottom: "12px",
-          borderRadius: "8px",
-          border: "1px solid #d1d5db",
-        }}
       />
 
       <ActionButtons>

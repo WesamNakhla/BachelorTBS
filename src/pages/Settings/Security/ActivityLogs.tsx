@@ -1,38 +1,51 @@
-import { useEffect, useState } from "react";
+// src/pages/Settings/Security/ActivityLogs.tsx
+
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import {
   LogsContainer,
-  LogsTable,
-  TableHead,
-  TableRow,
+  LogTable,
   TableHeader,
-  TableBody,
-  TableData,
+  TableRow,
+  TableCell,
+  LogTitle,
+  LogEmpty,
 } from "../../../styles/SecurityStyles";
-import axios from "axios";
 
-// Define the type for a log entry
-interface Log {
+interface LogEntry {
+  id: string;
   timestamp: string;
-  user: string;
-  action: string;
-  ipAddress: string;
+  event: string;
+  ip: string;
+  device: string;
+  status: string;
 }
 
-const ActivityLogs = () => {
-  // State to store logs
-  const [logs, setLogs] = useState<Log[]>([]);
+const ActivityLogs: React.FC = () => {
+  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch activity logs from API when component mounts
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await axios.get("/api/security/activity-logs");
-        setLogs(Array.isArray(response.data) ? response.data : []);
+        const res = await axios.get("/api/security/activity-logs");
+
+        // ✅ Ensure we always store an array
+        if (Array.isArray(res.data)) {
+          setLogs(res.data);
+        } else if (Array.isArray(res.data.logs)) {
+          setLogs(res.data.logs);
+        } else {
+          console.error("Expected array but got:", res.data);
+          setLogs([]); // fallback
+          setError("Unexpected response format.");
+        }
+
       } catch (err) {
-        console.error("Error fetching activity logs:", err);
+        console.error("Failed to fetch activity logs:", err);
         setError("Failed to load activity logs.");
+        setLogs([]);
       } finally {
         setLoading(false);
       }
@@ -43,38 +56,37 @@ const ActivityLogs = () => {
 
   return (
     <LogsContainer>
-      <h1>Activity Logs</h1>
+      <LogTitle>Security Activity History</LogTitle>
 
-      {/* Display loading message */}
-      {loading && <p>Loading activity logs...</p>}
-
-      {/* Display error message if any */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {/* Display table only if logs exist */}
-      {!loading && !error && logs.length > 0 ? (
-        <LogsTable>
-          <TableHead>
+      {loading ? (
+        <p>Loading...</p>
+      ) : error ? (
+        <LogEmpty>{error}</LogEmpty>
+      ) : logs.length === 0 ? (
+        <LogEmpty>No activity found.</LogEmpty>
+      ) : (
+        <LogTable>
+          <thead>
             <TableRow>
-              <TableHeader>Timestamp</TableHeader>
-              <TableHeader>User</TableHeader>
-              <TableHeader>Action</TableHeader>
+              <TableHeader>Date</TableHeader>
+              <TableHeader>Event</TableHeader>
               <TableHeader>IP Address</TableHeader>
+              <TableHeader>Device</TableHeader>
+              <TableHeader>Status</TableHeader>
             </TableRow>
-          </TableHead>
-          <TableBody>
-            {logs.map((log, index) => (
-              <TableRow key={index}>
-                <TableData>{log.timestamp}</TableData>
-                <TableData>{log.user}</TableData>
-                <TableData>{log.action}</TableData>
-                <TableData>{log.ipAddress}</TableData>
+          </thead>
+          <tbody>
+            {logs.map((log) => (
+              <TableRow key={log.id}>
+                <TableCell>{log.timestamp}</TableCell>
+                <TableCell>{log.event}</TableCell>
+                <TableCell>{log.ip}</TableCell>
+                <TableCell>{log.device}</TableCell>
+                <TableCell>{log.status}</TableCell>
               </TableRow>
             ))}
-          </TableBody>
-        </LogsTable>
-      ) : (
-        !loading && <p>No activity logs found.</p>
+          </tbody>
+        </LogTable>
       )}
     </LogsContainer>
   );

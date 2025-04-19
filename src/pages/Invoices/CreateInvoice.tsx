@@ -1,3 +1,5 @@
+// src/pages/Invoices/CreateInvoice.tsx
+
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -8,13 +10,13 @@ import {
 import { Button } from "../../components/ui/Button";
 import { toast } from "react-toastify";
 
-// Customer type
+// ✅ Interface for a customer object
 interface Customer {
   id: string;
   name: string;
 }
 
-// Invoice form data type
+// ✅ Invoice form structure
 interface InvoiceForm {
   customerId: string;
   invoiceNumber: string;
@@ -24,7 +26,7 @@ interface InvoiceForm {
   items: string;
 }
 
-const CreateInvoice = () => {
+const CreateInvoice: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [formData, setFormData] = useState<InvoiceForm>({
     customerId: "",
@@ -34,14 +36,17 @@ const CreateInvoice = () => {
     dueDate: "",
     items: "",
   });
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
+  // 📦 Fetch customers from API on mount
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
         const response = await axios.get("/api/customers");
         if (Array.isArray(response.data)) {
           setCustomers(response.data);
+        } else {
+          throw new Error("Invalid customers data.");
         }
       } catch (err) {
         console.error("Error fetching customers:", err);
@@ -52,20 +57,20 @@ const CreateInvoice = () => {
     fetchCustomers();
   }, []);
 
+  // ✍️ Handle form field changes
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
+  // ✅ Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
+    // Basic validation
     if (!formData.customerId || !formData.invoiceNumber || !formData.amount) {
       toast.warning("Please fill in all required fields.");
       setLoading(false);
@@ -77,7 +82,10 @@ const CreateInvoice = () => {
         ...formData,
         amount: parseFloat(formData.amount),
       });
+
       toast.success("✅ Invoice created successfully!");
+
+      // Reset form after success
       setFormData({
         customerId: "",
         invoiceNumber: "",
@@ -87,7 +95,7 @@ const CreateInvoice = () => {
         items: "",
       });
     } catch (err) {
-      console.error(err);
+      console.error("Invoice creation failed:", err);
       toast.error("❌ Failed to create invoice.");
     } finally {
       setLoading(false);
@@ -100,9 +108,13 @@ const CreateInvoice = () => {
 
       <form
         onSubmit={handleSubmit}
-        style={{ display: "flex", flexDirection: "column", gap: "16px" }}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px",
+        }}
       >
-        {/* Customer dropdown */}
+        {/* 🔽 Customer Selector */}
         <Select
           name="customerId"
           value={formData.customerId}
@@ -117,7 +129,7 @@ const CreateInvoice = () => {
           ))}
         </Select>
 
-        {/* Invoice number */}
+        {/* 🔢 Invoice Number */}
         <Input
           type="text"
           name="invoiceNumber"
@@ -127,7 +139,7 @@ const CreateInvoice = () => {
           required
         />
 
-        {/* Amount */}
+        {/* 💰 Amount */}
         <Input
           type="number"
           name="amount"
@@ -137,7 +149,7 @@ const CreateInvoice = () => {
           required
         />
 
-        {/* Status */}
+        {/* 🏷️ Status Selector */}
         <Select
           name="status"
           value={formData.status}
@@ -149,7 +161,7 @@ const CreateInvoice = () => {
           <option value="Overdue">Overdue</option>
         </Select>
 
-        {/* Due date */}
+        {/* 🗓️ Due Date */}
         <Input
           type="date"
           name="dueDate"
@@ -158,10 +170,10 @@ const CreateInvoice = () => {
           required
         />
 
-        {/* Items description */}
+        {/* 📝 Items/Description */}
         <textarea
           name="items"
-          placeholder="Invoice items/description"
+          placeholder="Invoice items or description"
           value={formData.items}
           onChange={handleChange}
           rows={4}
@@ -176,8 +188,8 @@ const CreateInvoice = () => {
           }}
         />
 
-        {/* Submit button */}
-        <Button $variant="primary" type="submit" $fullWidth>
+        {/* 🔘 Submit Button */}
+        <Button type="submit" $variant="primary" $fullWidth>
           {loading ? "Creating..." : "Create Invoice"}
         </Button>
       </form>
