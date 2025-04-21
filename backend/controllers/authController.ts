@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import User from "../models/User";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import crypto from "crypto";
 import { validationResult } from "express-validator";
+import ForgetEmail from "../utils/email/forgetEmail"
 
 // Generate JWT Token
 const generateToken = (id: string, role: string): string => {
@@ -83,3 +85,35 @@ export const loginUser = async (req: Request, res: Response, next: NextFunction)
     next(error);
   }
 };
+//forget password
+export const ForgetPassword = async(req: Request, res: Response, next: NextFunction): Promise<void>=>{
+  const { email } = req.body;
+  try{
+    crypto.randomBytes(12, async (err, buffer)=>{
+      if(err){
+        return res.status(400).json({
+            success: false,
+            message: err
+        })
+      }
+      const token = buffer.toString("hex");
+      const user = await User.findOne({ email: email });
+      if(!user){
+        return res.status(404).json({
+          success: false,
+          message: "This email does not have an account"
+        })
+      }
+      user.token = token;
+      user.tokenExpiration = Date.now() + 3600 * 1000;
+      let mail = ForgetEmail(user.name, user.email, user.token );
+      return await user.save();
+    })
+  }catch(err){
+    res.status(501).json({
+      success: false,
+      message: err
+    })
+    return
+  }
+}
