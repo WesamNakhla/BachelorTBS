@@ -13,6 +13,7 @@ import NotFound from "../pages/NotFound/NotFound";
 // Protected pages
 import Dashboard from "../pages/Dashboard/Dashboard";
 import InvoiceList from "../pages/Invoices/InvoiceList";
+import CreateInvoice from "../pages/Invoices/CreateInvoice"; // ✅ جديد
 import InventoryList from "../pages/Inventory/InventoryList";
 import Reports from "../pages/Reports/Reports";
 import Notifications from "../pages/Notifications/Notifications";
@@ -53,6 +54,7 @@ const AppRoutes: React.FC = () => {
         <Route path="/inventory" element={<InventoryList />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/invoices/create" element={<CreateInvoice />} /> {/* ✅ مضافة */}
       </Route>
 
       {/* 🔐 Admin + Employee + Customer */}

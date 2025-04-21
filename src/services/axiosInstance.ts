@@ -1,20 +1,25 @@
 // src/services/axiosInstance.ts
+
 import axios from 'axios';
 
-// Create a pre-configured Axios instance to be reused across the app
+// Create a pre-configured Axios instance for your local mock API (json-server)
 const axiosInstance = axios.create({
-  // Base URL for all API requests (replace with your backend URL)
-  baseURL: 'https://api.example.com/',
+  // Base URL for json-server (adjust the port if needed)
+  baseURL: 'http://localhost:5000',
 
-  // Set default headers for all requests
+  // Default headers
   headers: {
     'Content-Type': 'application/json',
   },
 
-  // Set a request timeout (e.g., 10 seconds)
+  // Timeout for requests (10 seconds)
   timeout: 10000,
 });
 
-// You can add interceptors here later (e.g., for attaching tokens or handling errors)
+// Optional: Add interceptors for handling authentication or logging in the future
+// axiosInstance.interceptors.request.use(config => {
+//   // Attach token here if needed
+//   return config;
+// });
 
 export default axiosInstance;

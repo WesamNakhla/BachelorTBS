@@ -20,9 +20,11 @@ interface CreateUserForm {
   email: string;
   password: string;
   role: "admin" | "employee" | "customer";
+  phoneNumber: string; // ✅ New field
   bankAccount?: string;
 }
 
+// Function to generate a strong password
 const generateStrongPassword = () => {
   const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lower = "abcdefghijklmnopqrstuvwxyz";
@@ -33,7 +35,7 @@ const generateStrongPassword = () => {
     pass += all[Math.floor(Math.random() * all.length)];
   }
   return pass.split("").sort(() => 0.5 - Math.random()).join("");
-};
+}
 
 const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
   const { user } = useAuth();
@@ -43,27 +45,32 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
     name: "",
     email: "",
     password: "",
+    phoneNumber: "", // ✅ Initialized
     role: user?.role === "admin" ? "employee" : "customer",
     bankAccount: "",
   });
 
   const [loading, setLoading] = useState(false);
 
+  // Handle form field changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Generate a password automatically
   const handleGeneratePassword = () => {
     const generated = generateStrongPassword();
     setFormData(prev => ({ ...prev, password: generated }));
     toast.info(`Generated password: ${generated}`);
   };
 
+  // Validate Norwegian IBAN
   const validateBankAccount = (iban: string) => {
     return /^NO\d{13}$/.test(iban.replace(/\s+/g, ""));
   };
 
+  // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -91,7 +98,6 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
 
     try {
       const response = await axios.post("/api/users", formData);
-    
       toast.success("User created successfully!");
       if (onSuccess) {
         onSuccess(response.data);
@@ -111,7 +117,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
       <h2 style={{ marginBottom: "24px" }}>Create New User</h2>
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
-        {/* 🟣 Role (always first) */}
+        {/* Role */}
         <DetailRow>
           <strong>Role:</strong>
           <Select
@@ -152,6 +158,19 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
             value={formData.email}
             onChange={handleChange}
             required
+          />
+        </DetailRow>
+
+        {/* Phone Number */}
+        <DetailRow>
+          <strong>Phone Number:</strong>
+          <Input
+            type="tel"
+            name="phoneNumber"
+            value={formData.phoneNumber}
+            onChange={handleChange}
+            required
+            placeholder="e.g., +47 912 345 67"
           />
         </DetailRow>
 

@@ -10,15 +10,23 @@ import {
 import { Button } from "../../components/ui/Button";
 import { toast } from "react-toastify";
 
-// ✅ Interface for a customer object
+// ✅ Interfaces
 interface Customer {
   id: string;
   name: string;
 }
 
-// ✅ Invoice form structure
+interface Inventory {
+  id: string;
+  goods: string;
+  type: string;
+  weight: string;
+  arrivalDate: string;
+}
+
 interface InvoiceForm {
   customerId: string;
+  inventoryId: string;
   invoiceNumber: string;
   amount: string;
   status: "Paid" | "Pending" | "Overdue";
@@ -28,8 +36,10 @@ interface InvoiceForm {
 
 const CreateInvoice: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [inventoryList, setInventoryList] = useState<Inventory[]>([]); // ✅ New
   const [formData, setFormData] = useState<InvoiceForm>({
     customerId: "",
+    inventoryId: "",
     invoiceNumber: "",
     amount: "",
     status: "Pending",
@@ -38,7 +48,7 @@ const CreateInvoice: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
 
-  // 📦 Fetch customers from API on mount
+  // 📦 Fetch all customers once on mount
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
@@ -53,9 +63,27 @@ const CreateInvoice: React.FC = () => {
         toast.error("Failed to load customers.");
       }
     };
-
     fetchCustomers();
   }, []);
+
+  // 📦 Fetch inventory when a customer is selected
+  useEffect(() => {
+    const fetchInventoryByCustomer = async () => {
+      if (!formData.customerId) return;
+      try {
+        const res = await axios.get(`/api/inventory?customerId=${formData.customerId}`);
+        if (Array.isArray(res.data)) {
+          setInventoryList(res.data);
+        } else {
+          throw new Error("Invalid inventory data.");
+        }
+      } catch (err) {
+        console.error("Error loading inventory:", err);
+        toast.error("Failed to load inventory for this customer.");
+      }
+    };
+    fetchInventoryByCustomer();
+  }, [formData.customerId]);
 
   // ✍️ Handle form field changes
   const handleChange = (
@@ -71,7 +99,7 @@ const CreateInvoice: React.FC = () => {
     setLoading(true);
 
     // Basic validation
-    if (!formData.customerId || !formData.invoiceNumber || !formData.amount) {
+    if (!formData.customerId || !formData.invoiceNumber || !formData.amount || !formData.inventoryId) {
       toast.warning("Please fill in all required fields.");
       setLoading(false);
       return;
@@ -85,15 +113,17 @@ const CreateInvoice: React.FC = () => {
 
       toast.success("✅ Invoice created successfully!");
 
-      // Reset form after success
+      // Reset form
       setFormData({
         customerId: "",
+        inventoryId: "",
         invoiceNumber: "",
         amount: "",
         status: "Pending",
         dueDate: "",
         items: "",
       });
+      setInventoryList([]);
     } catch (err) {
       console.error("Invoice creation failed:", err);
       toast.error("❌ Failed to create invoice.");
@@ -128,6 +158,23 @@ const CreateInvoice: React.FC = () => {
             </option>
           ))}
         </Select>
+
+        {/* 📦 Inventory Selector (based on customer) */}
+        {formData.customerId && (
+          <Select
+            name="inventoryId"
+            value={formData.inventoryId}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Select Inventory</option>
+            {inventoryList.map((inv) => (
+              <option key={inv.id} value={inv.id}>
+                {inv.goods} – {inv.type} – {inv.weight}kg
+              </option>
+            ))}
+          </Select>
+        )}
 
         {/* 🔢 Invoice Number */}
         <Input

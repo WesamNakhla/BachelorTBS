@@ -1,64 +1,113 @@
 import { Request, Response, NextFunction } from "express";
-import Invoice from "../models/Invoice";
+import { invoices } from "../models/Invoice";
+import { getInventoryByCustomerId } from "../models/Inventory";
 
-// Function to get all invoices
-export const getInvoices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Get all invoices
+export const getInvoices = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const invoices = await Invoice.find();
     res.status(200).json(invoices);
   } catch (error) {
     next(error);
   }
 };
 
-// Function to get a single invoice by ID
-export const getInvoiceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Get invoice by ID with extended details
+export const getInvoiceById = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const invoice = await Invoice.findById(req.params.id);
+    const invoiceId = parseInt(req.params.id);
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+
     if (!invoice) {
       res.status(404).json({ message: "Invoice not found" });
       return;
     }
-    res.status(200).json(invoice);
+
+    const inventoryItems = getInventoryByCustomerId(invoice.customer.id);
+
+    const response = {
+      id: invoice.id,
+      invoiceNumber: invoice.invoiceNumber,
+      company: "Terminal og Bud Service AS",
+      customer: {
+        name: invoice.customer.name,
+        email: invoice.customer.email,
+        address: invoice.customer.address,
+        postCode: invoice.customer.postCode,
+        city: invoice.customer.city,
+        phone: invoice.customer.phone,
+      },
+      products: invoice.products,
+      quantity: invoice.quantity,
+      unit: invoice.unit,
+      unitPrice: invoice.unitPrice,
+      total: invoice.total,
+      tax: invoice.tax,
+      grandTotal: invoice.grandTotal,
+      status: invoice.status,
+      date: invoice.date,
+      dueDate: invoice.dueDate,
+      inventoryItems: inventoryItems.map(item => ({
+        arrivalDate: item.arrivalDate,
+        departureDate: item.departureDate,
+        customer: item.customerName,
+        goods: item.goods,
+        type: item.type,
+        quantity: item.quantity,
+        weight: item.weight,
+      })),
+      bankInfo: {
+        accountNumber: "1234 56 789101",
+        kidNumber: "123XXX-01",
+      },
+    };
+
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
 };
 
-// Function to create a new invoice
-export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Create a new invoice
+export const createInvoice = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const { invoiceNumber, customer, amount, status, date } = req.body;
-    const newInvoice = new Invoice({ invoiceNumber, customer, amount, status, date });
-    const savedInvoice = await newInvoice.save();
-    res.status(201).json(savedInvoice);
+    const newInvoice = { ...req.body, id: Date.now() };
+    invoices.push(newInvoice);
+    res.status(201).json(newInvoice);
   } catch (error) {
     next(error);
   }
 };
 
-// Function to update an existing invoice
-export const updateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Update existing invoice
+export const updateInvoice = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
-    if (!updatedInvoice) {
+    const invoiceId = parseInt(req.params.id);
+    const index = invoices.findIndex(inv => inv.id === invoiceId);
+
+    if (index === -1) {
       res.status(404).json({ message: "Invoice not found" });
       return;
     }
-    res.status(200).json(updatedInvoice);
+
+    invoices[index] = { ...invoices[index], ...req.body };
+    res.status(200).json(invoices[index]);
   } catch (error) {
     next(error);
   }
 };
 
-// Function to delete an invoice
-export const deleteInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+// Delete an invoice
+export const deleteInvoice = (req: Request, res: Response, next: NextFunction): void => {
   try {
-    const deletedInvoice = await Invoice.findByIdAndDelete(req.params.id);
-    if (!deletedInvoice) {
+    const invoiceId = parseInt(req.params.id);
+    const index = invoices.findIndex(inv => inv.id === invoiceId);
+
+    if (index === -1) {
       res.status(404).json({ message: "Invoice not found" });
       return;
     }
+
+    invoices.splice(index, 1);
     res.status(200).json({ message: "Invoice deleted successfully" });
   } catch (error) {
     next(error);
