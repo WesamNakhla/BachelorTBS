@@ -23,7 +23,6 @@ import {
   FileText,
   Settings,
   Bell,
-  FileSignature,
   Menu,
   X,
   LogOut,
@@ -75,13 +74,12 @@ const Sidebar: React.FC = () => {
     navigate("/auth/login");
   };
 
+  // ✅ Removed "Reports" and "Activity Logs"
   const navLinks = [
     { to: "/dashboard", label: "Dashboard", icon: <Home />, roles: ["admin", "employee"] },
     { to: "/invoices", label: "Invoices", icon: <File />, roles: ["admin", "employee", "customer"] },
     { to: "/inventory", label: "Inventory", icon: <FileText />, roles: ["admin", "employee"] },
     { to: "/users", label: "Users", icon: <Users />, roles: ["admin"] },
-    { to: "/settings/security/logs", label: "Activity Logs", icon: <FileSignature />, roles: ["admin"] },
-    { to: "/reports", label: "Reports", icon: <Settings />, roles: ["admin", "employee"] },
     { to: "/notifications", label: "Notifications", icon: <Bell />, roles: ["admin", "employee"] },
     { to: "/settings", label: "Settings", icon: <Settings />, roles: ["admin"] },
   ];
