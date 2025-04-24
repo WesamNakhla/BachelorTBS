@@ -51,7 +51,6 @@ const InvoiceList = () => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
-  const [, setError] = useState<string | null>(null); // ✅ Removed unused variable warning
 
   const fetchInvoices = useCallback(async () => {
     setLoading(true);
@@ -64,7 +63,6 @@ const InvoiceList = () => {
       }
     } catch (err) {
       console.error(err);
-      setError("Failed to load invoices.");
       toast.error("Failed to load invoices from server.");
     } finally {
       setLoading(false);

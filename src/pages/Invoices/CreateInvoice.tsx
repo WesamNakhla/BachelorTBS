@@ -36,7 +36,7 @@ interface InvoiceForm {
 
 const CreateInvoice: React.FC = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [inventoryList, setInventoryList] = useState<Inventory[]>([]); // ✅ New
+  const [inventoryList, setInventoryList] = useState<Inventory[]>([]);
   const [formData, setFormData] = useState<InvoiceForm>({
     customerId: "",
     inventoryId: "",
@@ -53,8 +53,12 @@ const CreateInvoice: React.FC = () => {
     const fetchCustomers = async () => {
       try {
         const response = await axios.get("/api/customers");
+
+        // ✅ Validate response to ensure it is an array
         if (Array.isArray(response.data)) {
           setCustomers(response.data);
+        } else if (response.data && Array.isArray(response.data.customers)) {
+          setCustomers(response.data.customers);
         } else {
           throw new Error("Invalid customers data.");
         }
