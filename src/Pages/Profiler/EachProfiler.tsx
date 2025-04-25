@@ -4,13 +4,11 @@ import { GoPlusCircle } from "react-icons/go";
 import { IoEyeOutline } from "react-icons/io5";
 import { LuPencilLine } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
-import { useNavigate } from "react-router-dom";
 import Modal from "../../Components/Modal/Modal";
 import FormInput from "../../Components/FormInput/FormInput";
-const Profiler = ()=>{
+const EachProfiler = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
     const [ kunde, setKunde ] = useState<string>("");
-    const navigate = useNavigate();
 
     const handleKunde = (e: React.ChangeEvent<HTMLInputElement>)=>{
         setKunde(e.target.value);
@@ -36,16 +34,24 @@ const Profiler = ()=>{
                         </button>
                 </div>
                 <div className="flex mt-10">
-                    <table className="table-fixed w-full ">
+                    <table className="table-fixed w-full text-center ">
+                        <thead>
+                            <th>Mottaksdato</th>
+                            <th>Kunde</th>
+                            <th>Vare</th>
+                            <th>Antall kss/pll</th>
+                            <th>Vekt</th>
+                            <th>Avgangsdato kunde</th>
+                            <th>Actions</th>
+                        </thead>
                         <tbody>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4 cursor-pointer" onClick={()=>navigate("/Profiler/ab", { replace: true })}>sjømat as</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">06/03-2025</td>
+                                <td className="py-4">Vikenco</td>
+                                <td className="py-4">Laks</td>
+                                <td className="py-4">28</td>
+                                <td className="py-4">540.2</td>
+                                <td className="py-4">05/03</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -53,13 +59,12 @@ const Profiler = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4 cursor-pointer" onClick={()=>navigate("/Profiler/ab", { replace: true })}>Domstein øst</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">06/03-2025</td>
+                                <td className="py-4">Vertalplast</td>
+                                <td className="py-4">Tomkasser</td>
+                                <td className="py-4">33 pll</td>
+                                <td className="py-4">288 kg</td>
+                                <td className="py-4">05/03</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -67,55 +72,12 @@ const Profiler = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4 cursor-pointer" onClick={()=>navigate("/Profiler/ab", { replace: true })}>sjømathuset</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4" onClick={()=>navigate("/Profiler/ab")}>Domstein kr.sand</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4 cursor-pointer" onClick={()=>navigate("/Profiler/ab", { replace: true })}>Fiskcentralen</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4 cursor-pointer" onClick={()=>navigate("/Profiler/ab", { replace: true })}>Asia engros</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
+                                <td className="py-4">06/03-2025</td>
+                                <td className="py-4">Domstein</td>
+                                <td className="py-4">Laksefilet</td>
+                                <td className="py-4">3</td>
+                                <td className="py-4">540.2</td>
+                                <td className="py-4">05/03</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -191,4 +153,4 @@ const Profiler = ()=>{
         </>
     );
 }
-export default Profiler;
+export default EachProfiler;

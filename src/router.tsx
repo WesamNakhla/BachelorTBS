@@ -10,6 +10,7 @@ import DashboardLayout from "./Pages/DashboardLayout/DashboardLayout";
 import Faktura from "./Pages/Faktura/Faktura";
 import Kunde from "./Pages/Kunde/Kunde";
 import Profiler from "./Pages/Profiler/Profiler";
+import EachProfiler from "./Pages/Profiler/EachProfiler";
 
 
 const Router = ()=>{
@@ -51,6 +52,11 @@ const Router = ()=>{
                 <Route path="/Profiler" element={
                     <DashboardLayout>
                         <Profiler />
+                    </DashboardLayout>
+                } />
+                <Route path="/Profiler/:profile" element={
+                    <DashboardLayout>
+                        <EachProfiler />
                     </DashboardLayout>
                 } />
             </Routes>

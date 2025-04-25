@@ -10,7 +10,7 @@ const DashboardSidebar = ()=>{
             <div className="flex flex-col items-center w-[25%] h-full bg-[#A2A1A8]/5 p-5">
                 <h1 className="font-lexend font-bold text-[#31A2F2]">TBS</h1>
                 <div className="flex flex-col justify-between h-[600px]">
-                    <div className="flex flex-col justify-center">
+                    <div className="flex flex-col justify-center text-center">
                         <p className="flex justify-center items-center font-lexend font-light text-base mb-4">
                             <p className="mr-2"><RxDashboard /></p>
                             Dashboard
