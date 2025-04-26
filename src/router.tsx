@@ -11,6 +11,7 @@ import Faktura from "./Pages/Faktura/Faktura";
 import Kunde from "./Pages/Kunde/Kunde";
 import Profiler from "./Pages/Profiler/Profiler";
 import EachProfiler from "./Pages/Profiler/EachProfiler";
+import Dashboard from "./Pages/Dashboard/Dashboard";
 
 
 const Router = ()=>{
@@ -42,6 +43,11 @@ const Router = ()=>{
                 <Route path="/Faktura" element={
                     <DashboardLayout>
                         <Faktura />
+                    </DashboardLayout>
+                } />
+                <Route path="/Dashboard" element={
+                    <DashboardLayout>
+                        <Dashboard />
                     </DashboardLayout>
                 } />
                  <Route path="/Kunder" element={
