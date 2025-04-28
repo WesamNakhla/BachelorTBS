@@ -7,12 +7,10 @@ export const PageContainer = styled.div`
   min-height: 100vh;
 `;
 
-// ✅ Header with title, search bar, and add button
+// ✅ Page header (title, filters, add button)
 export const PageHeader = styled.div`
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 1rem;
   margin-bottom: 1.5rem;
 
@@ -22,24 +20,15 @@ export const PageHeader = styled.div`
   }
 `;
 
-// ✅ Search input field
-export const SearchInput = styled.input`
-  padding: 0.6rem 1rem;
-  border: 1px solid ${({ theme }) => theme.border || "#d1d5db"};
-  border-radius: 8px;
-  font-size: 1rem;
-  width: 260px;
-  background: ${({ theme }) => theme.inputBackground || "#fff"};
-  color: ${({ theme }) => theme.text || "#111827"};
-
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.primary || "#6366f1"};
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-  }
+// ✅ Filters row (Customer select, dates, buttons)
+export const FiltersRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
 `;
 
-// ✅ Add Inventory button
+// ✅ Button to add new inventory
 export const AddButton = styled.button`
   padding: 0.6rem 1.2rem;
   background-color: ${({ theme }) => theme.primary || "#6366f1"};
@@ -55,7 +44,7 @@ export const AddButton = styled.button`
   }
 `;
 
-// ✅ Inventory table (updated for better cell alignment)
+// ✅ Inventory table
 export const InventoryTable = styled.table`
   width: 100%;
   border-collapse: collapse;
@@ -74,8 +63,8 @@ export const InventoryTable = styled.table`
     text-align: left;
     font-size: 0.95rem;
     border-bottom: 1px solid ${({ theme }) => theme.border || "#e5e7eb"};
-    vertical-align: middle; // ✅ Ensures vertical alignment
-    white-space: nowrap; // ✅ Prevents text from breaking into multiple lines
+    vertical-align: middle;
+    white-space: nowrap;
   }
 
   th {
@@ -84,18 +73,49 @@ export const InventoryTable = styled.table`
   }
 `;
 
-
+// ✅ Table row with hover effect
 export const TableRow = styled.tr`
   &:hover {
     background-color: ${({ theme }) => theme.hover || "#f9fafb"};
   }
 `;
 
+// ✅ Table cell
 export const TableCell = styled.td`
   color: ${({ theme }) => theme.text || "#374151"};
 `;
 
-// ✅ Modal background overlay
+// ✅ Action buttons container (aligned under Actions column)
+export const ActionButtons = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+`;
+
+// ✅ Icon-only button (view, edit, delete)
+export const IconButton = styled.button`
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    color: ${({ theme }) => theme.text};
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.hover || "#f3f4f6"};
+  }
+`;
+
+// ✅ Modal overlay background
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
@@ -106,7 +126,7 @@ export const ModalOverlay = styled.div`
   z-index: 1000;
 `;
 
-// ✅ Modal container with scroll-friendly design
+// ✅ Modal container
 export const ModalContainer = styled.div`
   background: ${({ theme }) => theme.card || "#fff"};
   padding: 2rem;
@@ -127,7 +147,7 @@ export const ModalTitle = styled.h3`
   color: ${({ theme }) => theme.text || "#111827"};
 `;
 
-// ✅ Modal form with vertical scroll
+// ✅ Modal form
 export const ModalForm = styled.form`
   flex: 1;
   overflow-y: auto;
@@ -137,13 +157,13 @@ export const ModalForm = styled.form`
   padding-right: 0.25rem;
 `;
 
-// ✅ Form row
+// ✅ Form row container
 export const FormRow = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
-// ✅ Label for form fields
+// ✅ Label for inputs
 export const Label = styled.label`
   margin-bottom: 0.4rem;
   font-size: 0.95rem;
@@ -166,23 +186,7 @@ export const Input = styled.input`
   }
 `;
 
-// ✅ Dropdown select
-export const Select = styled.select`
-  padding: 0.6rem 1rem;
-  border: 1px solid ${({ theme }) => theme.border || "#d1d5db"};
-  border-radius: 8px;
-  background: ${({ theme }) => theme.inputBackground || "#fff"};
-  color: ${({ theme }) => theme.text || "#111827"};
-  font-size: 1rem;
-
-  &:focus {
-    outline: none;
-    border-color: ${({ theme }) => theme.primary || "#6366f1"};
-    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-  }
-`;
-
-// ✅ Modal action buttons at the bottom
+// ✅ Modal actions (buttons) at bottom
 export const ModalActions = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -192,7 +196,7 @@ export const ModalActions = styled.div`
   background-color: ${({ theme }) => theme.card || "#fff"};
 `;
 
-// ✅ Save button
+// ✅ Save button inside modal
 export const SaveButton = styled.button`
   background-color: ${({ theme }) => theme.primary || "#10b981"};
   color: #fff;
@@ -208,7 +212,7 @@ export const SaveButton = styled.button`
   }
 `;
 
-// ✅ Cancel button
+// ✅ Cancel button inside modal
 export const CancelButton = styled.button`
   background-color: ${({ theme }) => theme.danger || "#ef4444"};
   color: #fff;
@@ -224,31 +228,32 @@ export const CancelButton = styled.button`
   }
 `;
 
-// ✅ Action buttons container for table rows
-export const ActionButtons = styled.div`
+// ✅ Pagination wrapper (bottom of the table)
+export const PaginationWrapper = styled.div`
+  margin-top: 20px;
   display: flex;
-  gap: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
 `;
 
-// ✅ Small icon-only button style
-export const IconButton = styled.button`
-  background-color: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 6px;
+// ✅ Pagination button (Previous/Next)
+export const PaginationButton = styled.button`
+  padding: 6px 14px;
+  background-color: ${({ theme }) => theme.inputBackground || "#fff"};
+  color: ${({ theme }) => theme.text || "#111827"};
+  border: 1px solid ${({ theme }) => theme.border || "#d1d5db"};
   border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s;
-
-  svg {
-    width: 20px;
-    height: 20px;
-    color: ${({ theme }) => theme.text};
-  }
+  cursor: pointer;
+  font-size: 0.95rem;
+  transition: background-color 0.2s;
 
   &:hover {
     background-color: ${({ theme }) => theme.hover || "#f3f4f6"};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 `;
