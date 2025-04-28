@@ -38,7 +38,7 @@ const Profiler = ()=>{
                 <div className="flex mt-10">
                     <table className="table-fixed w-full ">
                         <tbody>
-                            <tr className="border-1 border-[#A2A1A8]/10 w-full">
+                            <tr className="border-1 border-[#A2A1A8]/10">
                                 <td className="py-4 cursor-pointer" onClick={()=>navigate("/Profiler/ab", { replace: true })}>sjømat as</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>

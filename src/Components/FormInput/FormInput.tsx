@@ -6,13 +6,15 @@ interface FormParameters {
    placeholder: string,
    onChange?: (e: React.ChangeEvent<HTMLInputElement>)=> void,
    value: string
+   name: string
 }
 const FormInput: React.FC<FormParameters> = ({
     label,
     type,
     placeholder,
     onChange,
-    value
+    value,
+    name
  }) => {
     return (
        <div className="flex flex-col gap-4 my-5 mx-5 w-full sm:w-full">
@@ -26,6 +28,7 @@ const FormInput: React.FC<FormParameters> = ({
                 type={type}
                 onChange={onChange}
                 value={value}
+                name={name}
              />
           </div>
           {/* {error && error[name] && (
