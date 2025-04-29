@@ -28,13 +28,7 @@ router.get("/:id", async (req: Request, res: Response, next: NextFunction) => {
 });
 
 // Route to create a new invoice
-router.post("/", async (req: Request, res: Response, next: NextFunction) => {
-  try {
-    await createInvoice(req, res, next);
-  } catch (error) {
-    next(error);
-  }
-});
+router.post("/create-invoice", createInvoice);
 
 // Route to update an existing invoice
 router.put("/:id", async (req: Request, res: Response, next: NextFunction) => {

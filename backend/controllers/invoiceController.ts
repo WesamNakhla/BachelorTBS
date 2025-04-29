@@ -4,7 +4,7 @@ import Invoice from "../models/Invoice";
 // Function to get all invoices
 export const getInvoices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const invoices = await Invoice.find();
+    const invoices = await Invoice.find({});
     res.status(200).json(invoices);
   } catch (error) {
     next(error);
@@ -27,6 +27,7 @@ export const getInvoiceById = async (req: Request, res: Response, next: NextFunc
 
 // Function to create a new invoice
 export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  console.log("invoice endpoint is working");
   try {
     const { customer, amount, status, date } = req.body;
     const data = {
@@ -37,13 +38,21 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
       date: date
     }
     const newInvoice = new Invoice(data);
-    await newInvoice.save();
+    let savedInvoice = await newInvoice.save();
     res.status(201).json({
       success: true,
-      message: "Invoice created successfully"
+      message: "Invoice created successfully",
+      invoice: savedInvoice
     });
-  } catch (error) {
-    next(error);
+    return;
+  } catch (error: any) {
+    console.log(error);
+    res.status(501).json({
+      success: false,
+      message: "Encounter an error"
+    });
+    // next(error);
+    
   }
 };
 
@@ -77,5 +86,6 @@ export const deleteInvoice = async (req: Request, res: Response, next: NextFunct
 
 const GenerateRandomID =()=>{
   let random_number = Math.floor(10 + Math.random() * 101);
+  console.log(random_number);
   return "#" + random_number;
 }

@@ -100,7 +100,8 @@ const Kunde = ()=>{
                                     label="Kunde"  
                                     placeholder="Kunde" 
                                     onChange={handleKunde}
-                                    value={kunde} />
+                                    value={kunde}
+                                    name="Kunde" />
                                 <FormInput 
                                     type="text" 
                                     label="Velge faktura mnde"  

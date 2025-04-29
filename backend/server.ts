@@ -4,9 +4,8 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import mongoose from "mongoose";
-import path from "path";
-import fs from "fs";
-import authRoutes from "./routes/authRoutes"
+import authRoutes from "./routes/authRoutes";
+import invoiceRoutes from "./routes/invoiceRoutes";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -41,40 +40,9 @@ app.use(
   })
 );
 
-// // Safe route loader with error isolation
-// const loadRoutes = async (routesPath: string) => {
-//   const routeFiles = fs.readdirSync(routesPath);
-
-//   for (const file of routeFiles) {
-//     const fullPath = path.join(routesPath, file);
-
-//     // Only .ts or .js files
-//     if (!file.endsWith(".ts") && !file.endsWith(".js")) continue;
-
-//     try {
-//       const routeModule = await import(fullPath);
-//       if (routeModule.default && typeof routeModule.default === "function") {
-//         const routePath = `/api/${path.basename(file, path.extname(file))}`;
-//         app.use(routePath, routeModule.default);
-//         console.log(`✅ Route loaded: ${routePath}`);
-//       } else {
-//         console.warn(`⚠️ Skipped file (no default export): ${file}`);
-//       }
-//     } catch (err) {
-//       console.error(`❌ Error loading route ${file}:`, err);
-//     }
-//   }
-// };
-
-// // Load all routes from the "routes" directory
-// const routesDir = path.join(__dirname, "routes");
-// if (fs.existsSync(routesDir)) {
-//   loadRoutes(routesDir);
-// } else {
-//   console.warn("⚠️ No 'routes' directory found to load.");
-// }
 
 app.use("/api/v1", authRoutes);
+app.use("/api/v1", invoiceRoutes);
 
 // Health check route
 app.get("/", (req: Request, res: Response) => {
