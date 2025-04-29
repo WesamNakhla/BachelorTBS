@@ -6,14 +6,15 @@ import axiosInstances from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 
 interface login {
-    email: string,
+    username: string,
     password: string
 }
 const Login = ()=>{
     const [ loginData, setLoginData ]  = useState<login>({
-        email: "",
+        username: "",
         password: ""
     });
+    const [ loading, setLoading ] = useState<boolean>(false);
     const navigate = useNavigate();
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const { name, value } = e.target;
@@ -24,21 +25,24 @@ const Login = ()=>{
     }
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
+        setLoading(!loading);
         try{
             const data = {
-                email: loginData.email,
+                username: loginData.username,
                 password: loginData.password
             }
-            if(!data.email || !data.password){
+            if(!data.username || !data.password){
                 toast.error("Enter your login credentials");
                 return false;
             }
             let response = await axiosInstances.post("/login", data);
             console.log(response);
+            setLoading(!loading);
             toast.success("You are logged in successfully");
             navigate("/Dashboard");
 
         }catch(err: any){
+            setLoading(!loading);
             console.log(err);
             toast.error(err.response?.data?.message || "An error occured");
         } 
@@ -52,12 +56,12 @@ const Login = ()=>{
                 <form className="flex flex-col justify-center items-center h-full" onSubmit={handleSubmit}>
                     <div className="w-1/2">
                         <FormInput 
-                            type="text" 
-                            label="username *" 
+                            type="text"
+                            label="Username *" 
                             placeholder="Enter your username"
-                            value={loginData.email}
+                            value={loginData.username}
                             onChange={handleChange}
-                            name="email"
+                            name="username"
                         />
                         <FormInput 
                             type="password" 
@@ -70,7 +74,7 @@ const Login = ()=>{
                     </div>
 
                     <button type="submit" className="bg-[#66B2FF] cursor-pointer rounded-full text-[#fff] font-bold  w-[200px] h-[50px]">
-                        Logg inn
+                        { loading ? "Loading..." : "Logg inn" }
                     </button>
                     <Link to="/" className="text-[#66B2FF] my-5">Jeg har glemt mitt passord</Link>
                    
