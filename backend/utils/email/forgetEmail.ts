@@ -4,6 +4,9 @@ import Mailgen from "mailgen";
 const ForgetEmail = async(name: string, email: string, token: string)=>{
     try{
         let config = {
+            // host: "smtp.gmail.com",
+            // port: 587,
+            // secure: true,
             service: "gmail",
             auth: {
                 user: process.env.user_email,

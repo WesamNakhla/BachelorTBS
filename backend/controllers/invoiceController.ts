@@ -28,10 +28,20 @@ export const getInvoiceById = async (req: Request, res: Response, next: NextFunc
 // Function to create a new invoice
 export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const { invoiceNumber, customer, amount, status, date } = req.body;
-    const newInvoice = new Invoice({ invoiceNumber, customer, amount, status, date });
-    const savedInvoice = await newInvoice.save();
-    res.status(201).json(savedInvoice);
+    const { customer, amount, status, date } = req.body;
+    const data = {
+      invoiceNumber: GenerateRandomID(),
+      customer: customer,
+      amount: amount,
+      status: status,
+      date: date
+    }
+    const newInvoice = new Invoice(data);
+    await newInvoice.save();
+    res.status(201).json({
+      success: true,
+      message: "Invoice created successfully"
+    });
   } catch (error) {
     next(error);
   }
@@ -64,3 +74,8 @@ export const deleteInvoice = async (req: Request, res: Response, next: NextFunct
     next(error);
   }
 };
+
+const GenerateRandomID =()=>{
+  let random_number = Math.floor(10 + Math.random() * 101);
+  return "#" + random_number;
+}

@@ -34,7 +34,15 @@ const Faktura = ()=>{
                         </button>
                 </div>
                 <div className="flex mt-10">
-                    <table className="table-fixed w-full ">
+                    <table className="table-fixed w-full text-center ">
+                    <thead>
+                            <th>Invoice ID</th>
+                            <th>Invoice name</th>
+                            <th>Customer</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                            
+                        </thead>
                         <tbody>
                             <tr className="border-1 border-[#A2A1A8]/10">
                                 <td className="py-4">Faktura 0001</td>

@@ -25,7 +25,7 @@ const Login = ()=>{
     }
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
-        setLoading(!loading);
+        setLoading(true);
         try{
             const data = {
                 username: loginData.username,
@@ -37,12 +37,12 @@ const Login = ()=>{
             }
             let response = await axiosInstances.post("/login", data);
             console.log(response);
-            setLoading(!loading);
+            setLoading(false);
             toast.success("You are logged in successfully");
             navigate("/Dashboard");
 
         }catch(err: any){
-            setLoading(!loading);
+            setLoading(false);
             console.log(err);
             toast.error(err.response?.data?.message || "An error occured");
         } 

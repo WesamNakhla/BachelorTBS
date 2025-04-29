@@ -34,11 +34,24 @@ const Kunde = ()=>{
                         </button>
                 </div>
                 <div className="flex mt-10">
-                    <table className="table-fixed w-full ">
+                    <table className="table-fixed w-full text-center ">
+                        <thead>
+                            <th>Customer</th>
+                            <th>Type</th>
+                            <th>Contact Person</th>
+                            <th>Org Num</th>
+                            <th>Address</th>
+                            <th>Telephone Num</th>
+                            <th>Actions</th>
+                        </thead>
                         <tbody>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Sjømat As</td>
-                                <td className="py-4">Sjømat</td>
+                                <td className="py-4">06/03-2025</td>
+                                <td className="py-4">Vikenco</td>
+                                <td className="py-4">Laks</td>
+                                <td className="py-4">28</td>
+                                <td className="py-4">540.2</td>
+                                <td className="py-4">05/03</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -46,8 +59,12 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Domstein Øst</td>
-                                <td className="py-4">DS</td>
+                                <td className="py-4">06/03-2025</td>
+                                <td className="py-4">Vertalplast</td>
+                                <td className="py-4">Tomkasser</td>
+                                <td className="py-4">33 pll</td>
+                                <td className="py-4">288 kg</td>
+                                <td className="py-4">05/03</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
@@ -55,35 +72,12 @@ const Kunde = ()=>{
                                 </td>
                             </tr>
                             <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Sjømathuset</td>
-                                <td className="py-4">Sj</td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Domstein Kr.sand</td>
-                                <td className="py-4">DS Kr.S</td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">FiskeCentralen</td>
-                                <td className="py-4">FC</td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Asia Engros</td>
-                                <td className="py-4">ASIA</td>
+                                <td className="py-4">06/03-2025</td>
+                                <td className="py-4">Domstein</td>
+                                <td className="py-4">Laksefilet</td>
+                                <td className="py-4">3</td>
+                                <td className="py-4">540.2</td>
+                                <td className="py-4">05/03</td>
                                 <td className="flex py-4 text-lg cursor-pointer">
                                     <p><IoEyeOutline /></p>
                                     <p className="mx-4"><LuPencilLine /></p>
