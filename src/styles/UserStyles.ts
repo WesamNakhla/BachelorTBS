@@ -2,42 +2,10 @@ import styled from "styled-components";
 
 /* ==== MAIN CONTAINER ==== */
 export const UserContainer = styled.div`
-  padding: 32px;
+  padding: 24px;
+  width: 100%;
   background-color: ${({ theme }) => theme.background};
   color: ${({ theme }) => theme.text};
-`;
-
-/* ==== TABLE STYLES ==== */
-export const UserTable = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-`;
-
-export const TableHead = styled.thead`
-  background-color: ${({ theme }) => theme.cardBackground};
-  text-transform: uppercase;
-`;
-
-export const TableRow = styled.tr`
-  border-bottom: 1px solid ${({ theme }) => theme.borderColor || "#e5e7eb"};
-`;
-
-export const TableHeader = styled.th`
-  text-align: left;
-  padding: 16px 20px;
-  font-size: 13px;
-  font-weight: 600;
-  color: ${({ theme }) => theme.text};
-`;
-
-export const TableBody = styled.tbody``;
-
-export const TableData = styled.td`
-  padding: 16px 20px;
-  font-size: 14px;
-  color: ${({ theme }) => theme.subText || "#4b5563"};
-  background-color: ${({ theme }) => theme.cardBackground};
 `;
 
 /* ==== HEADER BAR ==== */
@@ -45,20 +13,19 @@ export const TopBar = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
   flex-wrap: wrap;
-  gap: 16px;
+  margin-bottom: 24px;
 `;
 
-/* ==== SEARCH & FILTER ==== */
+/* ==== SEARCH AND FILTER FIELDS ==== */
 export const SearchInput = styled.input`
   padding: 10px 16px;
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: 14px;
-  min-width: 300px;
   flex: 1;
-  background-color: ${({ theme }) => theme.inputBackground || "#ffffff"};
+  min-width: 280px;
+  background-color: ${({ theme }) => theme.inputBackground};
   color: ${({ theme }) => theme.text};
 `;
 
@@ -67,59 +34,65 @@ export const FilterSelect = styled.select`
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: 14px;
-  background-color: ${({ theme }) => theme.inputBackground || "#ffffff"};
+  background-color: ${({ theme }) => theme.inputBackground};
   color: ${({ theme }) => theme.text};
 `;
 
-/* ==== PAGINATION ==== */
-export const PaginationContainer = styled.div`
+/* ==== TABLE STRUCTURE ==== */
+export const UserTable = styled.table`
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: 20px;
+`;
+
+export const TableHead = styled.thead``;
+
+export const TableRow = styled.tr`
+  border-radius: 12px;
+`;
+
+export const TableHeader = styled.th`
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.text};
+`;
+
+export const TableBody = styled.tbody``;
+
+export const TableData = styled.td`
+  padding: 16px 18px;
+  font-size: 14px;
+  background-color: ${({ theme }) => theme.cardBackground};
+  color: ${({ theme }) => theme.text};
+  border-top: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+`;
+
+/* ==== ACTION BUTTON WRAPPER ==== */
+export const ActionButtons = styled.div`
   display: flex;
-  justify-content: flex-end;
+  gap: 8px;
   align-items: center;
-  margin-top: 24px;
-  gap: 12px;
+  justify-content: flex-start;
 `;
 
-export const RowsPerPage = styled.select`
-  padding: 8px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-`;
-
-export const PageButtons = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  button {
-    padding: 6px 12px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-    background-color: ${({ theme }) => theme.primary || "#3b82f6"};
-    color: white;
-
-    &:disabled {
-      background-color: #e5e7eb;
-      color: #9ca3af;
-      cursor: not-allowed;
-    }
-  }
-`;
-
-/* ==== ADD BUTTON ==== */
+/* ==== ADD USER BUTTON ==== */
 export const AddButton = styled.button`
-  padding: 10px 22px;
+  padding: 10px 20px;
   font-size: 14px;
   font-weight: 600;
   border: none;
   border-radius: 10px;
+
+  /* ✅ Use theme.primary with fallback to safe blue */
   background-color: ${({ theme }) => theme.primary || "#3b82f6"};
   color: #fff;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: all 0.25s ease;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 
   &:hover {
     background-color: ${({ theme }) => theme.primaryDark || "#2563eb"};
@@ -133,21 +106,18 @@ export const AddButton = styled.button`
   }
 `;
 
-/* ==== ACTION BUTTONS ==== */
-export const ActionButtons = styled.div`
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-`;
-
+/* ==== INDIVIDUAL ACTION BUTTONS ==== */
 export const ViewButton = styled.button`
   background-color: #dbeafe;
   color: #1e40af;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 6px 10px;
   border: none;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background-color: #bfdbfe;
@@ -157,11 +127,14 @@ export const ViewButton = styled.button`
 export const EditButton = styled.button`
   background-color: #fef9c3;
   color: #92400e;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 6px 10px;
   border: none;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background-color: #fde68a;
@@ -171,18 +144,64 @@ export const EditButton = styled.button`
 export const DeleteButton = styled.button`
   background-color: #fee2e2;
   color: #991b1b;
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 6px 10px;
   border: none;
-  font-weight: 500;
+  border-radius: 8px;
   cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 
   &:hover {
     background-color: #fecaca;
   }
 `;
 
-/* ==== USER DETAIL ROW ==== */
+/* ==== PAGINATION SECTION ==== */
+export const PaginationContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+`;
+
+export const RowsPerPage = styled.select`
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 14px;
+  color: ${({ theme }) => theme.text};
+`;
+
+export const PageButtons = styled.div`
+  display: flex;
+  gap: 10px;
+
+  button {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background-color: #f3f4f6;
+    color: #111827;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #e5e7eb;
+    }
+
+    &:disabled {
+      background-color: #e5e7eb;
+      color: #9ca3af;
+      cursor: not-allowed;
+    }
+  }
+`;
+
+/* ==== DETAIL ROW FOR MODAL VIEW ==== */
 export const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;
@@ -203,35 +222,7 @@ export const DetailRow = styled.div`
   }
 `;
 
-/* ==== FORM ELEMENTS ==== */
-export const Input = styled.input`
-  padding: 10px 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  width: 100%;
-  background-color: ${({ theme }) => theme.inputBackground || "#ffffff"};
-  color: ${({ theme }) => theme.text};
-`;
-
-export const Select = styled.select`
-  padding: 10px 14px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 14px;
-  width: 100%;
-  background-color: ${({ theme }) => theme.inputBackground || "#ffffff"};
-  color: ${({ theme }) => theme.text};
-`;
-
-/* ==== MODAL COMPONENTS ==== */
-export const ModalOverlay = styled.div`
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.5);
-  z-index: 999;
-`;
-
+/* ==== MODAL CONTAINER ==== */
 export const ModalContainer = styled.div`
   position: fixed;
   top: 50%;
@@ -247,7 +238,7 @@ export const ModalContainer = styled.div`
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 `;
 
-/* ==== MODAL CONTENT SCROLL ==== */
+/* ==== SCROLLABLE MODAL CONTENT ==== */
 export const ModalContentScrollable = styled.div`
   max-height: 85vh;
   overflow-y: auto;
@@ -263,4 +254,12 @@ export const ModalContentScrollable = styled.div`
     background-color: #cbd5e1;
     border-radius: 8px;
   }
+`;
+
+/* ==== MODAL BACKDROP OVERLAY ==== */
+export const ModalOverlay = styled.div`
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 `;

@@ -10,14 +10,18 @@ import {
   TableBody,
   TableData,
   ActionButtons,
-  EditButton,
-  DeleteButton,
-  ViewButton,
   TopBar,
   SearchInput,
   AddButton,
   FilterSelect,
+  PaginationContainer,
+  RowsPerPage,
+  PageButtons,
+  ViewButton,
+  EditButton,
+  DeleteButton,
 } from "@/styles/UserStyles";
+import { FiEye, FiEdit, FiTrash2 } from "react-icons/fi";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import UserModal from "./UserModal";
@@ -29,9 +33,6 @@ import type { User } from "../types/User";
 // Simulated current user role
 const currentUserRole: string = "admin";
 
-// Pagination settings
-const ITEMS_PER_PAGE = 8;
-
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
@@ -42,6 +43,7 @@ const UserManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [showUserDetails, setShowUserDetails] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const navigate = useNavigate();
 
@@ -68,7 +70,7 @@ const UserManagement = () => {
     });
 
     setFilteredUsers(filtered);
-    setCurrentPage(1); // Reset to first page on filter
+    setCurrentPage(1);
   }, [searchQuery, roleFilter, users]);
 
   const handleDelete = (id: number) => {
@@ -81,10 +83,10 @@ const UserManagement = () => {
     toast.success("User deleted successfully.");
   };
 
-  const totalPages = Math.ceil(filteredUsers.length / ITEMS_PER_PAGE);
+  const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
   const paginatedUsers = filteredUsers.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
+    (currentPage - 1) * rowsPerPage,
+    currentPage * rowsPerPage
   );
 
   return (
@@ -118,91 +120,97 @@ const UserManagement = () => {
       </div>
 
       {paginatedUsers.length > 0 ? (
-        <UserTable>
-          <TableHead>
-            <TableRow>
-              <TableHeader>ID</TableHeader>
-              <TableHeader>Name</TableHeader>
-              <TableHeader>Email</TableHeader>
-              <TableHeader>Phone</TableHeader>
-              <TableHeader>Role</TableHeader>
-              <TableHeader>Actions</TableHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {paginatedUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableData>{user.id}</TableData>
-                <TableData>{user.name}</TableData>
-                <TableData>{user.email}</TableData>
-                <TableData>{user.phone}</TableData>
-                <TableData>{user.role}</TableData>
-                <TableData>
-                  <ActionButtons>
-                    <ViewButton
-                      onClick={() => {
-                        if (user.role === "customer") {
-                          const matchedCustomer = fakeCustomers.find((c) => c.userId === user.id);
-                          if (matchedCustomer) {
-                            setSelectedCustomer(matchedCustomer);
-                          } else {
-                            toast.error("Customer data not found.");
-                          }
-                        } else {
-                          setSelectedUser(user);
-                          setShowUserDetails(true);
-                        }
-                      }}
-                    >
-                      View
-                    </ViewButton>
-
-                    {currentUserRole === "admin" && (
-                      <>
-                        <EditButton
-                          onClick={() => {
-                            setSelectedUser(user);
-                            setIsModalOpen(true);
-                          }}
-                        >
-                          Edit
-                        </EditButton>
-                        <DeleteButton onClick={() => handleDelete(user.id)}>Delete</DeleteButton>
-                      </>
-                    )}
-                  </ActionButtons>
-                </TableData>
+        <>
+          <UserTable>
+            <TableHead>
+              <TableRow>
+                <TableHeader>ID</TableHeader>
+                <TableHeader>Name</TableHeader>
+                <TableHeader>Email</TableHeader>
+                <TableHeader>Phone</TableHeader>
+                <TableHeader>Role</TableHeader>
+                <TableHeader>Actions</TableHeader>
               </TableRow>
-            ))}
-          </TableBody>
-        </UserTable>
+            </TableHead>
+            <TableBody>
+              {paginatedUsers.map((user) => (
+                <TableRow key={user.id}>
+                  <TableData>{user.id}</TableData>
+                  <TableData>{user.name}</TableData>
+                  <TableData>{user.email}</TableData>
+                  <TableData>{user.phone}</TableData>
+                  <TableData>{user.role}</TableData>
+                  <TableData>
+                    <ActionButtons>
+                      <ViewButton
+                        onClick={() => {
+                          if (user.role === "customer") {
+                            const matchedCustomer = fakeCustomers.find((c) => c.userId === user.id);
+                            if (matchedCustomer) {
+                              setSelectedCustomer(matchedCustomer);
+                            } else {
+                              toast.error("Customer data not found.");
+                            }
+                          } else {
+                            setSelectedUser(user);
+                            setShowUserDetails(true);
+                          }
+                        }}
+                      >
+                        <FiEye />
+                      </ViewButton>
+
+                      {currentUserRole === "admin" && (
+                        <>
+                          <EditButton
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            <FiEdit />
+                          </EditButton>
+                          <DeleteButton onClick={() => handleDelete(user.id)}>
+                            <FiTrash2 />
+                          </DeleteButton>
+                        </>
+                      )}
+                    </ActionButtons>
+                  </TableData>
+                </TableRow>
+              ))}
+            </TableBody>
+          </UserTable>
+
+          <PaginationContainer>
+            <RowsPerPage value={rowsPerPage} onChange={(e) => setRowsPerPage(Number(e.target.value))}>
+              {[5, 10, 15, 20].map((size) => (
+                <option key={size} value={size}>
+                  {size}
+                </option>
+              ))}
+            </RowsPerPage>
+
+            <PageButtons>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </button>
+              <button
+                onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </button>
+            </PageButtons>
+          </PaginationContainer>
+        </>
       ) : (
         <p>No users found.</p>
       )}
 
-      {/* Pagination controls */}
-      {totalPages > 1 && (
-        <div style={{ marginTop: "20px", textAlign: "center", display: "flex", justifyContent: "center", gap: "8px" }}>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              style={{
-                padding: "8px 14px",
-                borderRadius: "8px",
-                border: "1px solid #d1d5db",
-                backgroundColor: currentPage === index + 1 ? "#3b82f6" : "#f3f4f6",
-                color: currentPage === index + 1 ? "#fff" : "#111827",
-                cursor: "pointer",
-              }}
-              onClick={() => setCurrentPage(index + 1)}
-            >
-              {index + 1}
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Modal: Create or Edit */}
       {isModalOpen && (
         <UserModal
           mode={selectedUser ? "edit" : "create"}
@@ -229,7 +237,6 @@ const UserManagement = () => {
         />
       )}
 
-      {/* Modal: User Details */}
       {showUserDetails && selectedUser && (
         <UserDetailsModal
           user={selectedUser}
@@ -240,7 +247,6 @@ const UserManagement = () => {
         />
       )}
 
-      {/* Modal: Customer Details */}
       {selectedCustomer && (
         <UserDetailsModal
           user={{
