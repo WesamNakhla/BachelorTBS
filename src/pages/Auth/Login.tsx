@@ -1,10 +1,8 @@
-// src/pages/Auth/Login.tsx
-
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useAuth } from "../../context/AuthContext";
-import { fakeUsers } from "../data/fakeUsers"; // ✅ External test users
+import { fakeUserAccounts } from "../data/fakeUserAccounts";  
 
 import {
   LoginWrapper,
@@ -42,11 +40,11 @@ const Login: React.FC = () => {
     setLoading(true);
 
     setTimeout(() => {
-      const userData = fakeUsers[username];
+      const userData = fakeUserAccounts[username];
 
       if (userData && userData.password === password) {
         login({
-          id: "1",
+          id: Date.now().toString(), // أو يمكنك تعيين ID ثابت لكل مستخدم
           name: username,
           email: `${username}@example.com`,
           role: userData.role,
@@ -54,7 +52,7 @@ const Login: React.FC = () => {
 
         toast.success("Login successful!");
 
-        // Redirect user based on role
+        // ✅ توجيه حسب الدور
         if (userData.role === "customer") {
           navigate("/invoices");
         } else {

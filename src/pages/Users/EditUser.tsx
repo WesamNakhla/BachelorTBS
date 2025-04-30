@@ -1,24 +1,19 @@
+// src/pages/Users/EditUser.tsx
+
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
 import {
   UserContainer,
   DetailRow,
-} from "../../styles/UserStyles";
-import { Input, Select } from "../../styles/InvoiceStyles";
-import { Button } from "../../components/ui/Button";
+} from "@/styles/UserStyles";
+import { Input, Select } from "@/styles/InvoiceStyles";
+import { Button } from "@/components/ui/Button";
 import { toast } from "react-toastify";
+import { fakeUsers } from "../data/fakeUsers";
+import type { User, UserRole } from "../types/User";
 
-// Define the user type
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: "admin" | "employee" | "client" | "visitor";
-}
-
-// Simulated current user's role (should be dynamic from auth context in real app)
-const CURRENT_USER_ROLE: User["role"] = "admin"; // Change this for testing
+// Simulated current user's role (should come from context in real apps)
+const CURRENT_USER_ROLE: UserRole = "admin";
 
 const EditUser = () => {
   const { id } = useParams();
@@ -27,54 +22,40 @@ const EditUser = () => {
   const [formData, setFormData] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
-  // Fetch user data by ID
+  // Load user by ID from fakeUsers
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`/api/users/${id}`);
-        setFormData(response.data);
-      } catch (err) {
-        console.error("Failed to fetch user:", err);
-        setError("Failed to load user data.");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
+    const userId = Number(id);
+    const userToEdit = fakeUsers.find((u) => u.id === userId) || null;
+    setFormData(userToEdit);
+    setLoading(false);
   }, [id]);
 
   // Handle input changes
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => (prev ? { ...prev, [name]: value } : prev));
+    setFormData((prev) => (prev ? { ...prev, [name]: name === "role" ? (value as UserRole) : value } : null));
   };
 
-  // Handle form submit
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Save changes to fakeUsers
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData) return;
 
     setSaving(true);
-    try {
-      await axios.put(`/api/users/${formData.id}`, {
-        name: formData.name,
-        email: formData.email,
-        role: formData.role,
-      });
+
+    const index = fakeUsers.findIndex((u) => u.id === formData.id);
+    if (index !== -1) {
+      fakeUsers[index] = { ...formData };
       toast.success("User updated successfully!");
       navigate("/users");
-    } catch (err) {
-      console.error("Failed to update user:", err);
-      toast.error("Failed to update user.");
-    } finally {
-      setSaving(false);
+    } else {
+      toast.error("User not found.");
     }
+
+    setSaving(false);
   };
 
-  // Loading state
   if (loading) {
     return (
       <UserContainer>
@@ -83,11 +64,10 @@ const EditUser = () => {
     );
   }
 
-  // Error or no user
-  if (error || !formData) {
+  if (!formData) {
     return (
       <UserContainer>
-        <p style={{ color: "red", textAlign: "center" }}>{error || "User not found."}</p>
+        <p style={{ color: "red", textAlign: "center" }}>User not found.</p>
       </UserContainer>
     );
   }
@@ -133,7 +113,7 @@ const EditUser = () => {
             >
               <option value="admin">Admin</option>
               <option value="employee">Employee</option>
-              <option value="client">Client</option>
+              <option value="customer">Customer</option>
               <option value="visitor">Visitor</option>
             </Select>
           ) : (

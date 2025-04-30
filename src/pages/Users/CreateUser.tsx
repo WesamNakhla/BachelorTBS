@@ -1,31 +1,42 @@
-// src/pages/Users/CreateUser.tsx
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { DetailRow } from "@/styles/UserStyles";
 import { Input, Select } from "@/styles/InvoiceStyles";
 import { Button } from "@/components/ui/Button";
 import { toast } from "react-toastify";
-import type { User } from "../types/User";
 import { useAuth } from "@/context/AuthContext";
+import type { User, UserRole } from "../types/User";
+import { fakeCustomers, Customer } from "../data/fakeCustomers";
 
 interface CreateUserProps {
+  mode: "create" | "edit";
+  initialUser?: User;
   onCancel?: () => void;
   onSuccess?: (user: User) => void;
 }
 
-interface CreateUserForm {
+interface UserFormData {
   name: string;
   email: string;
   password: string;
-  role: "admin" | "employee" | "customer";
-  phoneNumber: string; // ✅ New field
-  bankAccount?: string;
+  phoneNumber: string;
+  role: UserRole;
 }
 
-// Function to generate a strong password
-const generateStrongPassword = () => {
+interface CustomerFormData {
+  companyName: string;
+  companyEmail: string;
+  orgNumber: string;
+  zipCode: string;
+  city: string;
+  address: string;
+  contactPerson: string;
+  companyPhone: string;
+  customerType: string;
+}
+
+// Utility function to generate a strong password
+const generateStrongPassword = (): string => {
   const upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   const lower = "abcdefghijklmnopqrstuvwxyz";
   const digits = "0123456789";
@@ -35,42 +46,69 @@ const generateStrongPassword = () => {
     pass += all[Math.floor(Math.random() * all.length)];
   }
   return pass.split("").sort(() => 0.5 - Math.random()).join("");
-}
+};
 
-const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
+const CreateUser: React.FC<CreateUserProps> = ({ mode, initialUser, onCancel, onSuccess }) => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState<CreateUserForm>({
+  const [formData, setFormData] = useState<UserFormData>({
     name: "",
     email: "",
     password: "",
-    phoneNumber: "", // ✅ Initialized
-    role: user?.role === "admin" ? "employee" : "customer",
-    bankAccount: "",
+    phoneNumber: "",
+    role: (user?.role === "admin" ? "employee" : "customer") as UserRole,
+  });
+
+  const [customerData, setCustomerData] = useState<CustomerFormData>({
+    companyName: "",
+    companyEmail: "",
+    orgNumber: "",
+    zipCode: "",
+    city: "",
+    address: "",
+    contactPerson: "",
+    companyPhone: "",
+    customerType: "",
   });
 
   const [loading, setLoading] = useState(false);
 
-  // Handle form field changes
+  // Prefill form in edit mode
+  useEffect(() => {
+    if (mode === "edit" && initialUser) {
+      setFormData({
+        name: initialUser.name,
+        email: initialUser.email,
+        phoneNumber: initialUser.phone,
+        role: initialUser.role,
+        password: "",
+      });
+    }
+  }, [mode, initialUser]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === "role" ? (value as UserRole) : value,
+    }));
   };
 
-  // Generate a password automatically
+  const handleCustomerChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setCustomerData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
   const handleGeneratePassword = () => {
     const generated = generateStrongPassword();
     setFormData(prev => ({ ...prev, password: generated }));
     toast.info(`Generated password: ${generated}`);
   };
 
-  // Validate Norwegian IBAN
-  const validateBankAccount = (iban: string) => {
-    return /^NO\d{13}$/.test(iban.replace(/\s+/g, ""));
-  };
-
-  // Form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -82,31 +120,34 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
       return;
     }
 
-    if (user?.role === "employee" && formData.role !== "customer") {
-      toast.error("Employees can only create customer accounts.");
-      setLoading(false);
-      return;
-    }
-
-    if (formData.role === "customer" && formData.bankAccount) {
-      if (!validateBankAccount(formData.bankAccount)) {
-        toast.error("Bank account must start with 'NO' and be 15 characters long.");
-        setLoading(false);
-        return;
-      }
-    }
-
     try {
-      const response = await axios.post("/api/users", formData);
-      toast.success("User created successfully!");
+      const newUser: User = {
+        id: Date.now(),
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phoneNumber,
+        role: formData.role,
+      };
+
+      if (formData.role === "customer") {
+        const newCustomer: Customer = {
+          id: Date.now(),
+          userId: newUser.id,
+          ...customerData,
+        };
+        fakeCustomers.push(newCustomer);
+      }
+
+      toast.success(mode === "edit" ? "User updated" : "User created");
+
       if (onSuccess) {
-        onSuccess(response.data);
+        onSuccess(newUser);
       } else {
         navigate("/users");
       }
     } catch (err) {
-      console.error("User creation failed:", err);
-      toast.error("Error creating user.");
+      console.error("Error creating user:", err);
+      toast.error("Error processing user.");
     } finally {
       setLoading(false);
     }
@@ -114,9 +155,11 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
 
   return (
     <div style={{ maxWidth: "600px", width: "100%" }}>
-      <h2 style={{ marginBottom: "24px" }}>Create New User</h2>
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+      <h2 style={{ marginBottom: "24px" }}>
+        {mode === "edit" ? "Edit User" : "Create New User"}
+      </h2>
 
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
         {/* Role */}
         <DetailRow>
           <strong>Role:</strong>
@@ -137,73 +180,70 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
           </Select>
         </DetailRow>
 
-        {/* Name */}
+        {/* User fields */}
         <DetailRow>
           <strong>Name:</strong>
-          <Input
-            type="text"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            required
-          />
+          <Input name="name" value={formData.name} onChange={handleChange} required />
         </DetailRow>
 
-        {/* Email */}
         <DetailRow>
           <strong>Email:</strong>
-          <Input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
+          <Input name="email" value={formData.email} onChange={handleChange} required />
         </DetailRow>
 
-        {/* Phone Number */}
         <DetailRow>
-          <strong>Phone Number:</strong>
-          <Input
-            type="tel"
-            name="phoneNumber"
-            value={formData.phoneNumber}
-            onChange={handleChange}
-            required
-            placeholder="e.g., +47 912 345 67"
-          />
+          <strong>Phone:</strong>
+          <Input name="phoneNumber" value={formData.phoneNumber} onChange={handleChange} required />
         </DetailRow>
 
-        {/* Password + Generate */}
-        <DetailRow style={{ alignItems: "flex-start", flexDirection: "column" }}>
+        {/* Password with generator */}
+        <DetailRow style={{ flexDirection: "column", alignItems: "flex-start" }}>
           <strong>Password:</strong>
-          <div style={{ display: "flex", width: "100%", gap: "12px" }}>
+          <div style={{ display: "flex", width: "100%", gap: "12px", alignItems: "center" }}>
             <Input
               type="text"
               name="password"
               value={formData.password}
               onChange={handleChange}
               required
-              style={{ flex: 1 }}
+              style={{ flex: 1, minWidth: 0 }}
             />
-            <Button type="button" $variant="secondary" onClick={handleGeneratePassword}>
-              Generate
-            </Button>
+            <div style={{ flexShrink: 0 }}>
+              <Button
+                type="button"
+                $variant="secondary"
+                style={{ minWidth: "100px", padding: "10px 16px" }}
+                onClick={handleGeneratePassword}
+              >
+                Generate
+              </Button>
+            </div>
           </div>
         </DetailRow>
 
-        {/* Bank Account – only for customer */}
-        {formData.role === "customer" && (
-          <DetailRow>
-            <strong>Bank Account:</strong>
-            <Input
-              type="text"
-              name="bankAccount"
-              value={formData.bankAccount}
-              onChange={handleChange}
-              placeholder="e.g., NO1234567890123"
-            />
-          </DetailRow>
+        {/* Customer-specific fields */}
+        {(formData.role === "customer") && (
+          ([
+            "companyName",
+            "companyEmail",
+            "orgNumber",
+            "zipCode",
+            "city",
+            "address",
+            "contactPerson",
+            "companyPhone",
+            "customerType",
+          ] as (keyof CustomerFormData)[]).map((field) => (
+            <DetailRow key={field}>
+              <strong>{field.replace(/([A-Z])/g, " $1").replace(/^./, str => str.toUpperCase())}:</strong>
+              <Input
+                name={field}
+                value={customerData[field]}
+                onChange={handleCustomerChange}
+                required
+              />
+            </DetailRow>
+          ))
         )}
 
         {/* Actions */}
@@ -216,7 +256,7 @@ const CreateUser: React.FC<CreateUserProps> = ({ onCancel, onSuccess }) => {
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? "Creating..." : "Create User"}
+            {loading ? "Saving..." : mode === "edit" ? "Save Changes" : "Create User"}
           </Button>
         </div>
       </form>

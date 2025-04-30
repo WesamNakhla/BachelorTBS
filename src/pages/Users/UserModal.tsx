@@ -2,18 +2,20 @@
 
 import React from "react";
 import styled from "styled-components";
-import { ModalOverlay, ModalContent } from "../../styles/InvoiceStyles";
+import { ModalOverlay } from "@/styles/InvoiceStyles";
+import { ModalContentScrollable } from "@/styles/UserStyles";
 import CreateUser from "./CreateUser";
-import { useAuth } from "../../context/AuthContext"; // ✅ make sure this is the correct path
+import { useAuth } from "@/context/AuthContext";
 import type { User } from "../types/User";
 
-// Props for the modal component
 interface UserModalProps {
+  mode: "create" | "edit";
+  userToEdit?: User;
   onClose: () => void;
-  onUserCreated: (newUser: User) => void;
+  onUserSaved: (newUser: User) => void;
 }
 
-// Wrapper to center modal
+// Wrapper to center modal content
 const ModalWrapper = styled.div`
   position: relative;
   width: 100%;
@@ -22,20 +24,28 @@ const ModalWrapper = styled.div`
   align-items: center;
 `;
 
-// Modal to create a new user (admin only)
-const UserModal: React.FC<UserModalProps> = ({ onClose, onUserCreated }) => {
-  const { user } = useAuth(); // ✅ assumes your context provides user info including role
+// Modal for both creating and editing users
+const UserModal: React.FC<UserModalProps> = ({
+  mode,
+  userToEdit,
+  onClose,
+  onUserSaved,
+}) => {
+  const { user } = useAuth();
 
-  if (!user || user.role !== "admin") {
-    return null; // ⛔️ Non-admins should not see this modal
-  }
+  if (!user || user.role !== "admin") return null;
 
   return (
     <ModalOverlay>
       <ModalWrapper>
-        <ModalContent>
-          <CreateUser onCancel={onClose} onSuccess={onUserCreated} />
-        </ModalContent>
+        <ModalContentScrollable>
+          <CreateUser
+            mode={mode}
+            initialUser={userToEdit}
+            onCancel={onClose}
+            onSuccess={onUserSaved}
+          />
+        </ModalContentScrollable>
       </ModalWrapper>
     </ModalOverlay>
   );
