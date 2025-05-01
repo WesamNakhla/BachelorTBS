@@ -20,19 +20,19 @@ export const getInvoices = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// Function to get a single invoice by ID
-export const getInvoiceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  try {
-    const invoice = await Invoice.findById(req.params.id);
-    if (!invoice) {
-      res.status(404).json({ message: "Invoice not found" });
-      return;
-    }
-    res.status(200).json(invoice);
-  } catch (error) {
-    next(error);
-  }
-};
+// // Function to get a single invoice by ID
+// export const getInvoiceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+//   try {
+//     const invoice = await Invoice.findById(req.params.id);
+//     if (!invoice) {
+//       res.status(404).json({ message: "Invoice not found" });
+//       return;
+//     }
+//     res.status(200).json(invoice);
+//   } catch (error) {
+//     next(error);
+//   }
+// };
 
 // Function to create a new invoice
 export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -67,14 +67,13 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
 
 // Function to update an existing invoice
 export const updateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-  const { customer, amount, status, date  } = req.body;
+  const { invoiceNumber, customer, amount, status, date  } = req.body;
   const updatedData = {
     customer: customer,
     amount: amount,
     status: status,
     date: date
   }
-  const invoiceNumber = req.params.id
   try {
     const updatedInvoice = await Invoice.findOneAndUpdate({invoiceNumber}, updatedData , { new: true });
     if (!updatedInvoice) {
