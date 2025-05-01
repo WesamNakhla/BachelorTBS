@@ -67,8 +67,16 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
 
 // Function to update an existing invoice
 export const updateInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { customer, amount, status, date  } = req.body;
+  const updatedData = {
+    customer: customer,
+    amount: amount,
+    status: status,
+    date: date
+  }
+  const invoiceNumber = req.params.id
   try {
-    const updatedInvoice = await Invoice.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    const updatedInvoice = await Invoice.findOneAndUpdate({invoiceNumber}, updatedData , { new: true });
     if (!updatedInvoice) {
       res.status(404).json({ message: "Invoice not found" });
       return;
@@ -83,7 +91,7 @@ export const updateInvoice = async (req: Request, res: Response, next: NextFunct
 export const deleteInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   const { invoiceNumber } = req.body;
   try {
-    const deletedInvoice = await Invoice.findOneAndDelete(invoiceNumber);
+    const deletedInvoice = await Invoice.findOneAndDelete({invoiceNumber});
     if (!deletedInvoice) {
       res.status(404).json({ message: "Invoice not found" });
       return;

@@ -5,20 +5,18 @@ import { toast } from "react-toastify";
 import axiosInstances from "../../utils/api";
 import { useNavigate } from "react-router-dom";
 
-interface login {
-    username: string,
-    password: string
+interface forgetPassword {
+    email: string,
 }
 const Login = ()=>{
-    const [ loginData, setLoginData ]  = useState<login>({
-        username: "",
-        password: ""
+    const [ forgetPassword, setForgetPassword ]  = useState<forgetPassword>({
+        email: ""
     });
     const [ loading, setLoading ] = useState<boolean>(false);
     const navigate = useNavigate();
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const { name, value } = e.target;
-        setLoginData((prev)=>({
+        setForgetPassword((prev)=>({
             ...prev,
             [name]: value
         }))
@@ -28,11 +26,10 @@ const Login = ()=>{
         setLoading(true);
         try{
             const data = {
-                username: loginData.username,
-                password: loginData.password
+                email: forgetPassword.email,
             }
-            if(!data.username || !data.password){
-                toast.error("Enter your login credentials");
+            if(!data.email){
+                toast.error("Enter your email");
                 return false;
             }
             let response = await axiosInstances.post("/login", data);
@@ -53,30 +50,21 @@ const Login = ()=>{
                 <div className="flex items-center font-bold text-[#fff] w-[100%] h-[50px] p-10 text-lg bg-[#112147]">
                     <h3>TBS</h3>
                 </div>
-                <form className="flex flex-col justify-center items-center h-full" onSubmit={handleSubmit}>
+                <form className="flex flex-col  items-center h-full mt-20" onSubmit={handleSubmit}>
                     <div className="w-1/2">
                         <FormInput 
-                            type="text"
-                            label="Username *" 
-                            placeholder="Enter your username"
-                            value={loginData.username}
+                            type="email"
+                            label="Email" 
+                            placeholder="Enter your email"
+                            value={forgetPassword.email}
                             onChange={handleChange}
-                            name="username"
-                        />
-                        <FormInput 
-                            type="password" 
-                            label="Password *" 
-                            placeholder="*******"
-                            value={loginData.password}
-                            onChange={handleChange}
-                            name="password"
+                            name="email"
                         />
                     </div>
 
                     <button type="submit" className="bg-[#66B2FF] cursor-pointer rounded-full text-[#fff] font-bold  w-[200px] h-[50px]">
-                        { loading ? "Loading..." : "Logg inn" }
+                        { loading ? "Loading..." : "Send" }
                     </button>
-                    <Link to="/forget-password" className="text-[#66B2FF] my-5">Jeg har glemt mitt passord</Link>
                 </form>
                 <div className="w-[100%] h-[50px] bg-[#112147]">
 

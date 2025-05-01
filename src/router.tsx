@@ -3,8 +3,8 @@ import Home from "./Pages/Home/Home";
 import Om from "./Pages/Om/Om";
 import Login from "./Pages/Login/Login";
 import Contact from "./Pages/Contact/Contact";
-import Register from "./Pages/Register/Register";
 import Layout from "./Pages/Layout/Layout";
+import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword"
 // dashboard
 import DashboardLayout from "./Pages/DashboardLayout/DashboardLayout";
 import Faktura from "./Pages/Faktura/Faktura";
@@ -36,8 +36,10 @@ const Router = ()=>{
                         <Contact />
                     </Layout>
                 } />
-                <Route path="/register" element={
-                        <Register />
+                <Route path="/forget-password" element={
+                    
+                        <ForgetPassword />
+                    
                 } />
                 {/* dashboard route */}
                 <Route path="/Faktura" element={
