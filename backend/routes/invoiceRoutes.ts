@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 // Route to get all invoices
-router.get("/", async (req: Request, res: Response, next: NextFunction) => {
+router.get("/all-invoice", async (req: Request, res: Response, next: NextFunction) => {
   try {
     await getInvoices(req, res, next);
   } catch (error) {

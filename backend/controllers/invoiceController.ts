@@ -1,11 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import Invoice from "../models/Invoice";
-
+interface Invoice{
+  invoiceNumber: string,
+  customer: string,
+  amount: number,
+  status: string,
+  date: string
+}
 // Function to get all invoices
 export const getInvoices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const invoices = await Invoice.find({});
-    res.status(200).json(invoices);
+    const invoices = await Invoice.find({}).lean().select("invoiceNumber customer amount status date");
+    res.status(200).json({
+      success: true,
+      data: invoices
+    });
   } catch (error) {
     next(error);
   }
@@ -73,7 +82,7 @@ export const updateInvoice = async (req: Request, res: Response, next: NextFunct
 // Function to delete an invoice
 export const deleteInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const deletedInvoice = await Invoice.findByIdAndDelete(req.params.id);
+    const deletedInvoice = await Invoice.find
     if (!deletedInvoice) {
       res.status(404).json({ message: "Invoice not found" });
       return;
