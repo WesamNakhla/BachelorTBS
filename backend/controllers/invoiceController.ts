@@ -81,8 +81,9 @@ export const updateInvoice = async (req: Request, res: Response, next: NextFunct
 
 // Function to delete an invoice
 export const deleteInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  const { invoiceNumber } = req.body;
   try {
-    const deletedInvoice = await Invoice.find
+    const deletedInvoice = await Invoice.findOneAndDelete(invoiceNumber);
     if (!deletedInvoice) {
       res.status(404).json({ message: "Invoice not found" });
       return;
