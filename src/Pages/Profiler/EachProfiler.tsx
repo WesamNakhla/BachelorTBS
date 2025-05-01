@@ -36,12 +36,12 @@ const EachProfiler = ()=>{
                 <div className="flex mt-10">
                     <table className="table-fixed w-full text-center ">
                         <thead>
-                            <th>Mottaksdato</th>
-                            <th>Kunde</th>
-                            <th>Vare</th>
-                            <th>Antall kss/pll</th>
-                            <th>Vekt</th>
-                            <th>Avgangsdato kunde</th>
+                            <th>Arrival date</th>
+                            <th>sender</th>
+                            <th>Goods</th>
+                            <th>Qty</th>
+                            <th>Weight</th>
+                            <th>Departure date</th>
                             <th>Actions</th>
                         </thead>
                         <tbody>
