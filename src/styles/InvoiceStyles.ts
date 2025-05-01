@@ -1,4 +1,5 @@
 // src/styles/InvoiceStyles.ts
+
 import styled, { keyframes } from "styled-components";
 
 /* ========== ANIMATIONS ========== */
@@ -24,7 +25,7 @@ const slideIn = keyframes`
   }
 `;
 
-/* ========== MODAL ========== */
+/* ========== MODAL STYLES ========== */
 export const ModalOverlay = styled.div`
   position: fixed;
   inset: 0;
@@ -36,19 +37,47 @@ export const ModalOverlay = styled.div`
   z-index: 1001;
 `;
 
+export const ModalContainer = styled.div`
+  background: ${({ theme }) => theme.cardBackground || "#fff"};
+  padding: 24px;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  animation: ${slideIn} 0.3s ease;
+
+  @media (max-width: 600px) {
+    width: 95%;
+    padding: 16px;
+  }
+`;
+
 export const ModalContent = styled.div`
   background-color: ${({ theme }) => theme.cardBackground || "#fff"};
-  color: ${({ theme }) => theme.text};
+  color: ${({ theme }) => theme.text || "#111"};
   padding: 32px;
   border-radius: 20px;
-  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
-  max-width: 600px;
-  width: 90%;
+  max-height: 85vh;
+  overflow-y: auto;
+  width: 100%;
   animation: ${slideIn} 0.3s ease;
 
   @media (max-width: 768px) {
-    width: 95%;
     padding: 24px;
+  }
+`;
+
+export const ModalContentScrollable = styled(ModalContent)`
+  max-height: 90vh;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: #bbb;
+    border-radius: 4px;
   }
 `;
 
@@ -58,31 +87,16 @@ export const CloseButton = styled.button`
   right: 16px;
   background: transparent;
   border: none;
-  color: ${({ theme }) => theme.text};
-  font-size: 22px;
+  font-size: 20px;
+  color: ${({ theme }) => theme.text || "#000"};
   cursor: pointer;
 
   &:hover {
-    color: ${({ theme }) => theme.primary};
+    color: ${({ theme }) => theme.primary || "#4f46e5"};
   }
 `;
 
-export const ModalContainer = styled.div`
-  background: #fff;
-  padding: 24px;
-  border-radius: 16px;
-  width: 100%;
-  max-width: 520px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-  animation: ${slideIn} 0.3s ease;
-
-  @media (max-width: 600px) {
-    width: 90%;
-    padding: 16px;
-  }
-`;
-
-/* ========== MAIN CONTAINER ========== */
+/* ========== CONTAINERS ========== */
 export const InvoiceContainer = styled.div`
   padding: 24px;
   background: ${({ theme }) => theme.cardBackground || "#ffffff"};
@@ -95,7 +109,7 @@ export const InvoiceContainer = styled.div`
   }
 `;
 
-/* ========== TABLE ========== */
+/* ========== TABLES ========== */
 export const InvoiceTable = styled.table`
   width: 100%;
   margin-top: 24px;
@@ -113,14 +127,14 @@ export const TableRow = styled.tr`
   border-bottom: 1px solid #e2e6ea;
 
   &:nth-child(even) {
-    background-color: #f8f9fa;
+    background-color: ${({ theme }) => theme.tableAlt || "#f9fafb"};
   }
 
   &:hover {
-    background-color: #f1f3f5;
+    background-color: ${({ theme }) => theme.hover || "#f1f5f9"};
   }
 
-  transition: background-color 0.2s;
+  transition: background-color 0.2s ease;
 `;
 
 export const TableHeader = styled.th`
@@ -135,8 +149,8 @@ export const TableBody = styled.tbody``;
 export const TableData = styled.td`
   padding: 14px 18px;
   font-size: 14px;
-  border-bottom: 1px solid #e2e6ea;
-  color: ${({ theme }) => theme.text || "#333"};
+  border-bottom: 1px solid #e5e7eb;
+  color: ${({ theme }) => theme.text || "#111"};
 `;
 
 /* ========== FORM ELEMENTS ========== */
@@ -146,13 +160,13 @@ export const Input = styled.input`
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: 15px;
-  color: #111827;
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.inputBg || "#f9fafb"};
+  color: ${({ theme }) => theme.inputText || "#111827"};
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    background-color: #ffffff;
+    border-color: ${({ theme }) => theme.primary || "#3b82f6"};
+    background-color: #fff;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   }
 
@@ -167,55 +181,24 @@ export const Select = styled.select`
   border: 1px solid #d1d5db;
   border-radius: 10px;
   font-size: 15px;
-  color: #111827;
-  background-color: #f9fafb;
+  background-color: ${({ theme }) => theme.inputBg || "#f9fafb"};
+  color: ${({ theme }) => theme.inputText || "#111827"};
 
   &:focus {
     outline: none;
-    border-color: #3b82f6;
-    background-color: #ffffff;
+    border-color: ${({ theme }) => theme.primary || "#3b82f6"};
+    background-color: #fff;
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
   }
 `;
 
-/* ========== BUTTONS ========== */
-const baseButton = styled.button`
-  padding: 10px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 14px;
-  font-weight: 500;
-  color: #fff;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: scale(1.08);
-  }
-`;
-
-export const ExportButton = styled(baseButton)`
-  background-color: #5a0ebc;
-
-  &:hover {
-    background-color: #4b0f9c;
-  }
-`;
-
-export const ImportButton = styled(baseButton)`
-  background-color: #1e5bbf;
-
-  &:hover {
-    background-color: #164a96;
-  }
-`;
-
-export const AddInvoiceButton = styled(baseButton)`
-  background-color: #28a745;
-
-  &:hover {
-    background-color: #218838;
-  }
+/* ========== ACTIONS AND CONTROLS ========== */
+export const ActionButtons = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 20px 0;
+  align-items: center;
 `;
 
 /* ========== PAGINATION ========== */
@@ -261,39 +244,28 @@ export const PageButtons = styled.div`
   }
 `;
 
-/* ========== ACTION BUTTONS ========== */
-export const ActionButtons = styled.div`
-  display: flex;
-  gap: 12px;
-  margin: 16px 0;
-  flex-wrap: wrap;
-  align-items: center;
-`;
-
-/* ========== INVOICE DETAIL BOX ========== */
+/* ========== INVOICE DETAILS ========== */
 export const InvoiceInfo = styled.div`
-  background-color: #ffffff;
+  background-color: ${({ theme }) => theme.cardBackground || "#fff"};
   padding: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
   margin-top: 20px;
 `;
 
-/* ========== ROW INSIDE DETAIL BOX ========== */
 export const DetailRow = styled.div`
   display: flex;
   justify-content: space-between;
-  align-items: center;
   border-bottom: 1px solid #e5e7eb;
   padding: 12px 0;
 
   span {
-    color: #374151;
+    color: ${({ theme }) => theme.text || "#374151"};
     font-weight: 500;
   }
 
   strong {
-    color: #111827;
+    color: ${({ theme }) => theme.textStrong || "#111827"};
     font-weight: 600;
     min-width: 120px;
   }

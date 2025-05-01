@@ -1,8 +1,7 @@
 // src/pages/Invoices/InvoiceList.tsx
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { format } from "date-fns";
@@ -18,26 +17,17 @@ import {
   PaginationContainer,
   RowsPerPage,
   PageButtons,
-} from "../../styles/InvoiceStyles";
-import { Button } from "../../components/ui/Button";
+} from "@/styles/InvoiceStyles";
+import { Button } from "@/components/ui/Button";
 import { toast } from "react-toastify";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@/context/AuthContext";
+import { fakeInvoices } from "../data/fakeInvoices";
+import { Invoice } from "../types/Invoice"; // Import the Invoice interface
+import InvoiceDetailsModal from "./InvoiceDetailsModal"; // Add this line
 
-interface Invoice {
-  id: number;
-  invoiceNumber: string;
-  company: string;
-  customer: string;
-  products: string;
-  quantity: number;
-  unit: string;
-  unitPrice: number;
-  total: number;
-  tax: number;
-  grandTotal: number;
-  status: "Paid" | "Pending" | "Overdue";
-  dueDate: string;
-  date: string;
+// Extend jsPDF to include lastAutoTable
+interface jsPDFWithAutoTable extends jsPDF {
+  lastAutoTable?: { finalY: number };
 }
 
 const InvoiceList = () => {
@@ -50,41 +40,27 @@ const InvoiceList = () => {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  const fetchInvoices = useCallback(async () => {
-    setLoading(true);
-    try {
-      const response = await axios.get("/api/invoices");
-      if (Array.isArray(response.data)) {
-        setInvoices(response.data);
-      } else {
-        throw new Error("Invalid response format");
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load invoices from server.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
 
   useEffect(() => {
-    fetchInvoices();
-  }, [fetchInvoices]);
+    setInvoices(fakeInvoices);
+  }, []);
 
+  // Filter invoices by search and user role
   const filteredInvoices = invoices.filter((inv) => {
     const matchesSearch = inv.invoiceNumber.toLowerCase().includes(searchQuery.toLowerCase());
     const isVisibleToCustomer = user?.role === "customer" ? inv.customer === user.name : true;
     return matchesSearch && isVisibleToCustomer;
   });
 
+  // Further filter invoices by date range
   const filteredByDate = filteredInvoices.filter((inv) => {
     if (!startDate || !endDate) return true;
     const invoiceDate = new Date(inv.date);
     return invoiceDate >= new Date(startDate) && invoiceDate <= new Date(endDate);
   });
 
+  // Export filtered invoices to PDF
   const exportFilteredToPDF = () => {
     const doc = new jsPDF();
     doc.setFontSize(14);
@@ -95,17 +71,12 @@ const InvoiceList = () => {
       inv.customer,
       format(new Date(inv.date), "yyyy-MM-dd"),
       `${inv.total.toFixed(2)} kr`,
-      `${inv.tax}%`,
       `${inv.grandTotal.toFixed(2)} kr`,
     ]);
 
-    const total = filteredByDate.reduce((sum, inv) => sum + inv.total, 0);
-    const grand = filteredByDate.reduce((sum, inv) => sum + inv.grandTotal, 0);
-    tableData.push(["", "", "Totals", `${total.toFixed(2)} kr`, "", `${grand.toFixed(2)} kr`]);
-
     autoTable(doc, {
       startY: 30,
-      head: [["Invoice #", "Customer", "Date", "Total", "Tax", "Grand Total"]],
+      head: [["Invoice #", "Customer", "Date", "Total", "Grand Total"]],
       body: tableData,
     });
 
@@ -113,104 +84,81 @@ const InvoiceList = () => {
     toast.success("PDF generated!");
   };
 
-  const exportAllToPDF = () => {
-    const doc = new jsPDF();
-    doc.text("All Invoices", 14, 20);
-    const tableData = filteredInvoices.map((inv) => [
-      inv.invoiceNumber,
-      inv.company,
-      inv.customer,
-      inv.products,
-      inv.quantity,
-      inv.unit,
-      `${inv.unitPrice.toFixed(2)} kr`,
-      `${inv.total.toFixed(2)} kr`,
-      `${inv.tax}%`,
-      `${inv.grandTotal.toFixed(2)} kr`,
-      inv.status,
-      inv.dueDate,
-      inv.date,
-    ]);
-
-    autoTable(doc, {
-      startY: 30,
-      head: [["Invoice #", "Company", "Customer", "Products", "Qty", "Unit", "Unit Price", "Total", "Tax", "Grand Total", "Status", "Due", "Date"]],
-      body: tableData,
-    });
-
-    doc.save("all_invoices.pdf");
-    toast.success("All invoices exported!");
-  };
-
+  // Export a single invoice to PDF
   const exportSingleInvoiceToPDF = (invoice: Invoice) => {
-    const doc = new jsPDF();
-    doc.setFontSize(14);
+    const doc = new jsPDF() as jsPDFWithAutoTable;
+    doc.setFontSize(16);
     doc.text(`Invoice: ${invoice.invoiceNumber}`, 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Customer: ${invoice.customer}`, 14, 30);
+    doc.text(`Date: ${invoice.date}`, 14, 37);
+    doc.text(`Due Date: ${invoice.dueDate}`, 14, 44);
+    doc.text(`Status: ${invoice.status}`, 14, 51);
+    doc.text(`Bank Account: ${invoice.bankAccount}`, 14, 58);
 
     autoTable(doc, {
-      startY: 30,
-      body: [
-        ["Company", invoice.company],
-        ["Customer", invoice.customer],
-        ["Products", invoice.products],
-        ["Quantity", invoice.quantity.toString()],
-        ["Unit", invoice.unit],
-        ["Unit Price", `${invoice.unitPrice.toFixed(2)} kr`],
-        ["Total", `${invoice.total.toFixed(2)} kr`],
-        ["Tax", `${invoice.tax}%`],
-        ["Grand Total", `${invoice.grandTotal.toFixed(2)} kr`],
-        ["Status", invoice.status],
-        ["Date", invoice.date],
-        ["Due Date", invoice.dueDate],
-      ],
-      theme: "grid",
+      startY: 70,
+      head: [["Product", "Qty", "Unit", "Unit Price", "Total"]],
+      body: [[
+        invoice.products,
+        invoice.quantity,
+        invoice.unit,
+        `${invoice.unitPrice.toFixed(2)} kr`,
+        `${invoice.total.toFixed(2)} kr`
+      ]],
     });
 
+    const { finalY } = doc.lastAutoTable || { finalY: 70 }; // Fallback to 70 if undefined
+    const y = finalY + 10;
+    doc.text(`Grand Total: ${invoice.grandTotal.toFixed(2)} kr`, 150, y);
     doc.save(`invoice_${invoice.invoiceNumber}.pdf`);
   };
 
+  // Print a simple invoice layout
   const printInvoice = (invoice: Invoice) => {
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) return;
+    const win = window.open("", "_blank");
+    if (!win) return;
 
-    printWindow.document.write(`
+    win.document.write(`
       <html>
         <head><title>Invoice ${invoice.invoiceNumber}</title></head>
         <body style="font-family: Arial; padding: 24px;">
           <h2>Invoice ${invoice.invoiceNumber}</h2>
+          <p><strong>Customer:</strong> ${invoice.customer}</p>
+          <p><strong>Status:</strong> ${invoice.status}</p>
+          <p><strong>Bank Account:</strong> ${invoice.bankAccount}</p>
           <table border="1" cellpadding="8" cellspacing="0" width="100%">
-            <tr><th>Company</th><td>${invoice.company}</td></tr>
-            <tr><th>Customer</th><td>${invoice.customer}</td></tr>
-            <tr><th>Products</th><td>${invoice.products}</td></tr>
-            <tr><th>Quantity</th><td>${invoice.quantity}</td></tr>
-            <tr><th>Unit</th><td>${invoice.unit}</td></tr>
-            <tr><th>Unit Price</th><td>${invoice.unitPrice.toFixed(2)} kr</td></tr>
-            <tr><th>Total</th><td>${invoice.total.toFixed(2)} kr</td></tr>
-            <tr><th>Tax</th><td>${invoice.tax}%</td></tr>
-            <tr><th>Grand Total</th><td>${invoice.grandTotal.toFixed(2)} kr</td></tr>
-            <tr><th>Status</th><td>${invoice.status}</td></tr>
-            <tr><th>Date</th><td>${invoice.date}</td></tr>
-            <tr><th>Due Date</th><td>${invoice.dueDate}</td></tr>
+            <tr><th>Product</th><th>Qty</th><th>Unit</th><th>Unit Price</th><th>Total</th></tr>
+            <tr>
+              <td>${invoice.products}</td>
+              <td>${invoice.quantity}</td>
+              <td>${invoice.unit}</td>
+              <td>${invoice.unitPrice.toFixed(2)} kr</td>
+              <td>${invoice.total.toFixed(2)} kr</td>
+            </tr>
+            <tr>
+              <td colspan="4" style="text-align: right;"><strong>Grand Total</strong></td>
+              <td><strong>${invoice.grandTotal.toFixed(2)} kr</strong></td>
+            </tr>
           </table>
         </body>
       </html>
     `);
-
-    printWindow.document.close();
-    printWindow.focus();
-    printWindow.print();
+    win.document.close();
+    win.focus();
+    win.print();
   };
 
   const totalPages = Math.ceil(filteredInvoices.length / itemsPerPage);
-  const indexOfLast = currentPage * itemsPerPage;
-  const indexOfFirst = indexOfLast - itemsPerPage;
-  const paginatedInvoices = filteredInvoices.slice(indexOfFirst, indexOfLast);
+  const paginatedInvoices = filteredInvoices.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <InvoiceContainer>
       <h1>Invoices</h1>
 
-      {/* ✅ Add New Invoice Button */}
       {user?.role !== "customer" && (
         <div style={{ marginBottom: "20px" }}>
           <Button $variant="primary" onClick={() => navigate("/invoices/create")}>
@@ -230,71 +178,54 @@ const InvoiceList = () => {
         <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
         <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         <Button $variant="ghost" onClick={exportFilteredToPDF}>Export by Date</Button>
-        {user?.role !== "customer" && (
-          <Button $variant="ghost" onClick={exportAllToPDF}>Export All</Button>
-        )}
       </ActionButtons>
 
-      {loading ? (
-        <p>Loading invoices...</p>
-      ) : (
-        <div style={{ overflowX: "auto" }}>
-          <InvoiceTable>
-            <TableHead>
-              <TableRow>
-                <TableHeader>Invoice #</TableHeader>
-                <TableHeader>Company</TableHeader>
-                <TableHeader>Customer</TableHeader>
-                <TableHeader>Products</TableHeader>
-                <TableHeader>Qty</TableHeader>
-                <TableHeader>Unit</TableHeader>
-                <TableHeader>Unit Price</TableHeader>
-                <TableHeader>Total</TableHeader>
-                <TableHeader>Tax</TableHeader>
-                <TableHeader>Grand Total</TableHeader>
-                <TableHeader>Status</TableHeader>
-                <TableHeader>Due</TableHeader>
-                <TableHeader>Date</TableHeader>
-                <TableHeader>Actions</TableHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {paginatedInvoices.length > 0 ? (
-                paginatedInvoices.map((inv) => (
-                  <TableRow key={inv.id}>
-                    <TableData>{inv.invoiceNumber}</TableData>
-                    <TableData>{inv.company}</TableData>
-                    <TableData>{inv.customer}</TableData>
-                    <TableData>{inv.products}</TableData>
-                    <TableData>{inv.quantity}</TableData>
-                    <TableData>{inv.unit}</TableData>
-                    <TableData>{inv.unitPrice.toFixed(2)} kr</TableData>
-                    <TableData>{inv.total.toFixed(2)} kr</TableData>
-                    <TableData>{inv.tax}%</TableData>
-                    <TableData>{inv.grandTotal.toFixed(2)} kr</TableData>
-                    <TableData>{inv.status}</TableData>
-                    <TableData>{inv.dueDate}</TableData>
-                    <TableData>{inv.date}</TableData>
-                    <TableData>
-                      <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
-                        <Button $variant="ghost" onClick={() => navigate(`/invoices/${inv.id}`)}>View</Button>
-                        <Button $variant="ghost" onClick={() => exportSingleInvoiceToPDF(inv)}>⬇ PDF</Button>
-                        <Button $variant="ghost" onClick={() => printInvoice(inv)}>🖨 Print</Button>
-                      </div>
-                    </TableData>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableData colSpan={14} style={{ textAlign: "center", padding: "20px" }}>
-                    No invoices found.
+      <div style={{ overflowX: "auto" }}>
+        <InvoiceTable>
+          <TableHead>
+            <TableRow>
+              <TableHeader>#</TableHeader>
+              <TableHeader>Customer</TableHeader>
+              <TableHeader>Qty</TableHeader>
+              <TableHeader>Total</TableHeader>
+              <TableHeader>Grand Total</TableHeader>
+              <TableHeader>Status</TableHeader>
+              <TableHeader>Due</TableHeader>
+              <TableHeader>Date</TableHeader>
+              <TableHeader>Actions</TableHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {paginatedInvoices.length > 0 ? (
+              paginatedInvoices.map((inv) => (
+                <TableRow key={inv.id}>
+                  <TableData>{inv.invoiceNumber}</TableData>
+                  <TableData>{inv.customer}</TableData>
+                  <TableData>{inv.quantity}</TableData>
+                  <TableData>{inv.total.toFixed(2)} kr</TableData>
+                  <TableData>{inv.grandTotal.toFixed(2)} kr</TableData>
+                  <TableData>{inv.status}</TableData>
+                  <TableData>{inv.dueDate}</TableData>
+                  <TableData>{inv.date}</TableData>
+                  <TableData>
+                    <div style={{ display: "flex", gap: "6px", flexWrap: "wrap" }}>
+                      <Button $variant="ghost" onClick={() => setSelectedInvoice(inv)}>View</Button>
+                      <Button $variant="ghost" onClick={() => exportSingleInvoiceToPDF(inv)}>⬇ PDF</Button>
+                      <Button $variant="ghost" onClick={() => printInvoice(inv)}>🖨 Print</Button>
+                    </div>
                   </TableData>
                 </TableRow>
-              )}
-            </TableBody>
-          </InvoiceTable>
-        </div>
-      )}
+              ))
+            ) : (
+              <TableRow>
+                <TableData colSpan={9} style={{ textAlign: "center", padding: "20px" }}>
+                  No invoices found.
+                </TableData>
+              </TableRow>
+            )}
+          </TableBody>
+        </InvoiceTable>
+      </div>
 
       <PaginationContainer>
         <RowsPerPage>
@@ -310,13 +241,19 @@ const InvoiceList = () => {
             <button
               key={i + 1}
               onClick={() => setCurrentPage(i + 1)}
-              className={currentPage === i + 1 ? "active" : ""}
-            >
+              className={currentPage === i + 1 ? "active" : ""}>
               {i + 1}
             </button>
           ))}
         </PageButtons>
       </PaginationContainer>
+
+      {selectedInvoice && (
+        <InvoiceDetailsModal
+          invoice={selectedInvoice}
+          onClose={() => setSelectedInvoice(null)}
+        />
+      )}
     </InvoiceContainer>
   );
 };

@@ -8,9 +8,9 @@
     "skipLibCheck": true,
     "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "./",
+    "baseUrl": "src",
     "paths": {
-      "@/*": ["src/*"],
+      "@/*": ["*"],
       "@components/*": ["src/components/*"],
       "@styles/*": ["src/styles/*"],
       "@pages/*": ["src/pages/*"],

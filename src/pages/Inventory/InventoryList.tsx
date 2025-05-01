@@ -22,7 +22,7 @@ import {
   IconButton,
 } from '../../styles/InventoryStyles';
 
-import { fetchCustomers, Customer } from '../../api/fetchCustomers';
+import { fakeCustomers, Customer } from "../data/fakeCustomers"; // Import Customer
 import { fetchSenders, Sender } from '../../api/fetchSenders';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -77,6 +77,11 @@ const InventoryList: React.FC = () => {
   const [page, setPage] = useState<number>(0);
   const [rowsPerPage, setRowsPerPage] = useState<number>(5);
 
+  // Function to fetch customers
+  const fetchCustomers = async (): Promise<Customer[]> => {
+    return fakeCustomers;
+  };
+
   // Fetch customers and senders on mount
   useEffect(() => {
     const loadData = async () => {
@@ -91,10 +96,10 @@ const InventoryList: React.FC = () => {
   // Handle customer selection
   const handleCustomerSelect = (option: SingleValue<{ value: string; label: string }>) => {
     const value = option?.value || '';
-    const customer = customers.find((c) => c.id === value);
+    const customer = customers.find((c) => c.id.toString() === value);
     if (customer) {
-      setSelectedCustomerId(customer.id);
-      setSelectedCustomerName(customer.name);
+      setSelectedCustomerId(customer.id.toString());
+      setSelectedCustomerName(customer.companyName);
     } else {
       setSelectedCustomerId('');
       setSelectedCustomerName('');
@@ -207,8 +212,15 @@ const InventoryList: React.FC = () => {
         <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', alignItems: 'center' }}>
           <div style={{ minWidth: '250px' }}>
             <ReactSelect
-              options={[{ value: '', label: 'Select Customer' }, ...customers.map((c) => ({ value: c.id, label: c.name }))]}
-              value={selectedCustomerId ? { value: selectedCustomerId, label: selectedCustomerName } : { value: '', label: 'Select Customer' }}
+              options={[
+                { value: '', label: 'Select Customer' },
+                ...customers.map((c) => ({ value: c.id.toString(), label: c.companyName }))
+              ]}
+              value={
+                selectedCustomerId
+                  ? { value: selectedCustomerId, label: selectedCustomerName }
+                  : { value: '', label: 'Select Customer' }
+              }
               onChange={handleCustomerSelect}
               isSearchable
               placeholder="Select Customer"
