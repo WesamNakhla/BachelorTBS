@@ -1,17 +1,85 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import { GoPlusCircle } from "react-icons/go";
 import { IoEyeOutline } from "react-icons/io5";
 import { LuPencilLine } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { toast } from "react-toastify";
 import Modal from "../../Components/Modal/Modal";
 import FormInput from "../../Components/FormInput/FormInput";
+import axiosInstance  from "../../utils/api";
+
+interface AllInvoices{
+    invoiceNumber: string
+    customer: string,
+    amount: number,
+    status: string,
+    date: Date
+}
+interface Invoice{
+    customer: string,
+    amount: number,
+    status: string,
+    date: Date
+}
 const Faktura = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
-    const [ kunde, setKunde ] = useState<string>("");
+    const [ isLoading, setIsLoading ] = useState<boolean>(false);
+    const [ allInvoices, setAllInvoices ] = useState<AllInvoices[]>([]);
+    const [ invoice, setInvoice ] = useState<Invoice>({
+        customer: "",
+        amount: 0,
+        status: "",
+        date: new Date()
+    });
 
-    const handleKunde = (e: React.ChangeEvent<HTMLInputElement>)=>{
-        setKunde(e.target.value);
+
+    //fetch all invoices
+    useEffect( ()=>{
+        const getAllInvoice = async ()=>{
+            let response = await axiosInstance.get("/all-invoice");
+            const data_to_store = response.data?.data.map((data: AllInvoices)=>{
+                return {
+                    invoiceNumber: data.invoiceNumber,
+                    customer: data.customer,
+                    amount: data.amount,
+                    status: data.status,
+                    date: data.date
+                }
+            });
+            setAllInvoices(data_to_store);
+        }
+        getAllInvoice();
+    }, [])
+
+    const handleInvoice = (e: React.ChangeEvent<HTMLInputElement>)=>{
+        const { name, value } = e.target;
+        setInvoice(prev=>({
+            ...prev,
+            [name]: value
+        }))
+    }
+    const submitInvoice = async (e:React.FormEvent<HTMLFormElement>)=>{
+        e.preventDefault();
+        setIsLoading(true);
+        try{
+            const { customer, amount, status, date } = invoice;
+        const data = {
+            customer: customer,
+            amount: amount,
+            status: status,
+            date: date
+        }
+        let response = await axiosInstance.post("/create-invoice", data);
+        console.log(response);
+        setIsLoading(false);
+        toast.success(response.data?.message);
+        setShowModal(!showModal);
+
+        }catch(error){
+            setIsLoading(false)
+            console.log(error);
+        }
     }
     return(
         <>
@@ -30,110 +98,46 @@ const Faktura = ()=>{
                         <button className="flex items-center justify-center cursor-pointer font-semibold w-[150px] h-[50px] rounded-md bg-[#7152F3] text-[#fff]"
                          type="button"
                          onClick={()=>setShowModal(!showModal)}>
-                            <p className="text-xl font-semibold mr-2"><GoPlusCircle /></p>Ny faktura
+                            <p className="text-xl font-semibold mr-2"><GoPlusCircle /></p>New Invoice
                         </button>
                 </div>
                 <div className="flex mt-10">
                     <table className="table-fixed w-full text-center ">
                     <thead>
+                        <tr>
                             <th>Invoice ID</th>
                             <th>Invoice name</th>
                             <th>Customer</th>
                             <th>Status</th>
                             <th>Actions</th>
-                            
+                        </tr>
                         </thead>
                         <tbody>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">Faktura 0001</td>
-                                <td className="py-4">Faktura 00001</td>
-                                <td className="py-4">Sjømat</td>
-                                <td className="py-4">
-                                    <p className="flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm">
-                                        Betalt
-                                    </p>
-                                </td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
+                            {
+                                allInvoices.map(data=>(
+                                    <>
+                                        <tr className="border-1 border-[#A2A1A8]/10" key={data.invoiceNumber}>
+                                            <td className="py-4">{data.invoiceNumber}</td>
+                                            <td className="py-4">{data.customer}</td>
+                                            <td className="py-4">{ data.amount }</td>
+                                            <td className="py-4">
+                                                <p className={
+                                                    (data.status === "paid") ? "flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm"
+                                                    : (data.status === "expired") ? "flex items-center justify-center bg-[#7152F3]/10 text-[#FA1533] rounded-md w-[70px] h-[30px] text-sm"
+                                                    : "flex items-center justify-center bg-[#7152F3]/10 text-[#FAA215] rounded-md w-[70px] h-[30px] text-sm"
+                                                }>
+                                                    {data.status}
+                                                </p>
+                                            </td>
+                                            <td className="flex py-4 text-lg cursor-pointer">
+                                                <p><IoEyeOutline /></p>
+                                                <p className="mx-4"><LuPencilLine /></p>
+                                                <p><RiDeleteBinLine /></p>
+                                            </td>
+                                        </tr>
+                                    </>
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -141,74 +145,53 @@ const Faktura = ()=>{
             {
                     showModal &&
                     <Modal>
-                        <div className="flex flex-col">
-                            <h3 className="text-bold font-lexend text-base">Ny Faktura</h3>
+                        <form className="flex flex-col" onSubmit={submitInvoice}>
+                            <h3 className="text-bold font-lexend text-base">New Invoice</h3>
                             <div className="w-full h-[1px] bg-[#A2A1A8]/20 mt-5"></div>
                             <div className="flex ">
                                 <FormInput 
                                     type="text" 
-                                    label="Velg kunde"  
-                                    placeholder="Velg kunde" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
+                                    label="Customer"  
+                                    placeholder="Customer" 
+                                    onChange={handleInvoice}
+                                    value={invoice.customer}
+                                    name="customer" />
                                 <FormInput 
                                     type="text" 
-                                    label="Velge faktura mnde"  
-                                    placeholder="Velge faktura mnde" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
+                                    label="Amount"  
+                                    placeholder="Enter amount" 
+                                    onChange={handleInvoice}
+                                    value={invoice.amount}
+                                    name="amount" />
                             </div>
-                            <div className="flex ">
+                            <div className="flex">
                                 <FormInput 
                                     type="text" 
-                                    label="E-post"  
-                                    placeholder="E-post" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
+                                    label="Status"  
+                                    placeholder="Paid" 
+                                    onChange={handleInvoice}
+                                    value={invoice.status}
+                                    name="status" />
                                 <FormInput 
-                                    type="text" 
-                                    label="kontakt person"  
-                                    placeholder="kontakt person" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
+                                    type="date" 
+                                    label="Date"  
+                                    placeholder="2025-04-15" 
+                                    onChange={handleInvoice}
+                                    value={new Date(invoice.date).toISOString().slice(0, 10)}
+                                    name="date" />
+                                
                             </div>
-                            <div className="flex ">
-                                <FormInput 
-                                    type="text" 
-                                    label="Org nr"  
-                                    placeholder="Org nr" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
-                                <FormInput 
-                                    type="text" 
-                                    label="Adresse"  
-                                    placeholder="Adresse" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
-                            </div>
-                            <div className="flex ">
-                                <FormInput 
-                                    type="text" 
-                                    label="Postnr"  
-                                    placeholder="Postnr" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
-                                <FormInput 
-                                    type="text" 
-                                    label="sted"  
-                                    placeholder="sted" 
-                                    onChange={handleKunde}
-                                    value={kunde} />
-                            </div>
+                            
+                           
                             <div className="flex font-lexend">
-                                <button type="button" onClick={()=> setShowModal(!showModal)} className="w-[170px] h-[50px] cursor-pointer border-1 border-[#A2A1A8]/20 rounded-md">
+                                <div onClick={()=> setShowModal(!showModal)} className="flex items-center justify-center w-[170px] h-[50px] cursor-pointer border-1 border-[#A2A1A8]/20 rounded-md">
                                     Cancel
-                                </button>
-                                <button type="button" onClick={()=> setShowModal(!showModal)} className="w-[170px] h-[50px] cursor-pointer text-[#fff] bg-[#7152F3] border-1 border-[#A2A1A8]/20 rounded-md !ml-4">
-                                    Add
+                                </div>
+                                <button type="submit"  className="w-[170px] h-[50px] cursor-pointer text-[#fff] bg-[#7152F3] border-1 border-[#A2A1A8]/20 rounded-md !ml-4">
+                                    { isLoading ? "Loading..." : "Add" }
                                 </button>
                             </div>
-                        </div>
+                        </form>
                     </Modal>
             }
         </>

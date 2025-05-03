@@ -11,10 +11,22 @@ interface IInvoice extends Document {
 
 // Create a schema corresponding to the document interface
 const InvoiceSchema: Schema = new Schema({
-  invoiceNumber: { type: String, required: true },
-  customer: { type: String, required: true },
-  amount: { type: Number, required: true },
-  status: { type: String, required: true },
+  invoiceNumber: {
+     type: String,
+     required: true
+  },
+  customer: {
+     type: String,
+     required: true
+  },
+  amount: {
+     type: Number, 
+     required: true
+  },
+  status: {
+     type: String,
+     required: true
+  },
   date: { type: Date, default: Date.now },
 });
 

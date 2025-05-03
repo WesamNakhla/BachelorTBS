@@ -22,6 +22,7 @@ const DashboardSidebar = ()=>{
                         {
                             MenuLinks.map(link=>(
                                 <NavLink 
+                                    key={link.text}
                                     to={link.to}
                                     className={({isActive}: NavLinkRenderProps)=>
                                     isActive ?

@@ -2,10 +2,10 @@
 // import React from "react";
 interface FormParameters {
    label: string,
-   type: string,
+   type: "text" | "number" | "date" | "password",
    placeholder: string,
    onChange?: (e: React.ChangeEvent<HTMLInputElement>)=> void,
-   value: string
+   value: string | number,
    name: string
 }
 const FormInput: React.FC<FormParameters> = ({
@@ -29,6 +29,7 @@ const FormInput: React.FC<FormParameters> = ({
                 onChange={onChange}
                 value={value}
                 name={name}
+                required
              />
           </div>
           {/* {error && error[name] && (
