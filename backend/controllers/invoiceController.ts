@@ -58,7 +58,7 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
     console.log(error);
     res.status(501).json({
       success: false,
-      message: "Encounter an error"
+      message: error
     });
     // next(error);
     

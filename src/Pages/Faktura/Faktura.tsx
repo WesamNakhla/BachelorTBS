@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CiSearch } from "react-icons/ci";
 import { GoPlusCircle } from "react-icons/go";
 import { IoEyeOutline } from "react-icons/io5";
@@ -9,8 +9,10 @@ import Modal from "../../Components/Modal/Modal";
 import FormInput from "../../Components/FormInput/FormInput";
 import axiosInstance  from "../../utils/api";
 
+
+// interface UpdateIn
 interface AllInvoices{
-    invoiceNumber: string
+    invoiceNumber: string,
     customer: string,
     amount: number,
     status: string,
@@ -25,6 +27,15 @@ interface Invoice{
 const Faktura = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
     const [ isLoading, setIsLoading ] = useState<boolean>(false);
+    const [ isActive, setIsActive ] = useState(false);
+    const [ isUpdating, setIsupdating ] = useState(false);
+    const [ dataToUpdate, setDataToUpdate ] = useState<AllInvoices>({
+        invoiceNumber: "",
+        customer: "",
+        amount: 0,
+        status: "",
+        date: new Date()
+    });
     const [ allInvoices, setAllInvoices ] = useState<AllInvoices[]>([]);
     const [ invoice, setInvoice ] = useState<Invoice>({
         customer: "",
@@ -32,7 +43,6 @@ const Faktura = ()=>{
         status: "",
         date: new Date()
     });
-
 
     //fetch all invoices
     useEffect( ()=>{
@@ -47,40 +57,73 @@ const Faktura = ()=>{
                     date: data.date
                 }
             });
+            console.log(data_to_store);
             setAllInvoices(data_to_store);
         }
         getAllInvoice();
-    }, [])
-
-    const handleInvoice = (e: React.ChangeEvent<HTMLInputElement>)=>{
+    }, [isActive])
+    //delete invoice
+    const deleteInvoice = useCallback(async (invoiceId: string)=>{
+        const data = { 
+            invoiceNumber: invoiceId
+        }
+        let response = await axiosInstance.delete("/delete-invoice", { data: data });
+        setIsActive(prev=> !prev);
+        toast.success(response.data?.message || "Invoice deleted successfully");
+    }, []) 
+    //update invoice
+    // const updateInvoice = useCallback(async (invoiceId: string)=>{
+    //     const updatedArray = allInvoices.find((data)=> data.invoiceNumber == invoiceId);
+    //     if(!updatedArray){
+    //         toast.error(`There is no invoice with id ${invoiceId}`);
+    //         return;
+    //     }
+    //     console.log(isUpdating);
+    //     setDataToUpdate(updatedArray);
+        
+    //     // let response = await axiosInstance.put("")
+    // }, [])
+    //handle form input change
+    const handleInvoice = useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
         const { name, value } = e.target;
-        setInvoice(prev=>({
-            ...prev,
-            [name]: value
-        }))
-    }
-    const submitInvoice = async (e:React.FormEvent<HTMLFormElement>)=>{
+        if(isUpdating){
+            setDataToUpdate(prev=>({
+                ...prev,
+                [name]: name === "amount" ? Number(value) : value
+            }))
+        }else{
+            setInvoice(prev=>({
+                ...prev,
+                [name]: name === "amount" ? Number(value) : value
+            }))
+        }
+        
+    }, [isUpdating])
+    const submitInvoice = useCallback(async (e:React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         setIsLoading(true);
         try{
-            const { customer, amount, status, date } = invoice;
-        const data = {
-            customer: customer,
-            amount: amount,
-            status: status,
-            date: date
+            const data = isUpdating ? dataToUpdate : invoice
+        if(isUpdating){
+            let response = await axiosInstance.put("/update-invoice", dataToUpdate);
+            console.log(response);
+            toast.success(response.data?.message);
+        }else{
+            let response = await axiosInstance.post("/create-invoice", data);
+            toast.success(response.data?.message);
         }
-        let response = await axiosInstance.post("/create-invoice", data);
-        console.log(response);
+       
+        // console.log(response);
         setIsLoading(false);
-        toast.success(response.data?.message);
-        setShowModal(!showModal);
+        setIsActive(prev=> !prev);
+        setShowModal(false);
+        setIsupdating(false)
 
         }catch(error){
             setIsLoading(false)
             console.log(error);
         }
-    }
+    }, [invoice, dataToUpdate, isUpdating])
     return(
         <>
             <div className="flex flex-col border-1 border-[#A2A1A8]/20 mt-10 h-[500px] p-4 relative">
@@ -131,8 +174,12 @@ const Faktura = ()=>{
                                             </td>
                                             <td className="flex py-4 text-lg cursor-pointer">
                                                 <p><IoEyeOutline /></p>
-                                                <p className="mx-4"><LuPencilLine /></p>
-                                                <p><RiDeleteBinLine /></p>
+                                                <p className="mx-4" onClick={()=>{
+                                                    setDataToUpdate(data);
+                                                    setIsupdating(true);
+                                                    setShowModal(true);
+                                                }}><LuPencilLine /></p>
+                                                <p onClick={()=>deleteInvoice(data.invoiceNumber)}><RiDeleteBinLine /></p>
                                             </td>
                                         </tr>
                                     </>
@@ -154,14 +201,14 @@ const Faktura = ()=>{
                                     label="Customer"  
                                     placeholder="Customer" 
                                     onChange={handleInvoice}
-                                    value={invoice.customer}
+                                    value={isUpdating ? dataToUpdate.customer : invoice.customer}
                                     name="customer" />
                                 <FormInput 
                                     type="text" 
                                     label="Amount"  
                                     placeholder="Enter amount" 
                                     onChange={handleInvoice}
-                                    value={invoice.amount}
+                                    value={isUpdating ? dataToUpdate.amount : invoice.amount}
                                     name="amount" />
                             </div>
                             <div className="flex">
@@ -170,25 +217,28 @@ const Faktura = ()=>{
                                     label="Status"  
                                     placeholder="Paid" 
                                     onChange={handleInvoice}
-                                    value={invoice.status}
+                                    value={isUpdating ? dataToUpdate.status : invoice.status}
                                     name="status" />
                                 <FormInput 
                                     type="date" 
                                     label="Date"  
                                     placeholder="2025-04-15" 
                                     onChange={handleInvoice}
-                                    value={new Date(invoice.date).toISOString().slice(0, 10)}
+                                    value={isUpdating ? new Date(dataToUpdate.date).toISOString().slice(0, 10) : new Date(invoice.date).toISOString().slice(0, 10)}
                                     name="date" />
                                 
                             </div>
                             
                            
                             <div className="flex font-lexend">
-                                <div onClick={()=> setShowModal(!showModal)} className="flex items-center justify-center w-[170px] h-[50px] cursor-pointer border-1 border-[#A2A1A8]/20 rounded-md">
+                                <div onClick={()=> {
+                                    setShowModal(!showModal);
+                                    setIsupdating(!isUpdating);
+                                }} className="flex items-center justify-center w-[170px] h-[50px] cursor-pointer border-1 border-[#A2A1A8]/20 rounded-md">
                                     Cancel
                                 </div>
                                 <button type="submit"  className="w-[170px] h-[50px] cursor-pointer text-[#fff] bg-[#7152F3] border-1 border-[#A2A1A8]/20 rounded-md !ml-4">
-                                    { isLoading ? "Loading..." : "Add" }
+                                    { (isUpdating) ? "Update" : (isLoading) ? "Loading..." : "Add" }
                                 </button>
                             </div>
                         </form>
