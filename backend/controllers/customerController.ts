@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
-import { Customer } from "../models/Customer";
+import  { Customer } from "../models/Customer";
 
 export const CreateCustomer = async(req: Request, res: Response, next: NextFunction): Promise<void>=>{
     try{
-        const { name, email, org_number } = req.body;
+        const { customer, type, contact_person, org_number, address, telephone, email } = req.body;
         let existingCustomer = await Customer.findOne({ email: email });
         if(existingCustomer){
             res.status(409).json({
@@ -17,7 +17,7 @@ export const CreateCustomer = async(req: Request, res: Response, next: NextFunct
             email: email,
             org_number: org_number
         }
-        let customer = await Customer.create(data);
+        let new_customer = await Customer.create(data);
         if(customer){
             res.status(201).json({
                 success: true,

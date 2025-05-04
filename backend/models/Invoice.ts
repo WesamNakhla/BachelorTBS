@@ -16,8 +16,8 @@ const InvoiceSchema: Schema = new Schema({
      required: true
   },
   customer: {
-     type: String,
-     required: true
+     type: mongoose.Types.ObjectId,
+     ref: "Customer"
   },
   amount: {
      type: Number, 
