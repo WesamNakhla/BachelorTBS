@@ -6,6 +6,7 @@ import morgan from "morgan";
 import mongoose from "mongoose";
 import authRoutes from "./routes/authRoutes";
 import invoiceRoutes from "./routes/invoiceRoutes";
+import inventoryRoutes from "./routes/inventoryRoutes";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -43,6 +44,7 @@ app.use(
 
 app.use("/api/v1", authRoutes);
 app.use("/api/v1", invoiceRoutes);
+app.use("/api/v1", inventoryRoutes);
 
 // Health check route
 app.get("/", (req: Request, res: Response) => {

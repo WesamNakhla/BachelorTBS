@@ -71,18 +71,6 @@ const Faktura = ()=>{
         setIsActive(prev=> !prev);
         toast.success(response.data?.message || "Invoice deleted successfully");
     }, []) 
-    //update invoice
-    // const updateInvoice = useCallback(async (invoiceId: string)=>{
-    //     const updatedArray = allInvoices.find((data)=> data.invoiceNumber == invoiceId);
-    //     if(!updatedArray){
-    //         toast.error(`There is no invoice with id ${invoiceId}`);
-    //         return;
-    //     }
-    //     console.log(isUpdating);
-    //     setDataToUpdate(updatedArray);
-        
-    //     // let response = await axiosInstance.put("")
-    // }, [])
     //handle form input change
     const handleInvoice = useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
         const { name, value } = e.target;

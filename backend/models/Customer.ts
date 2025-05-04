@@ -4,11 +4,15 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 const customerSchema = new Schema({
-    name: {
+    customer: {
         type: String,
         required: true
     },
-    email: {
+    type: {
+        type: String,
+        required: true
+    },
+    contact_person: {
         type: String,
         required: true
     },
@@ -16,6 +20,23 @@ const customerSchema = new Schema({
         type: String,
         required: true
     },
+    address: {
+        type: String,
+        required: true
+    },
+    telephone: {
+        type: String,
+        required: true
+    },
+    invoice: {
+        type: mongoose.Types.ObjectId,
+        ref: "Invoice"
+    },
+    inventory: {
+        type: mongoose.Types.ObjectId,
+        ref: "Inventory"
+    }
+   
 
 },
 {timeStamps: true});
