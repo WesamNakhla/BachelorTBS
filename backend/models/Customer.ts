@@ -1,9 +1,9 @@
 
 const mongoose = require("mongoose");
 
-const { Schema } = mongoose;
+// const { Schema } = mongoose;
 
-const customerSchema = new Schema({
+const customerSchema = new mongoose.Schema({
     customer: {
         type: String,
         required: true
@@ -28,10 +28,12 @@ const customerSchema = new Schema({
         type: String,
         required: true
     },
-    invoice: {
+    invoices: [{
         type: mongoose.Types.ObjectId,
-        ref: "Invoice"
-    },
+        ref: "Invoice",
+        required: false
+
+    }],
     inventory: {
         type: mongoose.Types.ObjectId,
         ref: "Inventory"
@@ -39,6 +41,6 @@ const customerSchema = new Schema({
    
 
 },
-{timeStamps: true});
+{timestamps: true});
 
 export const Customer = mongoose.model("Customer", customerSchema);

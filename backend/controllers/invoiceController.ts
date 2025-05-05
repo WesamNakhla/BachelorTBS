@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import Invoice from "../models/Invoice";
+import Invoice  from "../models/Invoice";
 interface Invoice{
   invoiceNumber: string,
   customer: string,

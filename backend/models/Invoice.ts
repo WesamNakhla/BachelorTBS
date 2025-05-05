@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 // Define an interface representing an invoice document
 interface IInvoice extends Document {
   invoiceNumber: string;
-  customer: string;
+  customer: mongoose.Types.ObjectId;
   amount: number;
   status: string;
   date: Date;
@@ -17,7 +17,8 @@ const InvoiceSchema: Schema = new Schema({
   },
   customer: {
      type: mongoose.Types.ObjectId,
-     ref: "Customer"
+     ref: "Customer",
+     required: true
   },
   amount: {
      type: Number, 
@@ -28,7 +29,8 @@ const InvoiceSchema: Schema = new Schema({
      required: true
   },
   date: { type: Date, default: Date.now },
-});
+},
+{timestamps: true});
 
 // Create and export the model
 const Invoice = mongoose.model<IInvoice>("Invoice", InvoiceSchema);
