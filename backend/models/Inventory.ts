@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const InventorySchema = new mongoose.Schema({
     customer: {
         type: mongoose.Types.ObjectId,
-        ref: "Invoice"
+        ref: "Customer"
     },
     arrival_date: {
         type: Date,

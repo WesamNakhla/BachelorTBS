@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import Invoice  from "../models/Invoice";
+import { Customer } from "../models/Customer";
 interface Invoice{
   invoiceNumber: string,
   customer: string,
@@ -10,7 +11,7 @@ interface Invoice{
 // Function to get all invoices
 export const getInvoices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
-    const invoices = await Invoice.find({}).lean().select("invoiceNumber customer amount status date");
+    const invoices = await Invoice.find({}).populate({ path: "customer", select: "customer -_id" }).exec();
     res.status(200).json({
       success: true,
       data: invoices
@@ -20,28 +21,24 @@ export const getInvoices = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// // Function to get a single invoice by ID
-// export const getInvoiceById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-//   try {
-//     const invoice = await Invoice.findById(req.params.id);
-//     if (!invoice) {
-//       res.status(404).json({ message: "Invoice not found" });
-//       return;
-//     }
-//     res.status(200).json(invoice);
-//   } catch (error) {
-//     next(error);
-//   }
-// };
 
 // Function to create a new invoice
 export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   console.log("invoice endpoint is working");
   try {
     const { customer, amount, status, date } = req.body;
+    //get the id of the customer with the help of the customer name
+    let customer_name = await Customer.findOne({ customer: customer }).select("_id").exec();
+    if(!customer_name){
+      res.status(404).json({
+        success: false,
+        message: "No customer with the name you entered"
+    })
+    }
+
     const data = {
       invoiceNumber: GenerateRandomID(),
-      customer: customer,
+      customer: customer_name._id,
       amount: amount,
       status: status,
       date: date

@@ -1,6 +1,20 @@
 import { Request, Response, NextFunction } from "express";
 import  { Customer } from "../models/Customer";
 
+export const GetAllCustomer = async (req: Request, res: Response, next: NextFunction): Promise<void>=>{
+    try{
+        let allCustomer = await Customer.find({}).select("customer type contact_person org_number address telephone email").exec();
+        res.status(200).json({
+            success: true,
+            data: allCustomer
+        })
+    }catch(error: any){
+        res.status(500).json({
+            success: false,
+            message: error.message
+        })
+    }
+}
 export const CreateCustomer = async(req: Request, res: Response, next: NextFunction): Promise<void>=>{
     try{
         console.log(req.body);
@@ -27,6 +41,7 @@ export const CreateCustomer = async(req: Request, res: Response, next: NextFunct
         if(new_customer){
             res.status(201).json({
                 success: true,
+                data: new_customer,
                 message: "Customer created successfully"
             })
             return 

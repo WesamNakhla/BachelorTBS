@@ -1,7 +1,7 @@
 import express from "express";
-import { getAllInventoryCustomer } from "../controllers/inventoryController"
+import { CreateInventory } from "../controllers/inventoryController"
 const router  = express.Router();
 
-router.get("/all-customer-inventory", getAllInventoryCustomer);
+router.post("/create-inventory", CreateInventory);
 
 export default router;

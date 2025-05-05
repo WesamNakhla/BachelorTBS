@@ -34,10 +34,10 @@ const customerSchema = new mongoose.Schema({
         required: false
 
     }],
-    inventory: {
+    inventory: [{
         type: mongoose.Types.ObjectId,
         ref: "Inventory"
-    }
+    }]
    
 
 },
