@@ -63,3 +63,38 @@ export const DeleteCustomer = async (req: Request, res: Response, next:NextFunct
         return 
     }
 }
+export const UpdateCustomer = async (req: Request, res:Response, next:NextFunction): Promise<void>=>{
+    const { customer, type, contact_person, org_number, address, telephone, email } = req.body;
+    const { id } = req.params;
+    let updatedData = {
+        customer: customer,
+        type: type, 
+        contact_person: contact_person, 
+        org_number: org_number, 
+        address: address, 
+        telephone: telephone, 
+        email: email,
+    }
+    try{
+        let updatedCustomer = await Customer.findByIdAndUpdate({ _id: id }, updatedData, { new: true }).exec();
+        if(!updatedCustomer){
+            res.status(404).json({
+                success: false,
+                message: "Customer not found"
+            });
+            return 
+        }
+        res.status(200).json({
+            success: true,
+            message: "Customer updated successfully"
+        });
+        return 
+    }catch(error: any){
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+        return 
+    }
+
+}
