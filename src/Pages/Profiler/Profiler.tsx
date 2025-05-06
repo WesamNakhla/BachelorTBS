@@ -22,7 +22,7 @@ const Profiler = ()=>{
                 let customer_to_store = response.data.data.map((data: AllCustomer)=>{
                     return {
                         _id: data._id,
-                        customer: data.customer.customer
+                        customer: data.customer
                     }
                 })
                 setAllCustomer(customer_to_store);

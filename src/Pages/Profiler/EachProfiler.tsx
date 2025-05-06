@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { CiSearch } from "react-icons/ci";
 import { GoPlusCircle } from "react-icons/go";
 import { IoEyeOutline } from "react-icons/io5";
 import { LuPencilLine } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
 import Modal from "../../Components/Modal/Modal";
 import FormInput from "../../Components/FormInput/FormInput";
 import  axiosInstance  from "../../utils/api";
@@ -20,12 +21,29 @@ interface AllInventory {
 }
 const EachProfiler = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
-    const [ kunde, setKunde ] = useState<string>("");
+    const [ isLoading, setIsLoading ] = useState<boolean>(false);
+    const [ isUpdating, setIsupdating ] = useState<boolean>(false);
+    const [ isActive, setIsActive ] = useState<boolean>(false);
     const [ allInventory, setAllInventory ] = useState<AllInventory[]>([]);
+    const [ inventoryUpdate, setInventoryUpdate ] = useState<AllInventory>({
+        _id: "",
+        arrival_date: "",
+        sender: "",
+        goods: "",
+        quantity: "",
+        weight: "",
+        departure_date: ""
+    });
+    const [ inventory, setInventory ] = useState({
+        arrival_date: "",
+        sender: "",
+        goods: "",
+        quantity: "",
+        weight: "",
+        departure_date: ""
+    });
 
-    const handleKunde = (e: React.ChangeEvent<HTMLInputElement>)=>{
-        setKunde(e.target.value);
-    }
+
     const param = useParams();
     useEffect(()=>{
         const getAllInventoryPerCustomer = async()=>{
@@ -49,6 +67,55 @@ const EachProfiler = ()=>{
         }
         getAllInventoryPerCustomer();
     }, []);
+    const handleInventory = useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
+        const { name, value } = e.target;
+        if(isUpdating){
+            setInventoryUpdate(prev=>({
+                ...prev,
+                [name]: value
+            }));
+        }
+        setInventory(prev=>({
+            ...prev,
+            [name]: value
+        }));
+    }, [isUpdating]);
+    const deleteInventory = useCallback(async (id: string)=>{
+        try{
+            let response = await axiosInstance.delete(`/delete-customer/${id}`);
+            toast.error(response.data?.message || "Customer deleted successfully");
+            setIsActive(prev=> !prev);
+        }catch(error: any){
+            console.log(error);
+            toast.error(error.response.data.message)
+        }
+    }, []);
+    const submitInventory = useCallback(async (e:React.FormEvent<HTMLFormElement>)=>{
+        e.preventDefault();
+        setIsLoading(true);
+        try{
+
+            const data = isUpdating ? inventoryUpdate : inventory;
+            if(isUpdating){
+                let response = await axiosInstance.put(`/update-inventory/${inventoryUpdate._id}`, inventoryUpdate);
+                console.log(response);
+                toast.success(response.data?.message);
+            }else{
+                let response = await axiosInstance.post("/create-inventory", data);
+                toast.success(response.data?.message);
+            }
+            // console.log(response);
+            setIsLoading(false);
+            setIsActive(prev=> !prev);
+            setShowModal(!showModal);
+            
+
+        }catch(error: any){
+            setIsLoading(false);
+            setShowModal(!showModal);
+            toast.error(error.response.data.message)
+        }
+    }, [inventory, inventoryUpdate, isUpdating])
     return(
         <>
             <div className="flex flex-col border-1 border-[#A2A1A8]/20 mt-10 h-[500px] p-4 relative">
@@ -93,7 +160,7 @@ const EachProfiler = ()=>{
                                         <td className="flex py-4 text-lg cursor-pointer">
                                             <p><IoEyeOutline /></p>
                                             <p className="mx-4"><LuPencilLine /></p>
-                                            <p><RiDeleteBinLine /></p>
+                                            <p onClick={()=>deleteInventory(data._id)}><RiDeleteBinLine /></p>
                                         </td>
                                     </tr>
                                 ))
@@ -113,7 +180,7 @@ const EachProfiler = ()=>{
                                     type="text" 
                                     label="Mottaksdato"  
                                     placeholder="Mottaksdato" 
-                                    onChange={handleKunde}
+                                    onChange={handleInventory}
                                     value={kunde} />
                                
                             </div>
@@ -122,7 +189,7 @@ const EachProfiler = ()=>{
                                     type="text" 
                                     label="Kunde"  
                                     placeholder="Kunde" 
-                                    onChange={handleKunde}
+                                    onChange={handleInventory}
                                     value={kunde} />
                               
                             </div>
@@ -131,7 +198,7 @@ const EachProfiler = ()=>{
                                     type="text" 
                                     label="Vare"  
                                     placeholder="Vare" 
-                                    onChange={handleKunde}
+                                    onChange={handleInventory}
                                     value={kunde} />
                                
                             </div>
@@ -140,7 +207,7 @@ const EachProfiler = ()=>{
                                     type="text" 
                                     label="Vekt"  
                                     placeholder="Vekt" 
-                                    onChange={handleKunde}
+                                    onChange={handleInventory}
                                     value={kunde} />
                                
                             </div>
@@ -149,7 +216,7 @@ const EachProfiler = ()=>{
                                     type="text" 
                                     label="Avgangsdato kunde"  
                                     placeholder="Avgangsdato kunde" 
-                                    onChange={handleKunde}
+                                    onChange={handleInventory}
                                     value={kunde} />
                                
                             </div>

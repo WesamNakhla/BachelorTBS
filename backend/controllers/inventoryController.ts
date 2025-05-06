@@ -94,7 +94,7 @@ export const UpdateInventory = async (req: Request, res:Response, next:NextFunct
 }
 export const getAllCustomerForInventory = async (req: Request, res: Response, next: NextFunction)=>{
     try{
-        let customer = await Inventory.find({}).populate({ path: "customer", select: "customer -_id" }).exec();
+        let customer = await Customer.find({}).select("customer -_id").exec();
         if(!customer){
             res.status(404).json({
                 success: true,
@@ -102,9 +102,11 @@ export const getAllCustomerForInventory = async (req: Request, res: Response, ne
             });
             return ;
         }
-        let inventory_customer = customer.filter(data=>{
+        console.log(customer);
+        let inventory_customer = customer.filter((data: any)=>{
             return data.customer != null
         });
+        
         res.status(200).json({
             success: true,
             data: inventory_customer
