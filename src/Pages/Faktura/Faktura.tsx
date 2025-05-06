@@ -48,16 +48,17 @@ const Faktura = ()=>{
     useEffect( ()=>{
         const getAllInvoice = async ()=>{
             let response = await axiosInstance.get("/all-invoice");
+            console.log(response);
             const data_to_store = response.data?.data.map((data: AllInvoices)=>{
                 return {
                     invoiceNumber: data.invoiceNumber,
-                    customer: data.customer,
+                    customer: JSON.parse(data.customer).customer,
                     amount: data.amount,
                     status: data.status,
                     date: data.date
                 }
             });
-            console.log(data_to_store);
+           
             setAllInvoices(data_to_store);
         }
         getAllInvoice();
