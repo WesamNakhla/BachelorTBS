@@ -100,7 +100,6 @@ const Faktura = ()=>{
             const data = isUpdating ? dataToUpdate : invoice
         if(isUpdating){
             let response = await axiosInstance.put("/update-invoice", dataToUpdate);
-            console.log(response);
             toast.success(response.data?.message);
         }else{
             let response = await axiosInstance.post("/create-invoice", data);

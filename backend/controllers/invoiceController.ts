@@ -12,9 +12,13 @@ interface Invoice{
 export const getInvoices = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const invoices = await Invoice.find({}).populate({ path: "customer", select: "customer -_id" }).exec();
+    const invoices_data = invoices.filter(data=> {
+      return data.customer != null
+    })
+    console.log(invoices_data);
     res.status(200).json({
       success: true,
-      data: invoices
+      data: invoices_data
     });
   } catch (error) {
     next(error);

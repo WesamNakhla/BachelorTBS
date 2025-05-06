@@ -9,7 +9,7 @@ import ForgetPassword from "./Pages/ForgetPassword/ForgetPassword"
 import DashboardLayout from "./Pages/DashboardLayout/DashboardLayout";
 import Faktura from "./Pages/Faktura/Faktura";
 import Kunde from "./Pages/Kunde/Kunde";
-// import Profiler from "./Pages/Profiler/Profiler";
+import Profiler from "./Pages/Profiler/Profiler";
 import EachProfiler from "./Pages/Profiler/EachProfiler";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 
@@ -57,11 +57,11 @@ const Router = ()=>{
                         <Kunde />
                     </DashboardLayout>
                 } />
-                {/* <Route path="/Profiler" element={
+                <Route path="/Profiler" element={
                     <DashboardLayout>
                         <Profiler />
                     </DashboardLayout>
-                } /> */}
+                } />
                 <Route path="/Profiler/:profile" element={
                     <DashboardLayout>
                         <EachProfiler />
