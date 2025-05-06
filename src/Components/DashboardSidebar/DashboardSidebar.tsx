@@ -7,7 +7,7 @@ import { CiLight } from "react-icons/ci";
 import { MdOutlineDarkMode } from "react-icons/md";
 const MenuLinks = [
     { "text": "Dashboard", to:"/Dashboard", icon:<RxDashboard /> },
-    { "text": "Kunde", to:"/Kunder", icon:<LiaIdCard /> },
+    { "text": "Customer", to:"/Kunder", icon:<LiaIdCard /> },
     { "text": "Inventory", to:"/Profiler", icon:<PiBriefcaseThin /> },
     { "text": "Invoices", to:"/Faktura", icon:<BiSolidBarChartAlt2 /> },
 ]

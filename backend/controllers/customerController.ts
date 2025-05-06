@@ -18,8 +18,8 @@ export const GetAllCustomer = async (req: Request, res: Response, next: NextFunc
 export const CreateCustomer = async(req: Request, res: Response, next: NextFunction): Promise<void>=>{
     try{
         console.log(req.body);
-        const { customer, type, contact_person, org_number, address, telephone, email } = req.body;
-        let existingCustomer = await Customer.findOne({ email: email });
+        const { customer, type, contact_person, org_number, address, telephone } = req.body;
+        let existingCustomer = await Customer.findOne({ customer: customer });
         if(existingCustomer){
             res.status(409).json({
                 success: false,
@@ -33,8 +33,7 @@ export const CreateCustomer = async(req: Request, res: Response, next: NextFunct
             contact_person: contact_person, 
             org_number: org_number, 
             address: address, 
-            telephone: telephone, 
-            email: email,
+            telephone: telephone
         }
         let new_customer = await new Customer(data).save();
         
