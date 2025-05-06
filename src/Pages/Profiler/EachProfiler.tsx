@@ -12,12 +12,12 @@ import  axiosInstance  from "../../utils/api";
 
 interface AllInventory {
     _id: string,
-    arrival_date: string,
+    arrival_date: Date,
     sender: string,
     goods: string,
     quantity: string,
     weight: string,
-    departure_date: string
+    departure_date: Date
 }
 const EachProfiler = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
@@ -27,20 +27,21 @@ const EachProfiler = ()=>{
     const [ allInventory, setAllInventory ] = useState<AllInventory[]>([]);
     const [ inventoryUpdate, setInventoryUpdate ] = useState<AllInventory>({
         _id: "",
-        arrival_date: "",
+        arrival_date: new Date(),
         sender: "",
         goods: "",
         quantity: "",
         weight: "",
-        departure_date: ""
+        departure_date: new Date()
     });
     const [ inventory, setInventory ] = useState({
-        arrival_date: "",
+        customer_name: "",
+        arrival_date: new Date(),
         sender: "",
         goods: "",
         quantity: "",
         weight: "",
-        departure_date: ""
+        departure_date: new Date()
     });
 
 
@@ -66,7 +67,7 @@ const EachProfiler = ()=>{
             }
         }
         getAllInventoryPerCustomer();
-    }, []);
+    }, [isActive]);
     const handleInventory = useCallback((e: React.ChangeEvent<HTMLInputElement>)=>{
         const { name, value } = e.target;
         if(isUpdating){
@@ -82,7 +83,7 @@ const EachProfiler = ()=>{
     }, [isUpdating]);
     const deleteInventory = useCallback(async (id: string)=>{
         try{
-            let response = await axiosInstance.delete(`/delete-customer/${id}`);
+            let response = await axiosInstance.delete(`/delete-inventory/${id}`);
             toast.error(response.data?.message || "Customer deleted successfully");
             setIsActive(prev=> !prev);
         }catch(error: any){
@@ -94,8 +95,16 @@ const EachProfiler = ()=>{
         e.preventDefault();
         setIsLoading(true);
         try{
-
-            const data = isUpdating ? inventoryUpdate : inventory;
+            const inventory_data = {
+                customer_name: param.profile,
+                arrival_date: inventory.arrival_date,
+                sender: inventory.sender,
+                goods: inventory.goods,
+                quantity: inventory.quantity,
+                weight: inventory.weight,
+                departure_date: inventory.departure_date
+            }
+            const data = isUpdating ? inventoryUpdate : inventory_data;
             if(isUpdating){
                 let response = await axiosInstance.put(`/update-inventory/${inventoryUpdate._id}`, inventoryUpdate);
                 console.log(response);
@@ -133,33 +142,39 @@ const EachProfiler = ()=>{
                         <button className="flex items-center justify-center cursor-pointer font-semibold w-[150px] h-[50px] rounded-md bg-[#7152F3] text-[#fff]"
                          type="button"
                          onClick={()=>setShowModal(!showModal)}>
-                            <p className="text-xl font-semibold mr-2"><GoPlusCircle /></p>legg til  verdier
+                            <p className="text-xl font-semibold mr-2"><GoPlusCircle /></p>My Inventory
                         </button>
                 </div>
                 <div className="flex mt-10">
                     <table className="table-fixed w-full text-center ">
                         <thead>
-                            <th>Arrival date</th>
-                            <th>sender</th>
-                            <th>Goods</th>
-                            <th>Qty</th>
-                            <th>Weight</th>
-                            <th>Departure date</th>
-                            <th>Actions</th>
+                            <tr>
+                                <th>Arrival date</th>
+                                <th>sender</th>
+                                <th>Goods</th>
+                                <th>Qty</th>
+                                <th>Weight</th>
+                                <th>Departure date</th>
+                                <th>Actions</th>
+                            </tr>
                         </thead>
                         <tbody>
                             {
                                 allInventory.map(data=>(
                                     <tr className="border-1 border-[#A2A1A8]/10">
-                                        <td className="py-4">{data.arrival_date}</td>
+                                        <td className="py-4">{new Date(data.arrival_date).toISOString().slice(0, 10)}</td>
                                         <td className="py-4">{data.sender}</td>
                                         <td className="py-4">{data.goods}</td>
                                         <td className="py-4">{data.quantity}</td>
                                         <td className="py-4">{data.weight}</td>
-                                        <td className="py-4">{data.departure_date}</td>
+                                        <td className="py-4">{new Date(data.departure_date).toISOString().slice(0, 10)}</td>
                                         <td className="flex py-4 text-lg cursor-pointer">
                                             <p><IoEyeOutline /></p>
-                                            <p className="mx-4"><LuPencilLine /></p>
+                                            <p className="mx-4" onClick={()=>{
+                                                setInventoryUpdate(data);
+                                                setIsupdating(true);
+                                                setShowModal(true);
+                                            }}><LuPencilLine /></p>
                                             <p onClick={()=>deleteInventory(data._id)}><RiDeleteBinLine /></p>
                                         </td>
                                     </tr>
@@ -172,63 +187,75 @@ const EachProfiler = ()=>{
             {
                     showModal &&
                     <Modal>
-                        <div className="flex flex-col">
-                            <h3 className="text-bold font-lexend text-base">Verdier</h3>
+                        <form className="flex flex-col" onSubmit={submitInventory}>
+                            <h3 className="text-bold font-lexend text-base">My Inventory</h3>
                             <div className="w-full h-[1px] bg-[#A2A1A8]/20 mt-5"></div>
                             <div className="flex ">
                                 <FormInput 
-                                    type="text" 
-                                    label="Mottaksdato"  
-                                    placeholder="Mottaksdato" 
+                                    type="date" 
+                                    label="Arrival Date"  
+                                    placeholder="2002-12-33" 
                                     onChange={handleInventory}
-                                    value={kunde} />
+                                    value={isUpdating ? new Date(inventoryUpdate.arrival_date).toISOString().slice(0, 10) : new Date(inventory.arrival_date).toISOString().slice(0, 10)}
+                                    name="arrival_date" />
                                
                             </div>
                             <div className="flex ">
                                 <FormInput 
                                     type="text" 
-                                    label="Kunde"  
-                                    placeholder="Kunde" 
+                                    label="Sender"  
+                                    placeholder="Siyabend" 
                                     onChange={handleInventory}
-                                    value={kunde} />
+                                    value={isUpdating ? inventoryUpdate.sender : inventory.sender}
+                                    name="sender" />
                               
                             </div>
                             <div className="flex ">
                                 <FormInput 
                                     type="text" 
-                                    label="Vare"  
-                                    placeholder="Vare" 
+                                    label="Goods"  
+                                    placeholder="Soap" 
                                     onChange={handleInventory}
-                                    value={kunde} />
+                                    value={isUpdating ? inventoryUpdate.goods : inventory.goods}
+                                    name="goods" />
                                
                             </div>
                             <div className="flex ">
                                 <FormInput 
                                     type="text" 
-                                    label="Vekt"  
-                                    placeholder="Vekt" 
+                                    label="Quantity"  
+                                    placeholder="01" 
                                     onChange={handleInventory}
-                                    value={kunde} />
+                                    value={isUpdating ? inventoryUpdate.quantity : inventory.quantity}
+                                    name="quantity" />
                                
                             </div>
                             <div className="flex ">
                                 <FormInput 
                                     type="text" 
-                                    label="Avgangsdato kunde"  
-                                    placeholder="Avgangsdato kunde" 
+                                    label="Weight"  
+                                    placeholder="23lbs" 
                                     onChange={handleInventory}
-                                    value={kunde} />
+                                    value={isUpdating ? inventoryUpdate.weight : inventory.weight}
+                                    name="weight" />
+                                <FormInput 
+                                    type="date" 
+                                    label="Departure Date"  
+                                    placeholder="2003-12-45" 
+                                    onChange={handleInventory}
+                                    value={isUpdating ? new Date(inventoryUpdate.departure_date).toISOString().slice(0, 10) : new Date(inventory.departure_date).toISOString().slice(0, 10)}
+                                    name="departure_date" />
                                
                             </div>
                             <div className="flex font-lexend">
                                 <button type="button" onClick={()=> setShowModal(!showModal)} className="w-[170px] h-[50px] cursor-pointer border-1 border-[#A2A1A8]/20 rounded-md">
-                                    Avbryt
+                                    cancel
                                 </button>
-                                <button type="button" onClick={()=> setShowModal(!showModal)} className="w-[170px] h-[50px] cursor-pointer text-[#fff] bg-[#7152F3] border-1 border-[#A2A1A8]/20 rounded-md !ml-4">
-                                    Lagre
+                                <button type="submit" className="w-[170px] h-[50px] cursor-pointer text-[#fff] bg-[#7152F3] border-1 border-[#A2A1A8]/20 rounded-md !ml-4">
+                                    { isLoading ? "Loading" : "Add" }
                                 </button>
                             </div>
-                        </div>
+                        </form>
                     </Modal>
             }
         </>

@@ -55,8 +55,7 @@ const Profiler = ()=>{
                                         <td className="py-4 cursor-pointer" onClick={()=>navigate(`/Profiler/${data.customer}`, { replace: true })}>{data.customer}</td>
                                         <td className="flex py-4 text-lg cursor-pointer">
                                             <p><IoEyeOutline /></p>
-                                            <p className="mx-4"><LuPencilLine /></p>
-                                            <p><RiDeleteBinLine /></p>
+                                            
                                         </td>
                                     </tr>
                                 ))

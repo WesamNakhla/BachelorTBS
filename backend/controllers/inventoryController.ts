@@ -37,7 +37,7 @@ export const CreateInventory =  async(req: Request, res: Response, next: NextFun
 export const DeleteInventory = async (req: Request, res: Response, next:NextFunction): Promise<void>=>{
     const { id } = req.params;
     try{
-        let customer = await Customer.findByIdAndDelete({ _id: id }).exec();
+        let customer = await Inventory.findByIdAndDelete({ _id: id }).exec();
         if(!customer){
             res.status(404).json({
                 success: false,
@@ -61,6 +61,7 @@ export const DeleteInventory = async (req: Request, res: Response, next:NextFunc
 export const UpdateInventory = async (req: Request, res:Response, next:NextFunction): Promise<void>=>{
     const {  arrival_date, sender, goods, quantity, weight,  departure_date } = req.body;
     const { id } = req.params;
+    console.log(id);
     let updatedData = {
         arrival_date: arrival_date,
         sender: sender,
@@ -70,7 +71,8 @@ export const UpdateInventory = async (req: Request, res:Response, next:NextFunct
         departure_date: departure_date
     }
     try{
-        let updatedCustomer = await Customer.findByIdAndUpdate({ _id: id }, updatedData, { new: true }).exec();
+        let updatedCustomer = await Inventory.findByIdAndUpdate({ _id: id  }, updatedData, { new: true }).exec();
+        console.log(updatedCustomer);
         if(!updatedCustomer){
             res.status(404).json({
                 success: false,
@@ -80,7 +82,8 @@ export const UpdateInventory = async (req: Request, res:Response, next:NextFunct
         }
         res.status(200).json({
             success: true,
-            message: "Customer updated successfully"
+            message: "Customer updated successfully",
+            data: updatedCustomer
         });
         return 
     }catch(error: any){
