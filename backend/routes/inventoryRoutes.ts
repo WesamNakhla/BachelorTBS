@@ -12,6 +12,6 @@ router.post("/create-inventory", CreateInventory);
 router.put("/update-inventory/:id", UpdateInventory);
 router.delete("/delete-inventory/:id", DeleteInventory);
 router.get("/getAllCustomerInventory", getAllCustomerForInventory);
-router.get("/getAllInventoryPerCustomer/:id", getAllInventoryPerCustomer);
+router.get("/getAllInventoryPerCustomer/:profile", getAllInventoryPerCustomer);
 
 export default router;

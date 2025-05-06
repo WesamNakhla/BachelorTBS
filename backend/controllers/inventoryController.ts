@@ -102,9 +102,12 @@ export const getAllCustomerForInventory = async (req: Request, res: Response, ne
             });
             return ;
         }
+        let inventory_customer = customer.filter(data=>{
+            return data.customer != null
+        });
         res.status(200).json({
             success: true,
-            data: customer
+            data: inventory_customer
         });
 
     }catch(error: any){
@@ -115,9 +118,17 @@ export const getAllCustomerForInventory = async (req: Request, res: Response, ne
     }
 }
 export const getAllInventoryPerCustomer = async (req: Request, res: Response, next: NextFunction): Promise<void>=>{
-    const { id } = req.params;
+    const { profile } = req.params;
     try{
-        let inventory = await Inventory.find({ customer: id }).select("arrival_date sender goods quantity weight  departure_date").lean();
+        let cus_tomer = await Customer.findOne({ customer: profile }).exec();
+        if(!cus_tomer){
+            res.status(404).json({
+                success: false,
+                message: "No customer found"
+            });
+            return ;
+        }
+        let inventory = await Inventory.find({ customer: cus_tomer._id }).select("arrival_date sender goods quantity weight  departure_date").exec();
         if(!inventory){
             res.status(404).json({
                 success: false,
@@ -125,7 +136,8 @@ export const getAllInventoryPerCustomer = async (req: Request, res: Response, ne
             });
             return ;
         }
-            res.status(404).json({
+       
+            res.status(200).json({
                 success: true,
                 data: inventory
             });

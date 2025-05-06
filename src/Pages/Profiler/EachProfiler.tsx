@@ -1,18 +1,54 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { CiSearch } from "react-icons/ci";
 import { GoPlusCircle } from "react-icons/go";
 import { IoEyeOutline } from "react-icons/io5";
 import { LuPencilLine } from "react-icons/lu";
 import { RiDeleteBinLine } from "react-icons/ri";
+import { useParams } from "react-router-dom";
 import Modal from "../../Components/Modal/Modal";
 import FormInput from "../../Components/FormInput/FormInput";
+import  axiosInstance  from "../../utils/api";
+
+interface AllInventory {
+    _id: string,
+    arrival_date: string,
+    sender: string,
+    goods: string,
+    quantity: string,
+    weight: string,
+    departure_date: string
+}
 const EachProfiler = ()=>{
     const [ showModal, setShowModal ] = useState<boolean>(false);
     const [ kunde, setKunde ] = useState<string>("");
+    const [ allInventory, setAllInventory ] = useState<AllInventory[]>([]);
 
     const handleKunde = (e: React.ChangeEvent<HTMLInputElement>)=>{
         setKunde(e.target.value);
     }
+    const param = useParams();
+    useEffect(()=>{
+        const getAllInventoryPerCustomer = async()=>{
+            try{
+                let response = await axiosInstance.get(`/getAllInventoryPerCustomer/${param.profile}`);
+                let inventory_to_store = response.data.data.map((data: AllInventory)=>{
+                    return{
+                        _id: data._id,
+                        arrival_date: data.arrival_date,
+                        sender: data.sender,
+                        goods: data.goods,
+                        quantity: data.quantity,
+                        weight: data.weight,
+                        departure_date: data.departure_date
+                    }
+                })
+                setAllInventory(inventory_to_store);
+            }catch(error: any){
+                console.log(error)
+            }
+        }
+        getAllInventoryPerCustomer();
+    }, []);
     return(
         <>
             <div className="flex flex-col border-1 border-[#A2A1A8]/20 mt-10 h-[500px] p-4 relative">
@@ -45,45 +81,23 @@ const EachProfiler = ()=>{
                             <th>Actions</th>
                         </thead>
                         <tbody>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">06/03-2025</td>
-                                <td className="py-4">Vikenco</td>
-                                <td className="py-4">Laks</td>
-                                <td className="py-4">28</td>
-                                <td className="py-4">540.2</td>
-                                <td className="py-4">05/03</td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">06/03-2025</td>
-                                <td className="py-4">Vertalplast</td>
-                                <td className="py-4">Tomkasser</td>
-                                <td className="py-4">33 pll</td>
-                                <td className="py-4">288 kg</td>
-                                <td className="py-4">05/03</td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
-                            <tr className="border-1 border-[#A2A1A8]/10">
-                                <td className="py-4">06/03-2025</td>
-                                <td className="py-4">Domstein</td>
-                                <td className="py-4">Laksefilet</td>
-                                <td className="py-4">3</td>
-                                <td className="py-4">540.2</td>
-                                <td className="py-4">05/03</td>
-                                <td className="flex py-4 text-lg cursor-pointer">
-                                    <p><IoEyeOutline /></p>
-                                    <p className="mx-4"><LuPencilLine /></p>
-                                    <p><RiDeleteBinLine /></p>
-                                </td>
-                            </tr>
+                            {
+                                allInventory.map(data=>(
+                                    <tr className="border-1 border-[#A2A1A8]/10">
+                                        <td className="py-4">{data.arrival_date}</td>
+                                        <td className="py-4">{data.sender}</td>
+                                        <td className="py-4">{data.goods}</td>
+                                        <td className="py-4">{data.quantity}</td>
+                                        <td className="py-4">{data.weight}</td>
+                                        <td className="py-4">{data.departure_date}</td>
+                                        <td className="flex py-4 text-lg cursor-pointer">
+                                            <p><IoEyeOutline /></p>
+                                            <p className="mx-4"><LuPencilLine /></p>
+                                            <p><RiDeleteBinLine /></p>
+                                        </td>
+                                    </tr>
+                                ))
+                            }
                         </tbody>
                     </table>
                 </div>
