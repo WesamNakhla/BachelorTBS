@@ -19,9 +19,9 @@ const Router = ()=>{
         <>
             <Routes>
                 <Route path="/" element={
-                    <Layout>
+                   
                         <Home />
-                    </Layout>
+                   
                 } />
                 <Route path="/om" element={
                     <Layout>
@@ -42,7 +42,7 @@ const Router = ()=>{
                     
                 } />
                 {/* dashboard route */}
-                <Route path="/Faktura" element={
+                <Route path="/Invoices" element={
                     <DashboardLayout>
                         <Faktura />
                     </DashboardLayout>
@@ -52,17 +52,17 @@ const Router = ()=>{
                         <Dashboard />
                     </DashboardLayout>
                 } />
-                 <Route path="/Kunder" element={
+                 <Route path="/Customers" element={
                     <DashboardLayout>
                         <Kunde />
                     </DashboardLayout>
                 } />
-                <Route path="/Profiler" element={
+                <Route path="/Inventory" element={
                     <DashboardLayout>
                         <Profiler />
                     </DashboardLayout>
                 } />
-                <Route path="/Profiler/:profile" element={
+                <Route path="/Inventory/:profile" element={
                     <DashboardLayout>
                         <EachProfiler />
                     </DashboardLayout>

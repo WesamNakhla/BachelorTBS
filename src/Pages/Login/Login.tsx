@@ -53,7 +53,7 @@ const Login = ()=>{
                 <div className="flex items-center font-bold text-[#fff] w-[100%] h-[50px] p-10 text-lg bg-[#112147]">
                     <h3>TBS</h3>
                 </div>
-                <form className="flex flex-col justify-center items-center h-full" onSubmit={handleSubmit}>
+                <form className="flex flex-col mt-10 items-center h-full" onSubmit={handleSubmit}>
                     <div className="w-1/2">
                         <FormInput 
                             type="text"

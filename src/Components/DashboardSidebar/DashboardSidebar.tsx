@@ -5,14 +5,16 @@ import { LiaIdCard } from "react-icons/lia";
 import { PiBriefcaseThin } from "react-icons/pi";
 import { CiLight } from "react-icons/ci";
 import { MdOutlineDarkMode } from "react-icons/md";
+import { useTheme } from "../../context/theme";
 const MenuLinks = [
     { "text": "Dashboard", to:"/Dashboard", icon:<RxDashboard /> },
-    { "text": "Customer", to:"/Kunder", icon:<LiaIdCard /> },
-    { "text": "Inventory", to:"/Profiler", icon:<PiBriefcaseThin /> },
-    { "text": "Invoices", to:"/Faktura", icon:<BiSolidBarChartAlt2 /> },
+    { "text": "Customer", to:"/Customers", icon:<LiaIdCard /> },
+    { "text": "Inventory", to:"/Inventory", icon:<PiBriefcaseThin /> },
+    { "text": "Invoices", to:"/Invoices", icon:<BiSolidBarChartAlt2 /> },
 ]
 
 const DashboardSidebar = ()=>{
+    const { isDark, setIsDark } = useTheme();
     return(
         <>
             <div className="flex flex-col items-center w-[25%] h-full bg-[#A2A1A8]/5 p-5">
@@ -25,19 +27,22 @@ const DashboardSidebar = ()=>{
                                     key={link.text}
                                     to={link.to}
                                     className={({isActive}: NavLinkRenderProps)=>
-                                    isActive ?
+                                    [isActive ?
                                     "!bg-[#7152F3]/5 flex items-center w-full h-[50px] flex p-5 font-lexend font-semibold text-[#7152F3] text-base border-l-2 border-[#7152F3] mb-4" :
-                                    "w-full h-[50px] flex items-center p-5 font-lexend font-light text-[#000] text-base mb-4"}>
+                                    "w-full h-[50px] flex items-center p-5 font-lexend font-light text-[#000] text-base mb-4",
+                                    !isActive && (isDark ? "text-[#fff]": "text-[#000]")].join(" ")}>
                                     <p className="font-light text-base">{link.icon}</p>&nbsp;{link.text}
                                 </NavLink>
                             ))
                         }
                     </div>
                     <div className="flex justify-between">
-                        <div className="flex justify-center items-center mr-2 w-[110px] h-[50px] bg-[#7152F3] rounded-md font-lexend font-light text-[#fff]">
+                        <div className="flex justify-center items-center  cursor-pointer mr-2 w-[110px] h-[50px] bg-[#7152F3] rounded-md font-lexend font-light text-[#fff]"
+                            onClick={()=>setIsDark(false)}>
                             <p className="mr-2 text-lg"><CiLight /></p>Light
                         </div>
-                        <div className="flex justify-center items-center w-[110px] h-[50px] bg-[#fff] rounded-md font-lexend font-light text-[#000]">
+                        <div className="flex justify-center items-center  cursor-pointer w-[110px] h-[50px] bg-[#fff] rounded-md font-lexend font-light text-[#000]"
+                            onClick={()=>setIsDark(true)}>
                             <p className="mr-2 text-lg"><MdOutlineDarkMode /></p>Dark
                         </div>
                     </div>

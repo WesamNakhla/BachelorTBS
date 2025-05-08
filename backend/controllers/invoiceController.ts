@@ -30,7 +30,7 @@ export const getInvoices = async (req: Request, res: Response, next: NextFunctio
 export const createInvoice = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   console.log("invoice endpoint is working");
   try {
-    const { customer, amount, status, date } = req.body;
+    const { customer, status, date } = req.body;
     //get the id of the customer with the help of the customer name
     let customer_name = await Customer.findOne({ customer: customer }).select("_id").exec();
     if(!customer_name){
@@ -43,7 +43,6 @@ export const createInvoice = async (req: Request, res: Response, next: NextFunct
     const data = {
       invoiceNumber: GenerateRandomID(),
       customer: customer_name._id,
-      amount: amount,
       status: status,
       date: date
     }
@@ -71,7 +70,6 @@ export const updateInvoice = async (req: Request, res: Response, next: NextFunct
   const { invoiceNumber, customer, amount, status, date  } = req.body;
   const updatedData = {
     customer: customer,
-    amount: amount,
     status: status,
     date: date
   }

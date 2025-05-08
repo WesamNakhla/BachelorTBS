@@ -4,7 +4,6 @@ import mongoose, { Schema, Document } from "mongoose";
 interface IInvoice extends Document {
   invoiceNumber: string;
   customer: mongoose.Types.ObjectId;
-  amount: number;
   status: string;
   date: Date;
 }

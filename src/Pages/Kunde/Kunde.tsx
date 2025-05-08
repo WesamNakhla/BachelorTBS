@@ -185,7 +185,7 @@ const Kunde = ()=>{
                                 <FormInput 
                                     type="text" 
                                     label="Customer Name"  
-                                    placeholder="Siyabend" 
+                                    placeholder="Name" 
                                     onChange={handleCustomer}
                                     value={isUpdating ? customersUpdate.customer : customers.customer}
                                     name="customer" />
@@ -198,10 +198,10 @@ const Kunde = ()=>{
                                     name="type" />
                             </div>
                             <div className="flex ">
-                                <FormInput 
+                                <FormInput
                                     type="text" 
                                     label="Contact Person"  
-                                    placeholder="Goccu" 
+                                    placeholder="Contact Person" 
                                     onChange={handleCustomer}
                                     value={isUpdating ? customersUpdate.contact_person : customers.contact_person}
                                     name="contact_person" />

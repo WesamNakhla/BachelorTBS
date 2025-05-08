@@ -14,13 +14,11 @@ import axiosInstance  from "../../utils/api";
 interface AllInvoices{
     invoiceNumber: string,
     customer: string,
-    amount: number,
     status: string,
     date: Date
 }
 interface Invoice{
     customer: string,
-    amount: number,
     status: string,
     date: Date
 }
@@ -32,14 +30,12 @@ const Faktura = ()=>{
     const [ dataToUpdate, setDataToUpdate ] = useState<AllInvoices>({
         invoiceNumber: "",
         customer: "",
-        amount: 0,
         status: "",
         date: new Date()
     });
     const [ allInvoices, setAllInvoices ] = useState<AllInvoices[]>([]);
     const [ invoice, setInvoice ] = useState<Invoice>({
         customer: "",
-        amount: 0,
         status: "",
         date: new Date()
     });
@@ -54,7 +50,6 @@ const Faktura = ()=>{
                     return {
                         invoiceNumber: data.invoiceNumber,
                         customer: data.customer.customer,
-                        amount: data.amount,
                         status: data.status,
                         date: data.date
                     }
@@ -142,7 +137,6 @@ const Faktura = ()=>{
                     <thead>
                         <tr>
                             <th>Invoice ID</th>
-                            <th>Invoice name</th>
                             <th>Customer</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -155,8 +149,7 @@ const Faktura = ()=>{
                                         <tr className="border-1 border-[#A2A1A8]/10" key={data.invoiceNumber}>
                                             <td className="py-4">{data.invoiceNumber}</td>
                                             <td className="py-4">{data.customer}</td>
-                                            <td className="py-4">{ data.amount }</td>
-                                            <td className="py-4">
+                                            <td className="py-4 text-center w-auto pl-16">
                                                 <p className={
                                                     (data.status === "paid") ? "flex items-center justify-center bg-[#7152F3]/10 text-[#4DF410] rounded-md w-[70px] h-[30px] text-sm"
                                                     : (data.status === "expired") ? "flex items-center justify-center bg-[#7152F3]/10 text-[#FA1533] rounded-md w-[70px] h-[30px] text-sm"
@@ -165,7 +158,7 @@ const Faktura = ()=>{
                                                     {data.status}
                                                 </p>
                                             </td>
-                                            <td className="flex py-4 text-lg cursor-pointer">
+                                            <td className="flex text-right py-4 text-lg cursor-pointer pl-10">
                                                 <p><IoEyeOutline /></p>
                                                 <p className="mx-4" onClick={()=>{
                                                     setDataToUpdate(data);
@@ -208,7 +201,7 @@ const Faktura = ()=>{
                                 <FormInput 
                                     type="text" 
                                     label="Status"  
-                                    placeholder="Paid" 
+                                    placeholder="Awaiting" 
                                     onChange={handleInvoice}
                                     value={isUpdating ? dataToUpdate.status : invoice.status}
                                     name="status" />

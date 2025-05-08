@@ -52,7 +52,7 @@ const Profiler = ()=>{
                             {
                                 allCustomer.map(data=>(
                                     <tr className="border-1 border-[#A2A1A8]/10">
-                                        <td className="py-4 cursor-pointer" onClick={()=>navigate(`/Profiler/${data.customer}`, { replace: true })}>{data.customer}</td>
+                                        <td className="py-4 cursor-pointer" onClick={()=>navigate(`/Inventory/${data.customer}`, { replace: true })}>{data.customer}</td>
                                         <td className="flex py-4 text-lg cursor-pointer">
                                             <p><IoEyeOutline /></p>
                                             

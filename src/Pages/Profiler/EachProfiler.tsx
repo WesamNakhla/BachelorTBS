@@ -204,7 +204,7 @@ const EachProfiler = ()=>{
                                 <FormInput 
                                     type="text" 
                                     label="Sender"  
-                                    placeholder="Siyabend" 
+                                    placeholder="sender" 
                                     onChange={handleInventory}
                                     value={isUpdating ? inventoryUpdate.sender : inventory.sender}
                                     name="sender" />
@@ -214,7 +214,7 @@ const EachProfiler = ()=>{
                                 <FormInput 
                                     type="text" 
                                     label="Goods"  
-                                    placeholder="Soap" 
+                                    placeholder="Fish" 
                                     onChange={handleInventory}
                                     value={isUpdating ? inventoryUpdate.goods : inventory.goods}
                                     name="goods" />
@@ -234,7 +234,7 @@ const EachProfiler = ()=>{
                                 <FormInput 
                                     type="text" 
                                     label="Weight"  
-                                    placeholder="23lbs" 
+                                    placeholder="23kg" 
                                     onChange={handleInventory}
                                     value={isUpdating ? inventoryUpdate.weight : inventory.weight}
                                     name="weight" />
