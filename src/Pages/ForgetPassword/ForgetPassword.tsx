@@ -1,26 +1,39 @@
-import { useState } from "react";
-import FormInput from "../../Components/FormInput/FormInput";
+
+
+import React, { useState } from "react";
 import { toast } from "react-toastify";
-import axiosInstances from "../../utils/api";
 import { useNavigate } from "react-router-dom";
+import axiosInstances from "../../utils/api";
+import {
+  ForgotWrapper,
+  ForgotTitle,
+  Form,
+  Input,
+  SubmitButton,
+  BackLink,
+} from "../../styles/ForgotPasswordStyles";
 
 interface forgetPassword {
     email: string,
 }
-const Login = ()=>{
+const ForgotPassword: React.FC = () => {
     const [ forgetPassword, setForgetPassword ]  = useState<forgetPassword>({
         email: ""
     });
-    const [ loading, setLoading ] = useState<boolean>(false);
-    const navigate = useNavigate();
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+
+
+      const handleChange = (e: React.ChangeEvent<HTMLInputElement>)=>{
         const { name, value } = e.target;
         setForgetPassword((prev)=>({
             ...prev,
             [name]: value
         }))
     }
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>)=>{
+
+     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>)=>{
         e.preventDefault();
         setLoading(true);
         try{
@@ -43,33 +56,27 @@ const Login = ()=>{
             toast.error(err.response?.data?.message || "An error occured");
         } 
     }
-    return (
-        <>
-            <div className="flex flex-col h-[1000px]">
-                <div className="flex items-center font-bold text-[#fff] w-[100%] h-[50px] p-10 text-lg bg-[#112147]">
-                    <h3>TBS</h3>
-                </div>
-                <form className="flex flex-col  items-center h-full mt-20" onSubmit={handleSubmit}>
-                    <div className="w-1/2">
-                        <FormInput 
-                            type="email"
-                            label="Email" 
-                            placeholder="Enter your email"
-                            value={forgetPassword.email}
-                            onChange={handleChange}
-                            name="email"
-                        />
-                    </div>
 
-                    <button type="submit" className="bg-[#66B2FF] cursor-pointer rounded-full text-[#fff] font-bold  w-[200px] h-[50px]">
-                        { loading ? "Loading..." : "Send" }
-                    </button>
-                </form>
-                <div className="w-[100%] h-[50px] bg-[#112147]">
+  return (
+    <ForgotWrapper>
+      <Form onSubmit={handleSubmit}>
+        <ForgotTitle>Forgot Password</ForgotTitle>
+        <Input
+          type="email"
+          placeholder="Enter your email"
+          value={forgetPassword.email}
+          onChange={handleChange}
+          required
+        />
+        <SubmitButton type="submit" disabled={loading}>
+          {loading ? "Sending..." : "Send Reset Link"}
+        </SubmitButton>
+        <BackLink onClick={() => navigate("/auth/login")}>
+          Back to Login
+        </BackLink>
+      </Form>
+    </ForgotWrapper>
+  );
+};
 
-                </div>
-            </div>
-        </>
-    );
-}
-export default Login;
+export default ForgotPassword;
