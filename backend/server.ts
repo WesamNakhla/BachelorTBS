@@ -1,48 +1,77 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./config/db";
 
-// Load environment variables
+// Load environment variables from .env file
 dotenv.config();
 
-// Connect to MongoDB
-connectDB();
-
-// Initialize Express app
 const app = express();
-
-// Middleware setup
-app.use(express.json()); // Parse JSON requests
-app.use(cors({ credentials: true, origin: "http://localhost:5173" })); // Allow frontend requests
-app.use(cookieParser()); // Parse cookies
-
-// Import routes
-import authRoutes from "./routes/authRoutes";
-import userRoutes from "./routes/userRoutes";
-import customerRoutes from "./routes/customerRoutes";
-import invoiceRoutes from "./routes/invoiceRoutes";
-import reportRoutes from "./routes/reportRoutes";
-import securityRoutes from "./routes/securityRoutes";
-import notificationRoutes from "./routes/notificationRoutes";
-
-// Use routes
-app.use("/api/auth", authRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/customers", customerRoutes);
-app.use("/api/invoices", invoiceRoutes);
-app.use("/api/reports", reportRoutes);
-app.use("/api/security", securityRoutes);
-app.use("/api/notifications", notificationRoutes);
-
-// Root API endpoint
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
-// Start server
 const PORT = process.env.PORT || 5000;
+
+// ... your routes and middleware
+    // Middleware: Parse incoming JSON requests
+    app.use(express.json());
+
+    // Middleware: Parse cookies
+    app.use(cookieParser());
+
+    // Middleware: Enable CORS for frontend requests
+    const allowedOrigins = ["http://localhost:5173"];
+    app.use(
+      cors({
+        origin: allowedOrigins,
+        credentials: true,
+        methods: ["GET", "POST", "PUT", "DELETE"],
+        allowedHeaders: ["Content-Type", "Authorization"],
+      })
+    );
+
+    // Route modules
+    const routes = [
+      { path: "/api/auth", module: "./routes/authRoutes" },
+      { path: "/api/users", module: "./routes/userRoutes" },
+      { path: "/api/customers", module: "./routes/customerRoutes" },
+      { path: "/api/invoices", module: "./routes/invoiceRoutes" },
+      { path: "/api/reports", module: "./routes/reportRoutes" },
+      { path: "/api/security", module: "./routes/securityRoutes" },
+      { path: "/api/notifications", module: "./routes/notificationRoutes" },
+    ];
+
+    // Load routes dynamically
+    routes.forEach(({ path, module }) => {
+      try {
+        const routeModule = require(module).default;
+        if (routeModule) {
+          app.use(path, routeModule);
+          console.log(`✅ Route loaded: ${path}`);
+        }
+      } catch (error) {
+        if (error instanceof Error) {
+          console.error(`❌ Error loading route ${path}:`, error.message);
+        } else {
+          console.error(`❌ Unknown error loading route ${path}:`, error);
+        }
+      }
+    });
+
+    // Root endpoint
+    app.get("/", (req: Request, res: Response) => {
+      res.json({ message: "✅ API is running" });
+    });
+
+    // Global error handler
+    app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+      if (err instanceof Error) {
+        console.error("❌ Internal server error:", err.message);
+      } else {
+        console.error("❌ Unknown error:", err);
+      }
+      res.status(500).json({ error: "Internal Server Error" });
+    });
+
+// Start the server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
